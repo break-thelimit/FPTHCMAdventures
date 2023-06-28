@@ -36,12 +36,12 @@ namespace DataAccess
             {
                 using (var context = new FPTHCMAdventuresDBContext())
                 {
-                   // tasks = context.Tasks.Include(prop => prop.EventTasks);
+                    tasks = context.Tasks.Include(l=>l.Location).Include(m=>m.Major).Include(n=>n.Npc).ToList();
                 }
             }
             catch(Exception ex)
             {
-                throw new Exception("Error at GetTasks: "+ex);
+                throw new Exception("Error at GetAllTasks: "+ex);
             }
             return tasks;
         }
@@ -82,11 +82,13 @@ namespace DataAccess
         {
             try
             {
-
+                var context = new FPTHCMAdventuresDBContext();
+                task.Id = Guid.NewGuid();
+                context.Tasks.Update(task);
             }
             catch (Exception ex)
             {
-                throw new Exception("Error at CreateNewTask: " + ex.Message);
+                throw new Exception("Error at UpdateTask: " + ex.Message);
             }
             return task;
 
