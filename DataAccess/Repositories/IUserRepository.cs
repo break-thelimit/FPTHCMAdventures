@@ -12,5 +12,7 @@ namespace DataAccess.Repositories
         IEnumerable<User> GetUsers();
         User UpdateUser(User user);
         IEnumerable<User> GetUserBySchool(String schoolname);
+        bool CreateAccount(string role, User newAccount);
+        User GetUserById(Guid id);
     }
 }
