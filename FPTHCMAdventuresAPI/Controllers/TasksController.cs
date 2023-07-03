@@ -8,6 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using BusinessObjects.Model;
 using DataAccess.Repositories;
 using Microsoft.Extensions.Configuration;
+using AutoMapper;
+using Service.Services.EventService;
+using Service.Services.TaskService;
+using DataAccess.Dtos.EventDto;
+using Service;
+using DataAccess.Dtos.TaskDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
@@ -15,15 +21,20 @@ namespace FPTHCMAdventuresAPI.Controllers
     [ApiController]
     public class TasksController : ControllerBase
     {
+        private readonly ITaskService _taskService;
+        private readonly IMapper _mapper;
+
         ITaskRepository taskRepository = new TaskRepository();
         private readonly IConfiguration Configuration;
-        public TasksController(IConfiguration config)
+        public TasksController(IConfiguration config,ITaskService taskService,IMapper mapper)
         {
             Configuration = config;
+            _taskService = taskService;
+            _mapper = mapper;
         }
 
         // GET: api/Tasks
-        [HttpGet]
+/*        [HttpGet]
         public JsonResult GetTasks()
         {
             IEnumerable<BusinessObjects.Model.Task> list = taskRepository.GetTasks();
@@ -92,6 +103,52 @@ namespace FPTHCMAdventuresAPI.Controllers
                     status = 406, // created failed with invalid input value!
                     message = "This task has existed in system!"
                 });
+            }
+        }
+*/
+        [HttpGet(Name = "GetTaskList")]
+
+        public async Task<ActionResult<ServiceResponse<GetTaskDto>>> GetEventList()
+        {
+            try
+            {
+                var res = await _taskService.GetTask();
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        [HttpPost("task", Name = "CreateNewTask")]
+
+        public async Task<ActionResult<ServiceResponse<TaskDto>>> CreateNewEvent(CreateTaskDto taskDto)
+        {
+            try
+            {
+                var res = await _taskService.CreateNewTask(taskDto);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        [HttpPut("{id}")]
+
+        public async Task<ActionResult<ServiceResponse<TaskDto>>> CreateNewEvent(Guid id, [FromBody] UpdateTaskDto updateTaskDto)
+        {
+            try
+            {
+                var res = await _taskService.UpdateTask(id, updateTaskDto);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
     }

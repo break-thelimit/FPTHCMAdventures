@@ -28,7 +28,10 @@ namespace DataAccess
                 return instance;
             }
         }
-
+       /* public async Task<List<BusinessObjects.Model.Task>> GetAllAsync()
+        {
+            return await _context.Cinemas.ToListAsync();
+        }*/
         public IEnumerable<BusinessObjects.Model.Task> GetTasks()
         {
             List<BusinessObjects.Model.Task> tasks = new List<BusinessObjects.Model.Task>();

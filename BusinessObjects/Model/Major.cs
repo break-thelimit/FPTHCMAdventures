@@ -9,15 +9,15 @@ namespace BusinessObjects.Model
     {
         public Major()
         {
+            Questions = new HashSet<Question>();
             Tasks = new HashSet<Task>();
         }
 
         public Guid Id { get; set; }
-        public Guid? QuestionId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
 
-        public virtual Question Question { get; set; }
+        public virtual ICollection<Question> Questions { get; set; }
         public virtual ICollection<Task> Tasks { get; set; }
     }
 }

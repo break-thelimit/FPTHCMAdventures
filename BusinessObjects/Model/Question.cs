@@ -10,15 +10,15 @@ namespace BusinessObjects.Model
         public Question()
         {
             Answers = new HashSet<Answer>();
-            Majors = new HashSet<Major>();
+            Npcs = new HashSet<Npc>();
         }
 
         public Guid Id { get; set; }
-        public Guid? NpcId { get; set; }
         public string QuestionName { get; set; }
+        public Guid? MajorId { get; set; }
 
-        public virtual Npc Npc { get; set; }
+        public virtual Major Major { get; set; }
         public virtual ICollection<Answer> Answers { get; set; }
-        public virtual ICollection<Major> Majors { get; set; }
+        public virtual ICollection<Npc> Npcs { get; set; }
     }
 }
