@@ -8,6 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using BusinessObjects.Model;
 using DataAccess.Repositories;
 using Microsoft.Extensions.Configuration;
+using Service;
+using System.Net;
+using Service.Services.EventService;
+using AutoMapper;
+using DataAccess.Dtos.EventDto;
+using DataAccess.Exceptions;
 
 namespace XavalorAdventuresAPI.Controllers
 {
@@ -15,13 +21,19 @@ namespace XavalorAdventuresAPI.Controllers
     [ApiController]
     public class EventsController : ControllerBase
     {
+        private readonly IEventService _eventService;
+        private readonly IMapper _mapper;
+
         IEventRepository eventRepository = new EventRepository();
         private readonly IConfiguration Configuration;
-        public EventsController(IConfiguration config)
+        public EventsController(IMapper mapper, IConfiguration config,IEventService eventService)
         {
-            Configuration = config;
-        }
+            this._mapper = mapper;
 
+            Configuration = config;
+            _eventService = eventService;
+        }
+/*
         // GET: api/Events
         [HttpGet]
         public JsonResult GetEvents()
@@ -33,7 +45,7 @@ namespace XavalorAdventuresAPI.Controllers
             });
         }
 
-/*        // GET: api/Events/5
+*//*        // GET: api/Events/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Event>> GetEvent(Guid id)
         {
@@ -45,7 +57,7 @@ namespace XavalorAdventuresAPI.Controllers
             }
 
             return @event;
-        }*/
+        }*//*
 
         // PUT: api/Events/5
         [HttpPut]
@@ -92,6 +104,61 @@ namespace XavalorAdventuresAPI.Controllers
                     status = 406,
                     message = "Created failed!"
                 });
+            }
+        }
+*/
+
+        //Phan cua kiet
+        [HttpGet(Name = "GetEventList")]
+        
+        public async Task<ActionResult<ServiceResponse<GetEventDto>>> GetEventList()
+        {
+            try
+            {
+                var res = await _eventService.GetEvent();
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<EventDto>> GetEventById(Guid id)
+        {
+            var eventDetail = await _eventService.GetEventById(id);
+            return Ok(eventDetail);
+        }
+
+        [HttpPost("event", Name = "CreateNewEvent")]
+
+        public async Task<ActionResult<ServiceResponse<EventDto>>> CreateNewEvent(CreateEventDto eventDto)
+        {
+            try
+            {
+                var res = await _eventService.CreateNewEvent(eventDto);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        } 
+        [HttpPut("{id}")]
+
+        public async Task<ActionResult<ServiceResponse<EventDto>>> CreateNewEvent(Guid id, [FromBody] UpdateEventDto eventDto)
+        {
+            try
+            {
+                var res = await _eventService.UpdateEvent(id, eventDto);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
     }

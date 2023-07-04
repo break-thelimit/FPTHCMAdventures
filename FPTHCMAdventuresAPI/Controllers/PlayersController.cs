@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using DataAccess.Dtos.PlayerHistoryDto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BusinessObjects.Model;
-using DataAccess.Repositories;
-using Microsoft.Extensions.Configuration;
+using Service.Services.PlayerHistoryService;
+using Service;
+using System.Threading.Tasks;
+using System;
+using Service.Services.PlayerService;
+using DataAccess.Dtos.PlayerDto;
+
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
@@ -15,90 +16,66 @@ namespace FPTHCMAdventuresAPI.Controllers
     [ApiController]
     public class PlayersController : ControllerBase
     {
-        IPlayerRepository playerRepository = new PlayerRepository();
-        private readonly IConfiguration Configuration;
+        private readonly IPlayerService _playerService;
+        private readonly IMapper _mapper;
 
-        public PlayersController(IConfiguration config)
+        public PlayersController(IMapper mapper, IPlayerService playerService)
         {
-            Configuration = config;
+            this._mapper = mapper;
+            _playerService = playerService;
         }
 
-        // GET: api/Players
-        [HttpGet]
-        public JsonResult GetPlayers()
+
+        [HttpGet(Name = "GetPlayer")]
+
+        public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> GetPlayerList()
         {
-            IEnumerable<Player> list = playerRepository.GetPlayers();
-            return new JsonResult(new
-            {
-                result = list
-            });
-        }
-
-        // GET: api/Players/5
-        [HttpGet("getplayer/{playerid}")]
-        public JsonResult GetPlayer(Guid id)
-        {
-            Player player = playerRepository.GetPlayerByID(id);
-            return new JsonResult(new
-            {
-                result = player
-            });
-        }
-
-        // PUT: api/Players/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-/*        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPlayer(Guid id, Player player)
-        {
-            if (id != player.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(player).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                var res = await _playerService.GetPlayer();
+                return Ok(res);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!PlayerExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return StatusCode(500, "Internal server error: " + ex.Message);
             }
-
-            return NoContent();
-        }*/
-
-        // POST: api/Players
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("addnewplayer/{playerid}")]
-        public JsonResult CreatePlayer(Guid id)
+        }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PlayerDto>> GetPlayerById(Guid id)
         {
-            Player tmp = playerRepository.AddNewPlayer(id);
-            if (tmp != null)
-            {
-                return new JsonResult(new
-                {
-                    status = 200, // created successfully!
-                    player_id = tmp.Id,
-                    message = "Created successfully!"
-                });
-            }
+            var eventDetail = await _playerService.GetPlayerById(id);
+            return Ok(eventDetail);
+        }
 
-            else
+        [HttpPost("player", Name = "CreateNewPlayer")]
+
+        public async Task<ActionResult<ServiceResponse<PlayerDto>>> CreateNewPlayer(CreatePlayerDto answerDto)
+        {
+            try
             {
-                return new JsonResult(new
-                {
-                    status = 406, // created failed with invalid input value!
-                    message = "This player has existed in system!"
-                });
+                var res = await _playerService.CreateNewPlayer(answerDto);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        [HttpPut("{id}")]
+
+        public async Task<ActionResult<ServiceResponse<PlayerDto>>> UpdatePlayer(Guid id, [FromBody] UpdatePlayerDto eventDto)
+        {
+            try
+            {
+                var res = await _playerService.UpdatePlayer(id, eventDto);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+
             }
         }
     }

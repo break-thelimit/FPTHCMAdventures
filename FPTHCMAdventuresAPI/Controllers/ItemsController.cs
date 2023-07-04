@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using DataAccess.Dtos.ItemInventoryDto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BusinessObjects.Model;
-using DataAccess.Repositories;
-using Microsoft.Extensions.Configuration;
+using Service.Services.ItemInventoryService;
+using Service;
+using System.Threading.Tasks;
+using System;
+using Service.Services.ItemService;
+using DataAccess.Dtos.ItemDto;
+
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
@@ -15,82 +16,66 @@ namespace FPTHCMAdventuresAPI.Controllers
     [ApiController]
     public class ItemsController : ControllerBase
     {
-        IITemRepository itemRepository = new ItemRepository();
-        private readonly IConfiguration Configuration;
+        private readonly IItemService _itemService;
+        private readonly IMapper _mapper;
 
-        public ItemsController(IConfiguration config)
+        public ItemsController(IMapper mapper, IItemService itemService)
         {
-            Configuration = config;
+            this._mapper = mapper;
+            _itemService = itemService;
         }
 
-        // GET: api/Items
-        [HttpGet]
-        public JsonResult GetItems()
-        {
-            IEnumerable<Item> list = itemRepository.GetItems();
-            return new JsonResult(new
-            {
-                result = list
-            });
-        }
 
-        // GET: api/Items/5
-        [HttpGet("getitem/{itemid}")]
-        public JsonResult GetItem(Guid id)
-        {
-            Item item = itemRepository.GetItemByID(id);
-            return new JsonResult(new
-            {
-                result = item
-            });
-        }
+        [HttpGet(Name = "GetItem")]
 
-        // PUT: api/Items/5
-        [HttpPut]
-        public JsonResult UpdateItem([FromForm] Item item)
+        public async Task<ActionResult<ServiceResponse<GetItemDto>>> GetItemList()
         {
-            Item tmp = itemRepository.UpdateItem(item);
-            if (tmp != null)
+            try
             {
-                return new JsonResult(new
-                {
-                    status = 200, // updated successfully!
-                    item_id = tmp.Id,
-                    message = "Updated successfully!"
-                });
+                var res = await _itemService.GetItem();
+                return Ok(res);
             }
-            else
+            catch (Exception ex)
             {
-                return new JsonResult(new
-                {
-                    status = 406, // updated failed with invalid input value!
-                    message = "This item hasn't existed in system!"
-                });
+                return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-
-        // POST: api/Items
-        [HttpPost]
-        public JsonResult CreateItem([FromForm] Item item)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ItemDto>> GetItemById(Guid id)
         {
-            Item tmp = itemRepository.CreateItem(item);
-            if (tmp != null)
-            {
-                return new JsonResult(new
-                {
-                    status = 200, // created successfully!
-                    item_id = tmp.Id,
-                    message = "Created successfully!"
-                });
-            }
+            var eventDetail = await _itemService.GetItemById(id);
+            return Ok(eventDetail);
+        }
 
-            else
+        [HttpPost("item", Name = "CreateNewItem")]
+
+        public async Task<ActionResult<ServiceResponse<ItemDto>>> CreateNewItem(CreateItemDto answerDto)
+        {
+            try
             {
-                return new JsonResult(new
-                {
-                    status = 406, // created failed with invalid input value!
-                    message = "This item has existed in system!"
-                });
+                var res = await _itemService.CreateNewItem(answerDto);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        [HttpPut("{id}")]
+
+        public async Task<ActionResult<ServiceResponse<ItemDto>>> UpdateItem(Guid id, [FromBody] UpdateItemDto eventDto)
+        {
+            try
+            {
+                var res = await _itemService.UpdateItem(id, eventDto);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+      
             }
         }
     }

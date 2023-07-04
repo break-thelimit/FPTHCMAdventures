@@ -14,5 +14,6 @@ namespace DataAccess.Repositories
         public IEnumerable<BusinessObjects.Model.Task> GetTasks() => TaskDAO.Instance.GetTasks();
 
         public BusinessObjects.Model.Task CreateTask(BusinessObjects.Model.Task task) => TaskDAO.Instance.UpdateTask(task);
+
     }
 }

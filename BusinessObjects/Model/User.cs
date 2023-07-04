@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
 
 namespace BusinessObjects.Model
 {
-    public partial class User
+    public partial class User : IdentityUser
     {
         public User()
         {
