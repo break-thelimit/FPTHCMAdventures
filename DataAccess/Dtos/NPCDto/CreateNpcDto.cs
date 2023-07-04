@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.NPCDto
 {
-    internal class CreateNpcDto
+    public class CreateNpcDto : BaseNpcDto
     {
     }
 }

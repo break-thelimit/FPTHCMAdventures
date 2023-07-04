@@ -24,19 +24,7 @@ namespace DataAccess.Repositories.EventRepositories
             _mapper = mapper;
         }
 
-        public async Task<EventDto> GetDetailEvents(Guid id)
-        {
-            var country = await _dbContext.Events.Include(q => q.EventTasks).Include(a => a.SchoolEvents)
-                .ProjectTo<EventDto>(_mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync(q => q.Id == id);
-
-            if (country == null)
-            {
-                throw new NotFoundException(nameof(GetDetailEvents), id);
-            }
-
-            return country;
-        }
+       
     }
 }
 

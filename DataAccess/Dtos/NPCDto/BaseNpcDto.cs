@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.NPCDto
 {
-    internal class BaseNpcDto
+    public abstract class BaseNpcDto
     {
+        public string NpcName { get; set; }
+        public string Introduce { get; set; }
+        public Guid? QuestionId { get; set; }
     }
 }

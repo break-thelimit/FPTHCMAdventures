@@ -14,12 +14,12 @@ namespace FPTHCMAdventuresAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MajorsController : ControllerBase
+    public class MajorController : ControllerBase
     {
         private readonly IMajorService _majorService;
         private readonly IMapper _mapper;
 
-        public MajorsController(IMapper mapper, IMajorService majorService)
+        public MajorController(IMapper mapper, IMajorService majorService)
         {
             this._mapper = mapper;
             _majorService = majorService;
@@ -28,7 +28,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpGet(Name = "GetMajorList")]
 
-        public async Task<ActionResult<ServiceResponse<GetEventTaskDto>>> GetEventTaskList()
+        public async Task<ActionResult<ServiceResponse<GetMajorDto>>> GetEventTaskList()
         {
             try
             {

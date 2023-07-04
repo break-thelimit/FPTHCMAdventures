@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.NPCDto
 {
-    internal class UpdateNpcDto
+    public class UpdateNpcDto : BaseNpcDto, IBaseDto
     {
+        public Guid Id { get; set; }
     }
 }

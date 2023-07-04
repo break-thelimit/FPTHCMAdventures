@@ -8,6 +8,7 @@ namespace DataAccess.Dtos.EventDto
 {
     public abstract class BaseEventDto
     {
+        public Guid? RankId { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public string Status { get; set; }

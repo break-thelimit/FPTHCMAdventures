@@ -15,7 +15,8 @@ namespace DataAccess.GenericRepositories
         Task<IEnumerable<T>> GetAllWithCondition(Expression<Func<T, bool>> expression = null, List<Expression<Func<T, object>>> includes = null, Expression<Func<T, int>> orderBy = null, bool disableTracking = true);
 
         Task<IEnumerable<T>> GetAllWithPagination(Expression<Func<T, bool>> expression = null, List<Expression<Func<T, object>>> includes = null, Expression<Func<T, int>> orderBy = null, bool disableTracking = true, int? page = null, int? pageSize = null);
-
+        Task AddRangeAsync(List<T> entities);
+        Task<int> SaveChangesAsync();
         Task<int> CountAll(Expression<Func<T, bool>> expression = null);
         Task<T> GetById(object id);
         Task<T> GetByWithCondition(Expression<Func<T, bool>> expression = null, List<Expression<Func<T, object>>> includes = null, bool disableTracking = true);

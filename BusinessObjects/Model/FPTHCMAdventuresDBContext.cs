@@ -46,7 +46,7 @@ namespace BusinessObjects.Model
             var builder = new ConfigurationBuilder()
                              .SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             IConfigurationRoot configuration = builder.Build();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("CapstonProjectDbConnectionString"));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -18,5 +18,6 @@ namespace DataAccess.Dtos.TaskDto
         public int? Point { get; set; }
         public string Type { get; set; }
         public string Status { get; set; }
+
     }
 }

@@ -48,23 +48,22 @@ namespace DataAccess.Repositories.UserRepositories
 
         public async Task<BaseResponse<AuthResponseDto>> Login(LoginDto loginDto)
         {
+            var adminEmail = _configuration.GetSection("DefaultAccount").GetSection("Email").Value;
+            var adminPassowrd = _configuration.GetSection("DefaultAccount").GetSection("Password").Value;
             _logger.LogInformation($"Looking for user with email {loginDto.Email}");
             _user = await _userManager.FindByEmailAsync(loginDto.Email);
             bool isValidUser = await _userManager.CheckPasswordAsync(_user, loginDto.Password);
-            var adminEmail = _configuration.GetSection("DefaultAccount").GetSection("Email").Value;
-            var adminPassowrd = _configuration.GetSection("DefaultAccount").GetSection("Password").Value;
+            
+            Console.Write(adminEmail + adminPassowrd);
             var response = new BaseResponse<AuthResponseDto>();
-
-
-
-            if (_user == null || isValidUser == false)
+            if (loginDto.Email.Equals(adminEmail) && loginDto.Password.Equals(adminPassowrd))
+            {
+                return GenerateTokenForAdminNotManagedByIdentity(response, adminEmail);
+            }
+            else if (_user == null || isValidUser == false)
             {
                 _logger.LogWarning($"User with email {loginDto.Email} was not found");
                 return null;
-            }
-            else if (loginDto.Email.Equals(adminEmail) && loginDto.Password.Equals(adminPassowrd))
-            {
-                return GenerateTokenForAdminNotManagedByIdentity(response, adminEmail);
             }
             else
             {
@@ -148,8 +147,8 @@ namespace DataAccess.Repositories.UserRepositories
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, _user.Email),
                 new Claim("uid", _user.Id.ToString()),
-            }
-            .Union(userClaims);
+            };
+            
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["JwtSettings:Issuer"],
@@ -167,8 +166,7 @@ namespace DataAccess.Repositories.UserRepositories
             var claims = new[]
             {
                     new Claim(JwtRegisteredClaimNames.Sub, adminEmail),
-                    new Claim(ClaimTypes.Name, adminEmail),
-                    new Claim(ClaimTypes.Role, "Admin")
+                    new Claim(ClaimTypes.Name, adminEmail)
                 };
 
             var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
@@ -195,6 +193,8 @@ namespace DataAccess.Repositories.UserRepositories
             };
             return response;
         }
+
+        
     }
 
 }

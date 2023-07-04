@@ -249,5 +249,15 @@ namespace DataAccess.GenericRepositories
             _dbContext.Update(entity);
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task AddRangeAsync(List<T> entities)
+        {
+            await _dbContext.Set<T>().AddRangeAsync(entities);
+        }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            return await _dbContext.SaveChangesAsync();
+        }
     }
 }

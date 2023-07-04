@@ -34,6 +34,40 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using DataAccess.Repositories.LocationRepositories;
+using DataAccess.Repositories.NPCRepository;
+using Service.Services.LocationServoce;
+using Service.Services.NpcService;
+using DataAccess.Repositories.RankRepositories;
+using DataAccess.Repositories.SchoolEventRepositories;
+using DataAccess.Repositories.SchoolRepositories;
+using DataAccess.Repositories.AnswerRepositories;
+using DataAccess.Repositories.InventoryRepositories;
+using DataAccess.Repositories.ItemRepositories;
+using DataAccess.Repositories.GiftRepositories;
+using DataAccess.Repositories.PlayerRepositories;
+using DataAccess.Repositories.PlayerHistoryRepositories;
+using DataAccess.Repositories.RoleRepositories;
+using DataAccess.Repositories.TaskItemRepositories;
+using DataAccess.Repositories.ExchangeHistoryRepositories;
+using Service.Services.RankService;
+using Service.Services.SchoolEventService;
+using Service.Services.SchoolService;
+using Service.Services.AnswerService;
+using Service.Services.InventoryService;
+using Service.Services.ItemService;
+using Service.Services.GiftService;
+using Service.Services.PlayerService;
+using Service.Services.PlayerHistoryService;
+using Service.Services.RoleService;
+using Service.Services.TaskItemService;
+using Service.Services.ExchangeHistoryService;
+using Service.Services.ItemInventoryService;
+using DataAccess.Repositories.ItemInventoryRepositories;
+using OfficeOpenXml;
+using ClosedXML.Excel;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 
 namespace XavalorAdventuresAPI
 {
@@ -78,6 +112,29 @@ namespace XavalorAdventuresAPI
             services.AddScoped<IMajorRepository, MajorRepository>();
             services.AddScoped<IQuestionRepository, QuestionRepository>();
             services.AddScoped<IAuthManager, AuthManager>();
+            services.AddScoped<ILocationRepository, LocationRepository>();
+            services.AddScoped<INpcRepository, NpcRepository>();
+            services.AddScoped<IRankRepository, RankRepository>();
+            services.AddScoped<ISchoolEventRepository, SchoolEventRepository>();
+            services.AddScoped<ISchoolRepository, SchoolRepository>();
+            services.AddScoped<IAnswerRepository, AnswerRepository>();
+            services.AddScoped<IItemInventoryRepositories, ItemInventoryRepositories>();
+            services.AddScoped<IItemRepository, ItemRepository>();
+            services.AddScoped<IInventoryRepository, InventoryRepository>();
+            services.AddScoped<IGiftRepository, GiftRepository>();
+            services.AddScoped<IPlayerRepository, PlayerRepository>();
+            services.AddScoped<IPlayerHistoryRepository, PlayerHistoryRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<ITaskItemRepository, TaskItemRepository>();
+            services.AddScoped<IExchangeHistoryRepository, ExchangeHistoryRepository>();
+
+            #region Excel
+            services.AddScoped<ExcelPackage>();
+            services.AddScoped<IXLWorkbook, XLWorkbook>();
+            services.AddScoped<IWorkbook, XSSFWorkbook>();
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            #endregion
+
             services.AddHttpContextAccessor();
 
 
@@ -120,7 +177,21 @@ namespace XavalorAdventuresAPI
             services.AddScoped<IEventTaskService, EventTaskService>();
             services.AddScoped<IMajorService, MajorService>();
             services.AddScoped<IQuestionService, QuestionService>();
-
+            services.AddScoped<ILocationService, LocationService>();
+            services.AddScoped<INpcService, NpcService>();
+            services.AddScoped<IRankService, RankService>();
+            services.AddScoped<ISchoolEventService, SchoolEventService>();
+            services.AddScoped<ISchoolService, SchoolService>();
+            services.AddScoped<IAnswerService, AnswerService>();
+            services.AddScoped<IItemInventoryService, ItemInventoryService>();
+            services.AddScoped<IItemService, ItemService>();
+            services.AddScoped<IInventoryService, InventoryService>();
+            services.AddScoped<IGiftService, GiftService>();
+            services.AddScoped<IPlayerService, PlayerService>();
+            services.AddScoped<IPlayerHistoryService, PlayerHistoryService>();
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<ITaskItemService, TaskItemService>();
+            services.AddScoped<IExchangeHistoryService, ExchangHistoryService>();
 
         }
 

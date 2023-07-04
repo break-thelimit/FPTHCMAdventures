@@ -11,7 +11,7 @@ namespace DataAccess.Repositories.EventRepositories
 {
     public interface IEventRepositories : IGenericRepository<Event>
     {
-        Task<EventDto> GetDetailEvents(Guid id);
+        
 
     }
 }
