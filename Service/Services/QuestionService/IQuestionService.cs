@@ -1,5 +1,6 @@
 ﻿using DataAccess.Dtos.MajorDto;
 using DataAccess.Dtos.QuestionDto;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,8 @@ namespace Service.Services.QuestionService
         Task<ServiceResponse<QuestionDto>> GetQuestionById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewQuestion(CreateQuestionDto createQuestionDto);
         Task<ServiceResponse<string>> UpdateQuestion(Guid id, UpdateQuestionDto questionDto);
+
+        Task<ServiceResponse<byte[]>> DownloadExcelTemplate();
+        Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file);
     }
 }

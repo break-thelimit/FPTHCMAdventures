@@ -13,5 +13,6 @@ namespace DataAccess.Dtos.Users
 
         public string Token { get; set; }
         public string RefreshToken { get; set; }
+
     }
 }

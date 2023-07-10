@@ -3,22 +3,7 @@
     "secrets1": {
       "restored": true,
       "restoreTime": "2023-06-10T13:07:05.0113333Z"
-    },
-    "mssql1": {
-      "restored": true,
-      "restoreTime": "2023-06-10T13:07:13.6101049Z"
     }
   },
-  "parameters": {
-    "mssql1.subscriptionId": {
-      "Name": "mssql1.subscriptionId",
-      "Type": "subscription",
-      "Value": "2f794b9c-b4d5-4967-9d78-63a5280b6e4c"
-    },
-    "mssql1.resourceGroupName": {
-      "Name": "mssql1.resourceGroupName",
-      "Type": "resourceGroup",
-      "Value": "db"
-    }
-  }
+  "parameters": {}
 }

@@ -3,9 +3,13 @@
     "secrets1": {
       "type": "secrets"
     },
+    "apis1": {
+      "type": "apis"
+    },
     "mssql1": {
       "type": "mssql",
-      "connectionId": "MyConnectionStrings"
+      "connectionId": "ConnectionStrings:CapstonProjectDbConnectionString",
+      "dynamicId": null
     }
   }
 }

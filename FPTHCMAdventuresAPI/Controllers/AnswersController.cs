@@ -10,9 +10,11 @@ using System;
 using DataAccess.Repositories.AnswerRepositories;
 using DataAccess.Dtos.AnswerDto;
 using Service.Services.AnswerService;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AnswersController : ControllerBase

@@ -14,6 +14,7 @@ using Service.Services.TaskService;
 using DataAccess.Dtos.EventDto;
 using Service;
 using DataAccess.Dtos.TaskDto;
+using DataAccess.Dtos.TaskItemDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
@@ -24,88 +25,13 @@ namespace FPTHCMAdventuresAPI.Controllers
         private readonly ITaskService _taskService;
         private readonly IMapper _mapper;
 
-        ITaskRepository taskRepository = new TaskRepository();
-        private readonly IConfiguration Configuration;
-        public TasksController(IConfiguration config,ITaskService taskService,IMapper mapper)
+        public TasksController(ITaskService taskService,IMapper mapper)
         {
-            Configuration = config;
             _taskService = taskService;
             _mapper = mapper;
         }
 
-        // GET: api/Tasks
-/*        [HttpGet]
-        public JsonResult GetTasks()
-        {
-            IEnumerable<BusinessObjects.Model.Task> list = taskRepository.GetTasks();
-            return new JsonResult(new
-            {
-                result = list
-            });
-        }
-
-        // GET: api/Tasks/5
-        [HttpGet("{id}")]
-        public JsonResult GetTask(Guid id)
-        {
-            BusinessObjects.Model.Task task = taskRepository.GetTaskByID(id);
-            return new JsonResult(new
-            {
-                result = task
-            });
-        }
-
-
-        // PUT: api/Tasks/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public JsonResult UpdateTask([FromForm] BusinessObjects.Model.Task task)
-        {
-            BusinessObjects.Model.Task tmp = taskRepository.CreateTask(task);
-            if (tmp != null)
-            {
-                return new JsonResult(new
-                {
-                    status = 200, // created successfully!
-                    product_id = tmp.Id,
-                    message = "Updated successfully!"
-                });
-            }
-            else
-            {
-                return new JsonResult(new
-                {
-                    status = 406, // created failed with invalid input value!
-                    message = "This task hasn't existed in system!"
-                });
-            }
-        }
-
-        // POST: api/Tasks
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public JsonResult CreateTask([FromForm] BusinessObjects.Model.Task task)
-        {
-            BusinessObjects.Model.Task tmp = taskRepository.CreateTask(task);
-            if (tmp != null)
-            {
-                return new JsonResult(new
-                {
-                    status = 200, // created successfully!
-                    task_id = tmp.Id,
-                    message = "Created successfully!"
-                });
-            }
-            else
-            {
-                return new JsonResult(new
-                {
-                    status = 406, // created failed with invalid input value!
-                    message = "This task has existed in system!"
-                });
-            }
-        }
-*/
+     
         [HttpGet(Name = "GetTaskList")]
 
         public async Task<ActionResult<ServiceResponse<GetTaskDto>>> GetEventList()
@@ -120,6 +46,12 @@ namespace FPTHCMAdventuresAPI.Controllers
 
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
+        }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TaskItemDto>> GetTaskById(Guid id)
+        {
+            var eventDetail = await _taskService.GetTaskById(id);
+            return Ok(eventDetail);
         }
         [HttpPost("task", Name = "CreateNewTask")]
 

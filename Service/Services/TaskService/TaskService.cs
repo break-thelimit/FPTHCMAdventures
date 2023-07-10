@@ -45,16 +45,17 @@ namespace Service.Services.TaskService
             };
         }
 
+        
+
         public async Task<ServiceResponse<IEnumerable<GetTaskDto>>> GetTask()
         {
-            var eventList = await _taskRepository.GetAllAsync();
-            var _mapper = config.CreateMapper();
-            var lstDto = _mapper.Map<List<GetTaskDto>>(eventList);
+            var eventList = await _taskRepository.GetAllAsync<GetTaskDto>();
+            
             if (eventList != null)
             {
                 return new ServiceResponse<IEnumerable<GetTaskDto>>
                 {
-                    Data = lstDto,
+                    Data = eventList,
                     Success = true,
                     Message = "Successfully",
                     StatusCode = 200
@@ -64,7 +65,7 @@ namespace Service.Services.TaskService
             {
                 return new ServiceResponse<IEnumerable<GetTaskDto>>
                 {
-                    Data = lstDto,
+                    Data = eventList,
                     Success = false,
                     Message = "Faile because List event null",
                     StatusCode = 200

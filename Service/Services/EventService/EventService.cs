@@ -2,11 +2,16 @@
 using BusinessObjects.Model;
 using DataAccess.Configuration;
 using DataAccess.Dtos.EventDto;
+using DataAccess.Dtos.LocationDto;
 using DataAccess.Exceptions;
 using DataAccess.Repositories.EventRepositories;
+using DataAccess.Repositories.RankRepositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -17,6 +22,7 @@ namespace Service.Services.EventService
     public class EventService : IEventService
     {
         private readonly IEventRepositories _eventRepository;
+        private readonly IRankRepository _rankRepository;
         private readonly IMapper _mapper;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
@@ -43,6 +49,7 @@ namespace Service.Services.EventService
                 StatusCode = 201
             };
         }
+       
 
         public async Task<ServiceResponse<IEnumerable<GetEventDto>>> GetEvent()
         {
@@ -108,6 +115,7 @@ namespace Service.Services.EventService
             }
         }
 
+       
         public async Task<ServiceResponse<string>> UpdateEvent(Guid id, UpdateEventDto eventDto)
         {
             if (id != eventDto.Id)
@@ -166,6 +174,164 @@ namespace Service.Services.EventService
         private async Task<bool> CountryExists(Guid id)
         {
             return await _eventRepository.Exists(id);
+        }
+
+
+        public async Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file)
+        {
+
+            if (file == null || file.Length <= 0)
+            {
+                return new ServiceResponse<string>
+                {
+                    Data = null,
+                    Message = "No file uploaded.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+
+            if (file.ContentType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            {
+                return new ServiceResponse<string>
+                {
+                    Data = null,
+                    Message = "Invalid file format. Only Excel files are allowed.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            try
+            {
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream);
+                    using (var package = new ExcelPackage(stream))
+                    {
+                        var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+                        if (worksheet != null)
+                        {
+                            var rowCount = worksheet.Dimension.Rows;
+                            var dataList = new List<EventDto>();
+                           
+                            for (int row = 2; row <= rowCount; row++)
+                            {
+                                var data = new EventDto
+                                {
+                                    Id = Guid.NewGuid(),
+                                    EventName = worksheet.Cells[row, 1].Value?.ToString(),
+                                    StartTime = Convert.ToDateTime(worksheet.Cells[row, 2].Value),
+                                    EndTime = Convert.ToDateTime(worksheet.Cells[row, 3].Value),
+                                    Status = worksheet.Cells[row, 4].Value?.ToString()
+
+                                };
+
+                                dataList.Add(data);
+                            }
+
+                            // Start from row 2 to skip the header row
+
+                            var mapper = config.CreateMapper();
+                            var locations = _mapper.Map<List<Event>>(dataList);
+                            await _eventRepository.AddRangeAsync(locations);
+                            await _eventRepository.SaveChangesAsync();
+
+                        }
+                    }
+                }
+                return new ServiceResponse<string>
+                {
+                    Data = "Upload successful.",
+                    Success = true,
+                    StatusCode = 200
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<string>
+                {
+                    Data = null,
+                    Message = "Failed to process uploaded file.",
+                    Success = false,
+                    StatusCode = 500
+                };
+            }
+        }
+        public byte[] GenerateExcelTemplate()
+        {
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("SampleDataEvent");
+
+                // Thiết lập header cho các cột
+                worksheet.Cells[1, 1].Value = "Event Name";
+                worksheet.Cells[1, 2].Value = "Start Time";
+                worksheet.Cells[1, 3].Value = "End Time";
+                worksheet.Cells[1, 4].Value = "Status";
+
+                // Thiết lập kiểm tra dữ liệu cho cột StartTime
+                var startTimeColumn = worksheet.Cells["B2"]; // Dòng 2
+
+                var startTimeValidation = startTimeColumn.DataValidation.AddCustomDataValidation();
+                startTimeValidation.ShowErrorMessage = true;
+                startTimeValidation.ErrorTitle = "Lỗi";
+                startTimeValidation.Error = "Vui lòng nhập ngày và giờ theo định dạng chính xác.";
+                startTimeValidation.Formula.ExcelFormula = "AND(ISNUMBER(B2), B2>=DATE(1900,1,1), B2<=DATE(9999,12,31))";
+
+                // Tạo dữ liệu mẫu cho cột StartTime
+                DateTime startTime = new DateTime(2023, 7, 4, 10, 30, 0); // Ví dụ: 2023-07-04 10:30:00 AM
+                worksheet.Cells[2, 2].Value = startTime.ToString("yyyy-MM-dd HH:mm:ss");
+
+                // Thiết lập kiểm tra dữ liệu cho cột EndTime
+                var endTimeColumn = worksheet.Cells["C2"]; // Dòng 2
+
+                var endTimeValidation = endTimeColumn.DataValidation.AddCustomDataValidation();
+                endTimeValidation.ShowErrorMessage = true;
+                endTimeValidation.ErrorTitle = "Lỗi";
+                endTimeValidation.Error = "Vui lòng nhập ngày và giờ theo định dạng chính xác.";
+                endTimeValidation.Formula.ExcelFormula = "AND(ISNUMBER(C2), C2>=DATE(1900,1,1), C2<=DATE(9999,12,31))";
+
+                // Tạo dữ liệu mẫu cho cột EndTime
+                DateTime endTime = startTime.AddHours(2); // Kết thúc sự kiện sau 2 giờ
+                worksheet.Cells[2, 3].Value = endTime.ToString("yyyy-MM-dd HH:mm:ss");
+
+                // Lưu file Excel vào MemoryStream
+                var stream = new MemoryStream(package.GetAsByteArray());
+                return stream.ToArray();
+            }
+        }
+
+
+
+
+
+
+        public async Task<ServiceResponse<byte[]>> DownloadExcelTemplate()
+        {
+            byte[] fileContents;
+            try
+            {
+                fileContents = GenerateExcelTemplate();
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi nếu có
+                return new ServiceResponse<byte[]>
+                {
+                    Data = null,
+                    Message = "Failed to generate Excel template.",
+                    Success = false,
+                    StatusCode = 500
+                };
+            }
+
+            // Trả về file Excel dưới dạng byte array
+            return new ServiceResponse<byte[]>
+            {
+                Data = fileContents,
+                Success = true,
+                StatusCode = 200
+            };
         }
     }
 }

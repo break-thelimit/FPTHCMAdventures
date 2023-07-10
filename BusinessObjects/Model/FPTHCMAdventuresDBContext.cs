@@ -34,6 +34,7 @@ namespace BusinessObjects.Model
         public virtual DbSet<Player> Players { get; set; }
         public virtual DbSet<Question> Questions { get; set; }
         public virtual DbSet<Rank> Ranks { get; set; }
+        public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<School> Schools { get; set; }
         public virtual DbSet<SchoolEvent> SchoolEvents { get; set; }
@@ -44,7 +45,7 @@ namespace BusinessObjects.Model
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var builder = new ConfigurationBuilder()
-                             .SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                         .SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             IConfigurationRoot configuration = builder.Build();
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("CapstonProjectDbConnectionString"));
         }
@@ -276,12 +277,10 @@ namespace BusinessObjects.Model
 
                 entity.Property(e => e.Description)
                     .HasMaxLength(150)
-                    .IsUnicode(false)
                     .HasColumnName("description");
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(150)
-                    .IsUnicode(false)
                     .HasColumnName("name");
             });
 
@@ -352,6 +351,10 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
+                entity.Property(e => e.Nickname)
+                    .HasMaxLength(255)
+                    .HasColumnName("nickname");
+
                 entity.Property(e => e.TotalPoint).HasColumnName("total_point");
 
                 entity.Property(e => e.TotalTime).HasColumnName("total_time");
@@ -401,6 +404,32 @@ namespace BusinessObjects.Model
                     .WithMany(p => p.Ranks)
                     .HasForeignKey(d => d.PlayerId)
                     .HasConstraintName("FK_Rank.player_id");
+            });
+
+            modelBuilder.Entity<RefreshToken>(entity =>
+            {
+                entity.HasKey(e => e.TokenId);
+
+                entity.ToTable("RefreshToken");
+
+                entity.Property(e => e.TokenId).HasColumnName("token_id");
+
+                entity.Property(e => e.ExpiryDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("expiry_date");
+
+                entity.Property(e => e.Token)
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("token");
+
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.RefreshTokens)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK__RefreshTo__user___1DB06A4F");
             });
 
             modelBuilder.Entity<Role>(entity =>
@@ -539,9 +568,9 @@ namespace BusinessObjects.Model
 
                 entity.Property(e => e.Email).HasColumnName("email");
 
-                entity.Property(e => e.Gender).HasColumnName("gender");
+                entity.Property(e => e.Fullname).HasColumnName("fullname");
 
-                entity.Property(e => e.Name).HasColumnName("name");
+                entity.Property(e => e.Gender).HasColumnName("gender");
 
                 entity.Property(e => e.Password).HasColumnName("password");
 
@@ -553,7 +582,7 @@ namespace BusinessObjects.Model
 
                 entity.Property(e => e.Status)
                     .HasMaxLength(50)
-                    .HasColumnName("status ");
+                    .HasColumnName("status");
 
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.Users)

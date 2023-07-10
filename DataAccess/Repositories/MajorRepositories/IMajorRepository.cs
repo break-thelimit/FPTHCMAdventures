@@ -10,5 +10,6 @@ namespace DataAccess.Repositories.MajorRepositories
 {
     public interface  IMajorRepository : IGenericRepository<Major>
     {
+      
     }
 }

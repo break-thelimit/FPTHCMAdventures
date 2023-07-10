@@ -1,5 +1,6 @@
 ﻿using DataAccess.Dtos.EventTaskDto;
 using DataAccess.Dtos.MajorDto;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,8 @@ namespace Service.Services.MajorService
         Task<ServiceResponse<MajorDto>> GetEventById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewMajor(CreateMajorDto createMajorDto);
         Task<ServiceResponse<string>> UpdateMajor(Guid id, UpdateMajorDto majorDto);
+        Task<string> getMajorName(Guid id); 
+        Task<ServiceResponse<byte[]>> DownloadExcelTemplate();
+        Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file);
     }
 }

@@ -76,7 +76,8 @@ namespace Service.Services.EventTaskService
             {
               
                 var eventDetail = await _eventTaskRepository.GetAsync<EventTaskDto>(eventId);
-               
+                var _mapper = config.CreateMapper();
+                var eventDetailDto = _mapper.Map<EventTaskDto>(eventDetail);
                 if (eventDetail == null)
                 {
 

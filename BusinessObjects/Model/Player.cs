@@ -19,6 +19,7 @@ namespace BusinessObjects.Model
         public Guid? UserId { get; set; }
         public int? TotalPoint { get; set; }
         public int? TotalTime { get; set; }
+        public string Nickname { get; set; }
 
         public virtual User User { get; set; }
         public virtual ICollection<ExchangeHistory> ExchangeHistories { get; set; }

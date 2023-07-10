@@ -3,14 +3,18 @@ using BusinessObjects.Model;
 using DataAccess.Dtos.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,182 +23,250 @@ namespace DataAccess.Repositories.UserRepositories
     public class AuthManager : IAuthManager
     {
         private readonly IMapper _mapper;
-        private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
-        private readonly ILogger<AuthManager> _logger;
         private User _user;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         private const string _loginProvider = "FPTHCMAdventuresApi";
         private const string _refreshToken = "RefreshToken";
+        private readonly FPTHCMAdventuresDBContext _dbContext;
+        private readonly JWTSettings _jwtsettings;
 
-        public AuthManager(IMapper mapper, UserManager<User> userManager, IConfiguration configuration, ILogger<AuthManager> logger, IHttpContextAccessor httpContextAccessor)
+        public AuthManager(FPTHCMAdventuresDBContext dbContext, IOptions<JWTSettings> jwtsettings, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             this._mapper = mapper;
-            this._userManager = userManager;
             this._configuration = configuration;
-            this._logger = logger;
             this._httpContextAccessor = httpContextAccessor;
+            this._dbContext = dbContext;
+            this._jwtsettings = jwtsettings.Value;
 
         }
-
-        public async Task<string> CreateRefreshToken()
+        public async Task<BaseResponse<UserWithToken>> Login(LoginDto loginDto)
         {
-            await _userManager.RemoveAuthenticationTokenAsync(_user, _loginProvider, _refreshToken);
-            var newRefreshToken = await _userManager.GenerateUserTokenAsync(_user, _loginProvider, _refreshToken);
-            var result = await _userManager.SetAuthenticationTokenAsync(_user, _loginProvider, _refreshToken, newRefreshToken);
-            return newRefreshToken;
-        }
+            var user = await _dbContext.Users.Include(u => u.Role)
+                                        .Where(u => u.Email == loginDto.Email
+                                                && u.Password == loginDto.Password).FirstOrDefaultAsync();
 
-        public async Task<BaseResponse<AuthResponseDto>> Login(LoginDto loginDto)
-        {
-            var adminEmail = _configuration.GetSection("DefaultAccount").GetSection("Email").Value;
-            var adminPassowrd = _configuration.GetSection("DefaultAccount").GetSection("Password").Value;
-            _logger.LogInformation($"Looking for user with email {loginDto.Email}");
-            _user = await _userManager.FindByEmailAsync(loginDto.Email);
-            bool isValidUser = await _userManager.CheckPasswordAsync(_user, loginDto.Password);
+            UserWithToken userWithToken = null;
+
+            if(user != null)
+            {
+                RefreshToken refreshToken = GenerateRefreshToken();
+                user.RefreshTokens.Add(refreshToken);
+                await _dbContext.SaveChangesAsync();
+
+                userWithToken = new UserWithToken(user);
+                userWithToken.RefreshToken = refreshToken.Token;
+            }
             
-            Console.Write(adminEmail + adminPassowrd);
-            var response = new BaseResponse<AuthResponseDto>();
-            if (loginDto.Email.Equals(adminEmail) && loginDto.Password.Equals(adminPassowrd))
+            if(userWithToken == null)
             {
-                return GenerateTokenForAdminNotManagedByIdentity(response, adminEmail);
-            }
-            else if (_user == null || isValidUser == false)
-            {
-                _logger.LogWarning($"User with email {loginDto.Email} was not found");
-                return null;
-            }
-            else
-            {
-                var token = await GenerateToken();
-
-                _logger.LogInformation($"Token generated for user with email {loginDto.Email} | Token: {token}");
-
-                response = new BaseResponse<AuthResponseDto>
+                return new BaseResponse<UserWithToken>
                 {
-                    Data = new AuthResponseDto
+                    Data = null,
+                    Message = "Faile data is null ",
+                    Success = false
+                };
+            }
+            userWithToken.AccessToken = GenerateAccessToken(user.Id);
+            return new BaseResponse<UserWithToken>
+            {
+                Data = userWithToken,
+                Message = "Success",
+                Success = true
+            };
+        }
+
+
+        private RefreshToken GenerateRefreshToken()
+        {
+            RefreshToken refreshToken = new RefreshToken();
+
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                refreshToken.Token = Convert.ToBase64String(randomNumber);
+            }
+            refreshToken.ExpiryDate = DateTime.UtcNow.AddMonths(6);
+            return refreshToken;
+        }
+
+        private bool ValidateRefreshToken(User user, string refreshToken)
+        {
+
+            RefreshToken refreshTokenUser = _dbContext.RefreshTokens.Where(rt => rt.Token == refreshToken)
+                                                .OrderByDescending(rt => rt.ExpiryDate)
+                                                .FirstOrDefault();
+
+            if (refreshTokenUser != null && refreshTokenUser.UserId == user.Id
+                && refreshTokenUser.ExpiryDate > DateTime.UtcNow)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private async Task<User> GetUserFromAccessToken(string accessToken)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(_jwtsettings.SecretKey);
+
+                var tokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+
+                SecurityToken securityToken;
+                var principle = tokenHandler.ValidateToken(accessToken, tokenValidationParameters, out securityToken);
+
+                JwtSecurityToken jwtSecurityToken = securityToken as JwtSecurityToken;
+
+                if (jwtSecurityToken != null && jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var userId = principle.FindFirst(ClaimTypes.Name)?.Value;
+
+                    Guid userIdGuid;
+
+                    if (Guid.TryParse(userId, out userIdGuid))
                     {
-                        UserId = _user.Id,
-                        Token = token,
-                        Email = _user.Email,
-                        RefreshToken = await CreateRefreshToken()
-                    },
-                    Message = "Login Successful",
+                        return await _dbContext.Users.Include(u => u.Role)
+                                                    .FirstOrDefaultAsync(u => u.Id == userIdGuid);
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return new User();
+            }
+
+            return new User();
+        }
+        public string GenerateAccessTokenGoogle(string userId)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_jwtsettings.SecretKey);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, userId)
+                }),
+                Expires = DateTime.Now.AddMinutes(Convert.ToInt32(_configuration["JwtSettings:DurationInMinutes"])),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+        public string GenerateAccessToken(Guid userId)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_jwtsettings.SecretKey);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, Convert.ToString(userId))
+                }),
+                Expires = DateTime.Now.AddMinutes(Convert.ToInt32(_configuration["JwtSettings:DurationInMinutes"])),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+        public async Task<BaseResponse<UserWithToken>> RegisterUser(ApiUserDto apiUser)
+        {
+            var user = _mapper.Map<User>(apiUser);
+            user.Id = Guid.NewGuid();
+            user.RoleId = Guid.Parse("13c1b3fe-a3ac-44df-a4a0-22f0594834c0");
+            _dbContext.Users.Add(user);
+            await _dbContext.SaveChangesAsync();
+
+            //load role for registered user
+            user = await _dbContext.Users.Include(u => u.Role)
+                                        .Where(u => u.Id == user.Id).FirstOrDefaultAsync();
+
+            UserWithToken userWithToken = null;
+
+            if (user != null)
+            {
+                RefreshToken refreshToken = GenerateRefreshToken();
+                user.RefreshTokens.Add(refreshToken);
+                await _dbContext.SaveChangesAsync();
+
+                userWithToken = new UserWithToken(user);
+                userWithToken.RefreshToken = refreshToken.Token;
+            }
+
+            if (userWithToken == null)
+            {
+                return new BaseResponse<UserWithToken>
+                {
+                    Data = null,
+                    Success = false,
+                    Message = "Error because userwithtoken is null",
+                };
+            }
+
+            //sign your token here here..
+            userWithToken.AccessToken = GenerateAccessToken(user.Id);
+            return new BaseResponse<UserWithToken>
+            {
+                Data = userWithToken,
+                Success = true,
+                Message = "Success",
+            };
+        }
+
+        public async Task<BaseResponse<UserWithToken>> RefreshToken(RefreshRequest refreshRequest)
+        {
+            User user = await GetUserFromAccessToken(refreshRequest.AccessToken);
+
+            if (user != null && ValidateRefreshToken(user, refreshRequest.RefreshToken))
+            {
+                UserWithToken userWithToken = new UserWithToken(user);
+                userWithToken.AccessToken = GenerateAccessToken(user.Id);
+
+                return new BaseResponse<UserWithToken> 
+                { 
+                    Data= userWithToken,
+                    Message = "Success",
                     Success = true,
                 };
-                return response;
             }
-         
+
+            return new BaseResponse<UserWithToken>
+            {
+                Data = null,
+                Message = "Failed",
+                Success = false,
+            }; 
         }
 
-        public async Task<IEnumerable<IdentityError>> Register(ApiUserDto userDto)
+        public async Task<BaseResponse<User>> GetUserByAccessToken(string accessToken)
         {
-            _user = _mapper.Map<User>(userDto);
-            _user.UserName = userDto.Email;
-            Guid guid = Guid.NewGuid();
-            _user.Id = guid;
-            var result = await _userManager.CreateAsync(_user, userDto.Password);
+            User user = await GetUserFromAccessToken(accessToken);
 
-            if (result.Succeeded)
+            if (user != null)
             {
+                return new BaseResponse<User> { Data = user,Message = "Success", Success = true};
             }
 
-            return result.Errors;
-        }
-
-        public async Task<AuthResponseDto> VerifyRefreshToken(AuthResponseDto request)
-        {
-            var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-            var tokenContent = jwtSecurityTokenHandler.ReadJwtToken(request.Token);
-            var username = tokenContent.Claims.ToList().FirstOrDefault(q => q.Type == JwtRegisteredClaimNames.Email)?.Value;
-            _user = await _userManager.FindByNameAsync(username);
-
-            if (_user == null || _user.Id != request.UserId)
-            {
-                return null;
-            }
-
-            var isValidRefreshToken = await _userManager.VerifyUserTokenAsync(_user, _loginProvider, _refreshToken, request.RefreshToken);
-
-            if (isValidRefreshToken)
-            {
-                var token = await GenerateToken();
-                return new AuthResponseDto
-                {
-                    Token = token,
-                    UserId = _user.Id,
-                    RefreshToken = await CreateRefreshToken()
-                };
-            }
-
-            await _userManager.UpdateSecurityStampAsync(_user);
             return null;
         }
-
-        private async Task<string> GenerateToken()
-        {
-            var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
-
-            var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
-
-      
-            var userClaims = await _userManager.GetClaimsAsync(_user);
-
-            var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, _user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, _user.Email),
-                new Claim("uid", _user.Id.ToString()),
-            };
-            
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JwtSettings:Issuer"],
-                audience: _configuration["JwtSettings:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(Convert.ToInt32(_configuration["JwtSettings:DurationInMinutes"])),
-                signingCredentials: credentials
-                );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        private BaseResponse<AuthResponseDto> GenerateTokenForAdminNotManagedByIdentity(BaseResponse<AuthResponseDto> response, string adminEmail)
-        {
-            var claims = new[]
-            {
-                    new Claim(JwtRegisteredClaimNames.Sub, adminEmail),
-                    new Claim(ClaimTypes.Name, adminEmail)
-                };
-
-            var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
-            var signingCredentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
-
-            var jwtSecurityTokenForAdmin = new JwtSecurityToken(
-                issuer: _configuration["JwtSettings:Issuer"],
-                audience: _configuration["JwtSettings:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(Convert.ToInt32(_configuration["JwtSettings:DurationInMinutes"])),
-                signingCredentials: signingCredentials);
-
-            var identity = new ClaimsIdentity(claims, "custom");
-            var principal = new ClaimsPrincipal(identity);
-
-            _httpContextAccessor.HttpContext.User = principal;
-
-            response.Success = true;
-            response.Message = "Welcome Admin";
-            response.Data = new AuthResponseDto
-            {
-                Email = adminEmail,
-                Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityTokenForAdmin),
-            };
-            return response;
-        }
-
-        
     }
 
 }

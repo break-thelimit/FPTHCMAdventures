@@ -45,6 +45,12 @@ namespace FPTHCMAdventuresAPI.Controllers
             var eventDetail = await _playerHistoryService.GetPlayerHistoryById(id);
             return Ok(eventDetail);
         }
+        [HttpGet("task/{id}")]
+        public async Task<ActionResult<PlayerHistoryDto>> GetItemByTaskId(Guid id)
+        {
+            var eventDetail = await _playerHistoryService.GetPlayerHistoryByTaskId(id);
+            return Ok(eventDetail);
+        }
 
         [HttpPost("playerhistory", Name = "CreateNewPlayerHistory")]
 

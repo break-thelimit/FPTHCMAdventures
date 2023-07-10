@@ -330,3 +330,4 @@ F:\FPTHCMAdventures\FPTHCMAdventuresAPI\bin\Debug\net5.0\runtimes\win\lib\netsta
 F:\FPTHCMAdventures\FPTHCMAdventuresAPI\bin\Debug\net5.0\runtimes\win\lib\netcoreapp3.1\System.Security.Cryptography.Pkcs.dll
 F:\FPTHCMAdventures\FPTHCMAdventuresAPI\bin\Debug\net5.0\runtimes\win\lib\netcoreapp3.1\System.Text.Encoding.CodePages.dll
 F:\FPTHCMAdventures\FPTHCMAdventuresAPI\bin\Debug\net5.0\runtimes\win\lib\netcoreapp3.1\System.Windows.Extensions.dll
+F:\FPTHCMAdventures\FPTHCMAdventuresAPI\bin\Debug\net5.0\Microsoft.AspNetCore.Authentication.Google.dll

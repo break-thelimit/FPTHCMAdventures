@@ -21,6 +21,6 @@ namespace DataAccess.Repositories.MajorRepositories
             _mapper = mapper;
         }
 
-
+        
     }
 }
