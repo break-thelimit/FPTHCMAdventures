@@ -1,23 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "G:\\PRN231\\Capstone\\XavalorAdventures\\DataAccess\\DataAccess.csproj": {}
+    "F:\\FPTHCMAdventures\\DataAccess\\DataAccess.csproj": {}
   },
   "projects": {
-    "G:\\PRN231\\Capstone\\XavalorAdventures\\BusinessObjects\\BusinessObjects.csproj": {
+    "F:\\FPTHCMAdventures\\BusinessObjects\\BusinessObjects.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "G:\\PRN231\\Capstone\\XavalorAdventures\\BusinessObjects\\BusinessObjects.csproj",
+        "projectUniqueName": "F:\\FPTHCMAdventures\\BusinessObjects\\BusinessObjects.csproj",
         "projectName": "BusinessObjects",
-        "projectPath": "G:\\PRN231\\Capstone\\XavalorAdventures\\BusinessObjects\\BusinessObjects.csproj",
-        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "G:\\PRN231\\Capstone\\XavalorAdventures\\BusinessObjects\\obj\\",
+        "projectPath": "F:\\FPTHCMAdventures\\BusinessObjects\\BusinessObjects.csproj",
+        "packagesPath": "C:\\Users\\huynh\\.nuget\\packages\\",
+        "outputPath": "F:\\FPTHCMAdventures\\BusinessObjects\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\huynh\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -60,7 +61,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -69,24 +71,25 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.412\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "G:\\PRN231\\Capstone\\XavalorAdventures\\DataAccess\\DataAccess.csproj": {
+    "F:\\FPTHCMAdventures\\DataAccess\\DataAccess.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "G:\\PRN231\\Capstone\\XavalorAdventures\\DataAccess\\DataAccess.csproj",
+        "projectUniqueName": "F:\\FPTHCMAdventures\\DataAccess\\DataAccess.csproj",
         "projectName": "DataAccess",
-        "projectPath": "G:\\PRN231\\Capstone\\XavalorAdventures\\DataAccess\\DataAccess.csproj",
-        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "G:\\PRN231\\Capstone\\XavalorAdventures\\DataAccess\\obj\\",
+        "projectPath": "F:\\FPTHCMAdventures\\DataAccess\\DataAccess.csproj",
+        "packagesPath": "C:\\Users\\huynh\\.nuget\\packages\\",
+        "outputPath": "F:\\FPTHCMAdventures\\DataAccess\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\huynh\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -100,8 +103,8 @@
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "G:\\PRN231\\Capstone\\XavalorAdventures\\BusinessObjects\\BusinessObjects.csproj": {
-                "projectPath": "G:\\PRN231\\Capstone\\XavalorAdventures\\BusinessObjects\\BusinessObjects.csproj"
+              "F:\\FPTHCMAdventures\\BusinessObjects\\BusinessObjects.csproj": {
+                "projectPath": "F:\\FPTHCMAdventures\\BusinessObjects\\BusinessObjects.csproj"
               }
             }
           }
@@ -133,7 +136,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -142,7 +146,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.412\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
         }
       }
     }
