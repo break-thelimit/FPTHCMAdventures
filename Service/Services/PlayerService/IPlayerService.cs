@@ -1,0 +1,18 @@
+﻿using DataAccess.Dtos.PlayerDto;
+using DataAccess.Dtos.PlayerHistoryDto;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Service.Services.PlayerService
+{
+    public interface IPlayerService
+    {
+        Task<ServiceResponse<IEnumerable<GetPlayerDto>>> GetPlayer();
+        Task<ServiceResponse<PlayerDto>> GetPlayerById(Guid eventId);
+        Task<ServiceResponse<Guid>> CreateNewPlayer(CreatePlayerDto createPlayerDto);
+        Task<ServiceResponse<string>> UpdatePlayer(Guid id, UpdatePlayerDto PlayerDto);
+    }
+}

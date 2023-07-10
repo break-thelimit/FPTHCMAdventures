@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Configuration;
 
 #nullable disable
 
@@ -41,10 +43,10 @@ namespace BusinessObjects.Model
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer("server =(local); database = FPTHCMAdventuresDB;uid=sa;pwd=123456;");
-            }
+            var builder = new ConfigurationBuilder()
+                             .SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            IConfigurationRoot configuration = builder.Build();
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("CapstonProjectDbConnectionString"));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -281,13 +283,6 @@ namespace BusinessObjects.Model
                     .HasMaxLength(150)
                     .IsUnicode(false)
                     .HasColumnName("name");
-
-                entity.Property(e => e.QuestionId).HasColumnName("question_id");
-
-                entity.HasOne(d => d.Question)
-                    .WithMany(p => p.Majors)
-                    .HasForeignKey(d => d.QuestionId)
-                    .HasConstraintName("FK_Major.question_id");
             });
 
             modelBuilder.Entity<Npc>(entity =>
@@ -303,6 +298,13 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.NpcName)
                     .HasMaxLength(50)
                     .HasColumnName("npc_name");
+
+                entity.Property(e => e.QuestionId).HasColumnName("question_id");
+
+                entity.HasOne(d => d.Question)
+                    .WithMany(p => p.Npcs)
+                    .HasForeignKey(d => d.QuestionId)
+                    .HasConstraintName("FK_NPC_Question");
             });
 
             modelBuilder.Entity<PlayHistory>(entity =>
@@ -370,14 +372,14 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
-                entity.Property(e => e.NpcId).HasColumnName("npc_id");
+                entity.Property(e => e.MajorId).HasColumnName("major_id");
 
                 entity.Property(e => e.QuestionName).HasColumnName("question_name");
 
-                entity.HasOne(d => d.Npc)
+                entity.HasOne(d => d.Major)
                     .WithMany(p => p.Questions)
-                    .HasForeignKey(d => d.NpcId)
-                    .HasConstraintName("FK_Question.npc_id");
+                    .HasForeignKey(d => d.MajorId)
+                    .HasConstraintName("FK_Question_Major");
             });
 
             modelBuilder.Entity<Rank>(entity =>

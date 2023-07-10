@@ -9,15 +9,15 @@ namespace BusinessObjects.Model
     {
         public Npc()
         {
-            Questions = new HashSet<Question>();
             Tasks = new HashSet<Task>();
         }
 
         public Guid Id { get; set; }
         public string NpcName { get; set; }
         public string Introduce { get; set; }
+        public Guid? QuestionId { get; set; }
 
-        public virtual ICollection<Question> Questions { get; set; }
+        public virtual Question Question { get; set; }
         public virtual ICollection<Task> Tasks { get; set; }
     }
 }
