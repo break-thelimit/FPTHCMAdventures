@@ -15,5 +15,6 @@ namespace DataAccess.Dtos.UserDto
         public long? PhoneNumber { get; set; }
         public bool? Gender { get; set; }
         public string Status { get; set; }
+        public string FullName { get; set; }
     }
 }

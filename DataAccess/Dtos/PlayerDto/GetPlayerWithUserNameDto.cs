@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.PlayerDto
 {
-    public abstract class BasePlayerDto
+    public class GetPlayerWithUserNameDto : IBaseDto
     {
-        public Guid? UserId { get; set; }
+        public Guid Id { get; set; }
+        public string Name { get; set; }
         public int? TotalPoint { get; set; }
         public int? TotalTime { get; set; }
-        public string NickName { get; set; }
 
+        public string NickName { get; set; }
     }
 }

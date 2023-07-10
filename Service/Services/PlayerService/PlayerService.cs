@@ -4,8 +4,10 @@ using DataAccess.Configuration;
 using DataAccess.Dtos.PlayerDto;
 using DataAccess.Dtos.PlayerHistoryDto;
 using DataAccess.Dtos.TaskDto;
+using DataAccess.Dtos.UserDto;
 using DataAccess.Repositories.PlayerHistoryRepositories;
 using DataAccess.Repositories.PlayerRepositories;
+using DataAccess.Repositories.SchoolRepositories;
 using DataAccess.Repositories.UserRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -22,16 +24,18 @@ namespace Service.Services.PlayerService
     {
         private readonly IPlayerRepository _playerRepository;
         private readonly IUserRepository _userRepository;
+        private readonly ISchoolRepository _schoolRepository;
         private readonly IMapper _mapper;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MapperConfig());
         });
-        public PlayerService(IPlayerRepository playerRepository, IMapper mapper,IUserRepository userRepository)
+        public PlayerService(IPlayerRepository playerRepository, IMapper mapper,IUserRepository userRepository, ISchoolRepository schoolRepository)
         {
             _playerRepository = playerRepository;
             _mapper = mapper;
             _userRepository = userRepository;
+            _schoolRepository = schoolRepository;   
         }
 
         public async Task<ServiceResponse<PlayerDto>> CheckPlayerByUserName(string username)
@@ -197,6 +201,49 @@ namespace Service.Services.PlayerService
             {
 
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<IEnumerable<GetPlayerWithUserNameDto>>> GetPlayerWithUserName()
+        {
+            var players= await _playerRepository.GetAllAsync<GetPlayerDto>();
+            var playerList = new List<GetPlayerWithUserNameDto>();
+
+            if (playerList != null)
+            {
+                foreach (var player in players)
+                {
+                    var user = await _userRepository.GetAsync<UserDto>(player.UserId);
+                    if(user != null)
+                    {
+                        var playerData = new GetPlayerWithUserNameDto
+                        {
+                            Id = player.Id,
+                            Name = user.FullName,
+                            TotalPoint = player.TotalPoint,
+                            TotalTime = player.TotalTime,
+                            NickName = player.NickName
+                        };
+                        playerList.Add(playerData);
+
+                    }
+                }
+                return new ServiceResponse<IEnumerable<GetPlayerWithUserNameDto>>
+                {
+                    Data = playerList,
+                    Success = true,
+                    Message = "Successfully",
+                    StatusCode = 200
+                };
+            }
+            else
+            {
+                return new ServiceResponse<IEnumerable<GetPlayerWithUserNameDto>>
+                {
+                    Success = false,
+                    Message = "Faile because List event null",
+                    StatusCode = 200
+                };
             }
         }
 

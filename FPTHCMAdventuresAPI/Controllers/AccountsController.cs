@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -48,6 +49,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         [HttpGet("callback")]
         public async Task<IActionResult> GoogleSignInCallback()
         {
+            ApiUserDto apiUserDto = new ApiUserDto();
             var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
             if (!result.Succeeded)
             {
@@ -61,14 +63,32 @@ namespace FPTHCMAdventuresAPI.Controllers
                 // Xử lý khi không tìm thấy userId trong claims
                 return BadRequest();
             }
+            var emailClaim = result.Principal.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Email);
+            if (emailClaim == null)
+            {
+                apiUserDto.Email = emailClaim.Value;
 
-           
+                // Xử lý khi không tìm thấy email trong claims
+                return BadRequest();
+            }
+            // Kiểm tra xem phoneClaim có tồn tại không (tùy thuộc vào cấu hình của bạn)
+            var nameClaim = result.Principal.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name);
+            if(nameClaim == null)
+            {
+                apiUserDto.Fullname = nameClaim.Value;
+
+            }
+            apiUserDto.Email = emailClaim.Value;
+            apiUserDto.Fullname = nameClaim.Value;
+            
+            var errors = await _authManager.RegisterUser(apiUserDto);
+
+
             // Lấy thông tin người dùng từ authenticateResult.Principal
 
             // Tạo và trả về token truy cập (có thể làm bằng JWT)
-            var token = _authManager.GenerateAccessTokenGoogle(userIdClaim.Value); // Hàm tạo token
 
-            return Ok(token);
+            return Ok(errors);
         }
 
 
