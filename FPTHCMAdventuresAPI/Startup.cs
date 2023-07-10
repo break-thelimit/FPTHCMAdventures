@@ -68,6 +68,11 @@ using OfficeOpenXml;
 using ClosedXML.Excel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
+using DataAccess.Repositories.UserRepository;
+using Service.Services.UserService;
+using DataAccess.Dtos.Users;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 
 namespace XavalorAdventuresAPI
 {
@@ -88,17 +93,13 @@ namespace XavalorAdventuresAPI
 
             services.AddControllers();
 
-          
-          
+
+
 
             services.AddDbContext<FPTHCMAdventuresDBContext>(options => options.UseSqlServer(ConectionString));
             services.AddControllersWithViews().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddAutoMapper(typeof(MapperConfig));
-            services.AddIdentityCore<User>()
-                     .AddRoles<IdentityRole>()
-                     .AddTokenProvider<DataProtectorTokenProvider<User>>("FPTHCMAdventureAPI")
-                     .AddEntityFrameworkStores<FPTHCMAdventuresDBContext>()
-                     .AddDefaultTokenProviders();
+           
             services.AddCors(options => {
                 options.AddPolicy("AllowAll",
                     b => b.AllowAnyHeader()
@@ -111,8 +112,8 @@ namespace XavalorAdventuresAPI
             services.AddScoped<IEventTaskRepository, EventTaskRepository>();
             services.AddScoped<IMajorRepository, MajorRepository>();
             services.AddScoped<IQuestionRepository, QuestionRepository>();
-            services.AddScoped<IAuthManager, AuthManager>();
-            services.AddScoped<ILocationRepository, LocationRepository>();
+/*            services.AddScoped<IAuthManager, AuthManager>();
+*/            services.AddScoped<ILocationRepository, LocationRepository>();
             services.AddScoped<INpcRepository, NpcRepository>();
             services.AddScoped<IRankRepository, RankRepository>();
             services.AddScoped<ISchoolEventRepository, SchoolEventRepository>();
@@ -127,6 +128,8 @@ namespace XavalorAdventuresAPI
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<ITaskItemRepository, TaskItemRepository>();
             services.AddScoped<IExchangeHistoryRepository, ExchangeHistoryRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IAuthManager, AuthManager>();
 
             #region Excel
             services.AddScoped<ExcelPackage>();
@@ -137,7 +140,39 @@ namespace XavalorAdventuresAPI
 
             services.AddHttpContextAccessor();
 
+            var jwtSection = Configuration.GetSection("JWTSettings");
+            var appSettings = jwtSection.Get<JWTSettings>();
+            var key = Encoding.ASCII.GetBytes(appSettings.SecretKey);
+            services.Configure<JWTSettings>(jwtSection);
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
+
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = true;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+            };
+            }).AddCookie()
+            .AddGoogle(options =>
+            {
+                IConfigurationSection googleAuthNSection = Configuration.GetSection("Authentication:Google");
+                options.ClientId = googleAuthNSection["ClientId"];
+                options.ClientSecret = googleAuthNSection["ClientSecret"];
+                options.CallbackPath = "/signin-google";
+
+            });
 
             services.AddSwaggerGen(options => {
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "FPTHCM Adventure API", Version = "v1" });
@@ -169,8 +204,8 @@ namespace XavalorAdventuresAPI
                     }
                 });
             });
-            services.AddAuthentication().AddJwtBearer();
-
+             
+                  
             //For DI Service
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<ITaskService, TaskService>();
@@ -192,7 +227,7 @@ namespace XavalorAdventuresAPI
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<ITaskItemService, TaskItemService>();
             services.AddScoped<IExchangeHistoryService, ExchangHistoryService>();
-
+            services.AddScoped<IUserService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

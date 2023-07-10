@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "IrzvNzq1tnLzzdh7ZPGgXHNEFi2Q9YYgBux3OWOGbYW/vCXQipwu4P6ECbVKgK/LOHyllQbskETw/cVMG+CSVA==",
+  "dgSpecHash": "lASQJDiSsm24OnqE42AQPe+qgIRd69Ww19/WRVm5fXaMLXYGcVpcIfUQjatRbRevNJktGuz89bNIOHoNMcVV6Q==",
   "success": true,
   "projectFilePath": "F:\\FPTHCMAdventures\\BusinessObjects\\BusinessObjects.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\huynh\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\microsoft.aspnetcore.authentication.google\\5.0.17\\microsoft.aspnetcore.authentication.google.5.0.17.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\5.0.17\\microsoft.aspnetcore.authentication.jwtbearer.5.0.17.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\microsoft.data.sqlclient\\2.0.1\\microsoft.data.sqlclient.2.0.1.nupkg.sha512",

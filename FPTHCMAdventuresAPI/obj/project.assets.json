@@ -159,6 +159,22 @@
           }
         }
       },
+      "Microsoft.AspNetCore.Authentication.Google/5.0.17": {
+        "type": "package",
+        "compile": {
+          "lib/net5.0/Microsoft.AspNetCore.Authentication.Google.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net5.0/Microsoft.AspNetCore.Authentication.Google.dll": {
+            "related": ".xml"
+          }
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
+      },
       "Microsoft.AspNetCore.Authentication.JwtBearer/5.0.17": {
         "type": "package",
         "dependencies": {
@@ -3682,6 +3698,7 @@
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
           "AutoMapper": "12.0.1",
+          "Microsoft.AspNetCore.Authentication.Google": "5.0.17",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "5.0.17",
           "Microsoft.EntityFrameworkCore.SqlServer": "5.0.17",
           "Microsoft.Extensions.Configuration": "5.0.0",
@@ -3701,6 +3718,7 @@
         "dependencies": {
           "AutoMapper": "12.0.1",
           "BusinessObjects": "1.0.0",
+          "Microsoft.AspNetCore.Authentication.Google": "5.0.17",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "5.0.17",
           "Microsoft.EntityFrameworkCore.SqlServer": "5.0.17",
           "Microsoft.Extensions.Configuration": "5.0.0",
@@ -3719,7 +3737,8 @@
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
           "DataAccess": "1.0.0",
-          "EPPlus": "5.8.14"
+          "EPPlus": "5.8.14",
+          "Microsoft.AspNetCore.Authentication.Google": "5.0.17"
         },
         "compile": {
           "bin/placeholder/Service.dll": {}
@@ -3922,6 +3941,21 @@
         "lib/netstandard2.0/MathNet.Numerics.xml",
         "mathnet.numerics.signed.4.15.0.nupkg.sha512",
         "mathnet.numerics.signed.nuspec"
+      ]
+    },
+    "Microsoft.AspNetCore.Authentication.Google/5.0.17": {
+      "sha512": "Az1M408Z6KeOLHH4EJMHLgERvrDpo+YWqEjUzCIfYPwM2f3/FrapW9f/hIa9qYRwZB4sae/J/OlH98ebSm24CQ==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.authentication.google/5.0.17",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net5.0/Microsoft.AspNetCore.Authentication.Google.dll",
+        "lib/net5.0/Microsoft.AspNetCore.Authentication.Google.xml",
+        "microsoft.aspnetcore.authentication.google.5.0.17.nupkg.sha512",
+        "microsoft.aspnetcore.authentication.google.nuspec"
       ]
     },
     "Microsoft.AspNetCore.Authentication.JwtBearer/5.0.17": {
@@ -10609,6 +10643,7 @@
       "BusinessObjects >= 1.0.0",
       "ClosedXML >= 0.102.0",
       "DataAccess >= 1.0.0",
+      "Microsoft.AspNetCore.Authentication.Google >= 5.0.17",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 5.0.17",
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 5.0.17",
       "Microsoft.AspNetCore.Mvc.NewtonsoftJson >= 5.0.17",
@@ -10685,6 +10720,10 @@
           "ClosedXML": {
             "target": "Package",
             "version": "[0.102.0, )"
+          },
+          "Microsoft.AspNetCore.Authentication.Google": {
+            "target": "Package",
+            "version": "[5.0.17, )"
           },
           "Microsoft.AspNetCore.Authentication.JwtBearer": {
             "target": "Package",

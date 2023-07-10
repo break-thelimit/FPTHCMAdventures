@@ -77,6 +77,43 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+
+        [HttpPost("upload-excel-question")]
+        public async Task<IActionResult> UploadExcel(IFormFile file)
+        {
+            var serviceResponse = await _questionService.ImportDataFromExcel(file);
+
+            if (serviceResponse.Success)
+            {
+                // Xử lý thành công
+                return Ok(serviceResponse.Message);
+            }
+            else
+            {
+                // Xử lý lỗi
+                return BadRequest(serviceResponse.Message);
+            }
+        }
+
+        [HttpGet("excel-template-question")]
+        public async Task<IActionResult> DownloadExcelTemplate()
+        {
+            var serviceResponse = await _questionService.DownloadExcelTemplate();
+
+            if (serviceResponse.Success)
+            {
+                // Trả về file Excel dưới dạng response
+                return new FileContentResult(serviceResponse.Data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                {
+                    FileDownloadName = "SampleDataQuestion.xlsx"
+                };
+            }
+            else
+            {
+                // Xử lý lỗi nếu có
+                return BadRequest(serviceResponse.Message);
+            }
+        }
     }
 }
 

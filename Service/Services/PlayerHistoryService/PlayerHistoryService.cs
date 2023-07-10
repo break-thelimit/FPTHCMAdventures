@@ -2,6 +2,7 @@
 using BusinessObjects.Model;
 using DataAccess.Configuration;
 using DataAccess.Dtos.ItemDto;
+using DataAccess.Dtos.PlayerDto;
 using DataAccess.Dtos.PlayerHistoryDto;
 using DataAccess.Repositories.ItemRepositories;
 using DataAccess.Repositories.PlayerHistoryRepositories;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,18 +31,45 @@ namespace Service.Services.PlayerHistoryService
         }
         public async Task<ServiceResponse<Guid>> CreateNewPlayerHistory(CreatePlayerHistoryDto createPlayerHistoryDto)
         {
-            var mapper = config.CreateMapper();
-            var eventTaskcreate = mapper.Map<PlayHistory>(createPlayerHistoryDto);
-            eventTaskcreate.Id = Guid.NewGuid();
-            await _playerHistoryRepository.AddAsync(eventTaskcreate);
-
-            return new ServiceResponse<Guid>
+            var majorList = await _playerHistoryRepository.GetAllAsync<GetPlayerHistoryDto>();
+            if (majorList != null)
             {
-                Data = eventTaskcreate.Id,
-                Message = "Successfully",
-                Success = true,
-                StatusCode = 201
-            };
+               var playerHistory =  majorList.FirstOrDefault(x => x.TaskId == createPlayerHistoryDto.TaskId);
+                if(playerHistory != null)
+                {
+                    return new ServiceResponse<Guid>
+                    {
+                        Message = "Failed taskId have exists",
+                        Success = false,
+                        StatusCode = 500
+                    };
+                }
+                else
+                {
+                    var mapper = config.CreateMapper();
+                    var eventTaskcreate = mapper.Map<PlayHistory>(createPlayerHistoryDto);
+                    eventTaskcreate.Id = Guid.NewGuid();
+                    await _playerHistoryRepository.AddAsync(eventTaskcreate);
+
+                    return new ServiceResponse<Guid>
+                    {
+                        Data = eventTaskcreate.Id,
+                        Message = "Successfully",
+                        Success = true,
+                        StatusCode = 201
+                    };
+                }
+            }
+            else
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "Null",
+                    Success = false,
+                    StatusCode = 500
+                };
+            }
+            
         }
 
         public async Task<ServiceResponse<IEnumerable<GetPlayerHistoryDto>>> GetPlayerHistory()
@@ -89,6 +118,42 @@ namespace Service.Services.PlayerHistoryService
                 return new ServiceResponse<PlayerHistoryDto>
                 {
                     Data = eventDetail,
+                    Message = "Successfully",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<PlayerHistoryDto>> GetPlayerHistoryByTaskId(Guid taskId)
+        {
+            try
+            {
+                List<Expression<Func<PlayHistory, object>>> includes = new List<Expression<Func<PlayHistory, object>>>
+                {
+                   
+                };
+                var taskDetail = await _playerHistoryRepository.GetByWithCondition(x => x.TaskId == taskId, includes, true);
+                var _mapper = config.CreateMapper();
+                var taskDetailDto = _mapper.Map<PlayerHistoryDto>(taskDetail);
+                if (taskDetail == null)
+                {
+
+                    return new ServiceResponse<PlayerHistoryDto>
+                    {
+                        Message = "No rows",
+                        StatusCode = 200,
+                        Success = true
+                    };
+                }
+                return new ServiceResponse<PlayerHistoryDto>
+                {
+                    Data = taskDetailDto,
                     Message = "Successfully",
                     StatusCode = 200,
                     Success = true

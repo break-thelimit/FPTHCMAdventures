@@ -1,4 +1,5 @@
-﻿using DataAccess.Dtos.Users;
+﻿using BusinessObjects.Model;
+using DataAccess.Dtos.Users;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -10,10 +11,10 @@ namespace DataAccess.Repositories.UserRepositories
 {
     public interface IAuthManager
     {
-        Task<IEnumerable<IdentityError>> Register(ApiUserDto userDto);
-        Task<BaseResponse<AuthResponseDto>> Login(LoginDto loginDto);
-        Task<string> CreateRefreshToken();
-        Task<AuthResponseDto> VerifyRefreshToken(AuthResponseDto request);
-       
+        Task<BaseResponse<UserWithToken>> RegisterUser(ApiUserDto apiUser);
+        Task<BaseResponse<UserWithToken>> Login(LoginDto loginDto);
+        Task<BaseResponse<UserWithToken>> RefreshToken(RefreshRequest refreshRequest);
+        Task<BaseResponse<User>> GetUserByAccessToken(string accessToken);
+        string GenerateAccessTokenGoogle(string userId);
     }
 }

@@ -12,6 +12,7 @@ namespace Service.Services.PlayerHistoryService
     {
         Task<ServiceResponse<IEnumerable<GetPlayerHistoryDto>>> GetPlayerHistory();
         Task<ServiceResponse<PlayerHistoryDto>> GetPlayerHistoryById(Guid eventId);
+        Task<ServiceResponse<PlayerHistoryDto>> GetPlayerHistoryByTaskId(Guid taskId);
         Task<ServiceResponse<Guid>> CreateNewPlayerHistory(CreatePlayerHistoryDto createPlayerHistoryDto);
         Task<ServiceResponse<string>> UpdatePlayerHistory(Guid id, UpdatePlayerHistoryDto PlayerHistoryDto);
     }

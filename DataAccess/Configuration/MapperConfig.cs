@@ -20,6 +20,7 @@ using DataAccess.Dtos.SchoolDto;
 using DataAccess.Dtos.SchoolEventDto;
 using DataAccess.Dtos.TaskDto;
 using DataAccess.Dtos.TaskItemDto;
+using DataAccess.Dtos.UserDto;
 using DataAccess.Dtos.Users;
 using System;
 using System.Collections.Generic;
@@ -36,8 +37,9 @@ namespace DataAccess.Configuration
             CreateMap<Event, UpdateEventDto>().ReverseMap();
             CreateMap<Event, CreateEventDto>().ReverseMap();
             CreateMap<Event, EventDto>().ReverseMap();
-            #endregion  
+            #endregion     
             
+          
             #region Task
             CreateMap<Task, GetTaskDto>().ReverseMap();
             CreateMap<Task, UpdateTaskDto>().ReverseMap();
@@ -179,6 +181,10 @@ namespace DataAccess.Configuration
             CreateMap<User, ApiUserDto>().ReverseMap();
             CreateMap<User, AuthResponseDto>().ReverseMap();
             CreateMap<User, LoginDto>().ReverseMap();
+            CreateMap<User, UpdateUserDto>().ReverseMap();
+            CreateMap<User, GetUserDto>().ReverseMap();
+            CreateMap<User, UserDto>().ReverseMap();
+            CreateMap<User, CreateUserDto>().ReverseMap();
             #endregion
 
 

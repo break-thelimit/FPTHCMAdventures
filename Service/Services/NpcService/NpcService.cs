@@ -29,8 +29,7 @@ namespace Service.Services.NpcService
         }
         public async Task<ServiceResponse<Guid>> CreateNewNpc(CreateNpcDto createMajorDto)
         {
-            var mapper = config.CreateMapper();
-            var eventTaskcreate = mapper.Map<Npc>(createMajorDto);
+            var eventTaskcreate = _mapper.Map<Npc>(createMajorDto);
             eventTaskcreate.Id = Guid.NewGuid();
             await _npcRepository.AddAsync(eventTaskcreate);
 

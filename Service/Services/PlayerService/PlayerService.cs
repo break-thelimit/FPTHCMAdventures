@@ -3,12 +3,16 @@ using BusinessObjects.Model;
 using DataAccess.Configuration;
 using DataAccess.Dtos.PlayerDto;
 using DataAccess.Dtos.PlayerHistoryDto;
+using DataAccess.Dtos.TaskDto;
 using DataAccess.Repositories.PlayerHistoryRepositories;
 using DataAccess.Repositories.PlayerRepositories;
+using DataAccess.Repositories.UserRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,16 +21,72 @@ namespace Service.Services.PlayerService
     public class PlayerService : IPlayerService
     {
         private readonly IPlayerRepository _playerRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MapperConfig());
         });
-        public PlayerService(IPlayerRepository playerRepository, IMapper mapper)
+        public PlayerService(IPlayerRepository playerRepository, IMapper mapper,IUserRepository userRepository)
         {
             _playerRepository = playerRepository;
             _mapper = mapper;
+            _userRepository = userRepository;
         }
+
+        public async Task<ServiceResponse<PlayerDto>> CheckPlayerByUserName(string username)
+        {
+            var userId = await _userRepository.GetUserIdByUserName(username);
+            if(userId != null)
+            {
+                try
+                {
+                    List<Expression<Func<Player, object>>> includes = new List<Expression<Func<Player, object>>>
+                {
+                    x => x.Ranks,
+                    x => x.Inventories,
+                    x => x.ExchangeHistories,
+                    x => x.PlayHistories
+                };
+                    var taskDetail = await _playerRepository.GetByWithCondition(x => x.UserId == userId, includes, true);
+                    var _mapper = config.CreateMapper();
+                    var taskDetailDto = _mapper.Map<PlayerDto>(taskDetail);
+                    if (taskDetail == null)
+                    {
+
+                        return new ServiceResponse<PlayerDto>
+                        {
+                            Message = "No rows",
+                            StatusCode = 200,
+                            Success = true
+                        };
+                    }
+                    return new ServiceResponse<PlayerDto>
+                    {
+                        Data = taskDetailDto,
+                        Message = "Successfully",
+                        StatusCode = 200,
+                        Success = true
+                    };
+                }
+                catch (Exception ex)
+                {
+
+                    throw new Exception(ex.Message);
+                }
+            }
+            else
+            {
+                return new ServiceResponse<PlayerDto>
+                {
+                    Message = "No User ",
+                    StatusCode = 404,
+                    Success = false
+                };
+            }
+          
+        }
+
         public async Task<ServiceResponse<Guid>> CreateNewPlayer(CreatePlayerDto createPlayerDto)
         {
             var mapper = config.CreateMapper();
@@ -89,6 +149,45 @@ namespace Service.Services.PlayerService
                 return new ServiceResponse<PlayerDto>
                 {
                     Data = eventDetail,
+                    Message = "Successfully",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<PlayerDto>> GetPlayerByUserId(Guid userId)
+        {
+            try
+            {
+                List<Expression<Func<Player, object>>> includes = new List<Expression<Func<Player, object>>>
+                {
+                    x => x.Ranks,
+                    x => x.Inventories,
+                    x => x.ExchangeHistories,
+                    x => x.PlayHistories
+                };
+                var taskDetail = await _playerRepository.GetByWithCondition(x => x.UserId == userId, includes, true);
+                var _mapper = config.CreateMapper();
+                var taskDetailDto = _mapper.Map<PlayerDto>(taskDetail);
+                if (taskDetail == null)
+                {
+
+                    return new ServiceResponse<PlayerDto>
+                    {
+                        Message = "No rows",
+                        StatusCode = 200,
+                        Success = true
+                    };
+                }
+                return new ServiceResponse<PlayerDto>
+                {
+                    Data = taskDetailDto,
                     Message = "Successfully",
                     StatusCode = 200,
                     Success = true

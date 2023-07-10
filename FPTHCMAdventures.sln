@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "DataAccess\Da
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FPTHCMAdventuresAPI", "FPTHCMAdventuresAPI\FPTHCMAdventuresAPI.csproj", "{9F1CE6C3-3EF1-437F-90AB-37FC689B16BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service", "Service\Service.csproj", "{8E8667D9-9951-4706-BE59-7659D58BCA21}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service", "Service\Service.csproj", "{8E8667D9-9951-4706-BE59-7659D58BCA21}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
