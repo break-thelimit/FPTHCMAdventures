@@ -9,6 +9,7 @@ using System;
 using Service.Services.PlayerService;
 using DataAccess.Dtos.PlayerDto;
 
+
 namespace FPTHCMAdventuresAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -87,6 +88,7 @@ namespace FPTHCMAdventuresAPI.Controllers
             {
 
                 return StatusCode(500, "Internal server error: " + ex.Message);
+
             }
         }
     }
