@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
 using DataAccess.Configuration;
+using DataAccess.Dtos.PlayerDto;
+using DataAccess.Dtos.SchoolDto;
 using DataAccess.Dtos.TaskDto;
 using DataAccess.Dtos.UserDto;
+using DataAccess.Repositories.SchoolRepositories;
 using DataAccess.Repositories.TaskRepositories;
 using DataAccess.Repositories.UserRepository;
 using Microsoft.EntityFrameworkCore;
@@ -18,15 +21,17 @@ namespace Service.Services.UserService
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly ISchoolRepository _schoolRepository;
         private readonly IMapper _mapper;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MapperConfig());
         });
-        public UserService(IUserRepository userRepository, IMapper mapper)
+        public UserService(IUserRepository userRepository, IMapper mapper,ISchoolRepository schoolRepository)
         {
             _userRepository = userRepository;
             _mapper = mapper;
+            _schoolRepository = schoolRepository;   
         }
         public async Task<ServiceResponse<Guid>> CreateNewUser(CreateUserDto createUserDto)
         {
@@ -203,6 +208,86 @@ namespace Service.Services.UserService
         private async Task<bool> CountryExists(Guid id)
         {
             return await _userRepository.Exists(id);
+        }
+
+        public async Task<ServiceResponse<IEnumerable<GetUserListWithSchoolNameDto>>> GetUserWithSchoolName()
+        {
+            var users = await _userRepository.GetAllAsync<GetUserDto>();
+            var userList = new List<GetUserListWithSchoolNameDto>();
+
+            if (userList != null)
+            {
+                foreach (var user in users)
+                {
+                    if(user.SchoolId != null)
+                    {
+                        var school = await _schoolRepository.GetAsync<SchoolDto>(user.SchoolId);
+                        if (school != null)
+                        {
+                            if (user != null)
+                            {
+                                var playerData = new GetUserListWithSchoolNameDto
+                                {
+                                    Id = user.Id,
+                                    FullName = user.FullName,
+                                    Email = user.Email,
+                                    SchoolName = school.SchoolName,
+                                    Gender = user.Gender,
+                                    PhoneNumber = user.PhoneNumber,
+                                    Status = user.Status
+
+                                };
+                                userList.Add(playerData);
+
+                            }
+                        }
+                        else
+                        {
+                            var playerData = new GetUserListWithSchoolNameDto
+                            {
+                                Id = user.Id,
+                                FullName = user.FullName,
+                                Email = user.Email,
+                                Gender = user.Gender,
+                                PhoneNumber = user.PhoneNumber,
+                                Status = user.Status
+
+                            };
+                            userList.Add(playerData);
+                        }
+                    }
+                    else
+                    {
+                        var playerData = new GetUserListWithSchoolNameDto
+                        {
+                            Id = user.Id,
+                            FullName = user.FullName,
+                            Email = user.Email,
+                            Gender = user.Gender,
+                            PhoneNumber = user.PhoneNumber,
+                            Status = user.Status
+
+                        };
+                        userList.Add(playerData);
+                    }
+                }
+                return new ServiceResponse<IEnumerable<GetUserListWithSchoolNameDto>>
+                {
+                    Data = userList,
+                    Success = true,
+                    Message = "Successfully",
+                    StatusCode = 200
+                };
+            }
+            else
+            {
+                return new ServiceResponse<IEnumerable<GetUserListWithSchoolNameDto>>
+                {
+                    Success = false,
+                    Message = "Faile because List event null",
+                    StatusCode = 200
+                };
+            }
         }
     }
 }

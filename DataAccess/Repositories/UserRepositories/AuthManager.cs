@@ -186,12 +186,33 @@ namespace DataAccess.Repositories.UserRepositories
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+        public  string PasswordHash(string password)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                // Chuyển đổi mật khẩu sang mảng byte
+                byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
 
+                // Tính toán mã hash của mật khẩu
+                byte[] hashBytes = sha256.ComputeHash(passwordBytes);
+
+                // Chuyển đổi mã hash thành dạng chuỗi hex
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < hashBytes.Length; i++)
+                {
+                    builder.Append(hashBytes[i].ToString("x2"));
+                }
+
+                return builder.ToString();
+            }
+        }
         public async Task<BaseResponse<UserWithToken>> RegisterUser(ApiUserDto apiUser)
         {
             var user = _mapper.Map<User>(apiUser);
             user.Id = Guid.NewGuid();
             user.RoleId = Guid.Parse("13c1b3fe-a3ac-44df-a4a0-22f0594834c0");
+            string hashedPassword = PasswordHash(apiUser.Password);
+            user.Password = hashedPassword;
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
 

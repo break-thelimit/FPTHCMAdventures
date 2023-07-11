@@ -40,6 +40,21 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+
+        [HttpGet("users/listUser-schoolname", Name = "GetUserWithSchoolNames")]
+
+        public async Task<ActionResult<ServiceResponse<GetUserDto>>> GetUserWithSchoolName()
+        {
+            try
+            {
+                var res = await _userService.GetUserWithSchoolName();
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDto>> GetUserById(Guid id)
         {

@@ -41,7 +41,7 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
         }
 
-        [HttpGet("player/players",Name = "GetPlayerWithUserNames")]
+        [HttpGet("players/listPlayer-username",Name = "GetPlayerWithUserNames")]
 
         public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> GetPlayerListWithUserName()
         {

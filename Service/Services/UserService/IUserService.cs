@@ -11,6 +11,7 @@ namespace Service.Services.UserService
     public interface IUserService
     {
         Task<ServiceResponse<IEnumerable<GetUserDto>>> GetUser();
+        Task<ServiceResponse<IEnumerable<GetUserListWithSchoolNameDto>>> GetUserWithSchoolName();
         Task<ServiceResponse<UserDto>> GetUserById(Guid userId);
         Task<ServiceResponse<UserDto>> GetUserByEmail(string Email);
 
