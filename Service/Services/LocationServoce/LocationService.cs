@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
+using DataAccess;
 using DataAccess.Configuration;
+using DataAccess.Dtos.AnswerDto;
 using DataAccess.Dtos.EventTaskDto;
 using DataAccess.Dtos.LocationDto;
 using DataAccess.Dtos.MajorDto;
@@ -263,6 +265,18 @@ namespace Service.Services.LocationServoce
                 Data = fileContents,
                 Success = true,
                 StatusCode = 200
+            };
+        }
+
+        public async Task<ServiceResponse<PagedResult<LocationDto>>> GetLocationWithPage(QueryParameters queryParameters)
+        {
+            var pagedsResult = await _locationRepository.GetAllAsync<LocationDto>(queryParameters);
+            return new ServiceResponse<PagedResult<LocationDto>>
+            {
+                Data = pagedsResult,
+                Message = "Successfully",
+                StatusCode = 200,
+                Success = true
             };
         }
     }

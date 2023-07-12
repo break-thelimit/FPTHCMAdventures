@@ -10,6 +10,8 @@ using System;
 using Service.Services.LocationServoce;
 using DataAccess.Dtos.LocationDto;
 using DataAccess.Dtos.EventDto;
+using DataAccess.Dtos.AnswerDto;
+using DataAccess;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
@@ -35,6 +37,20 @@ namespace FPTHCMAdventuresAPI.Controllers
             {
                 var res = await _locationService.GetLocation();
                 return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        [HttpGet("location/pagination", Name = "GetLocationListWithPagination")]
+
+        public async Task<ActionResult<ServiceResponse<AnswerDto>>> GetLocationListWithPage([FromQuery] QueryParameters queryParameters)
+        {
+            try
+            {
+                var pagedsResult = await _locationService.GetLocationWithPage(queryParameters);
+                return Ok(pagedsResult);
             }
             catch (Exception ex)
             {

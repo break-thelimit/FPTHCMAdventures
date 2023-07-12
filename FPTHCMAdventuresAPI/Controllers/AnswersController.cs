@@ -11,6 +11,7 @@ using DataAccess.Repositories.AnswerRepositories;
 using DataAccess.Dtos.AnswerDto;
 using Service.Services.AnswerService;
 using Microsoft.AspNetCore.Authorization;
+using DataAccess;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
@@ -37,6 +38,20 @@ namespace FPTHCMAdventuresAPI.Controllers
             {
                 var res = await _answerService.GetAnswer();
                 return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        [HttpGet("/pagination" ,Name = "GetAnswerListWithPagination")]
+
+        public async Task<ActionResult<ServiceResponse<AnswerDto>>> GetAnswerListWithPage([FromQuery] QueryParameters queryParameters)
+        {
+            try
+            {
+                var pagedsResult = await _answerService.GetAnswerWithPage(queryParameters);
+                return Ok(pagedsResult);
             }
             catch (Exception ex)
             {

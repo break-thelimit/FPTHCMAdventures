@@ -22,6 +22,7 @@ namespace BusinessObjects.Model
         public bool? Gender { get; set; }
         public string Status { get; set; }
         public string Fullname { get; set; }
+        public string Username { get; set; }
 
         public virtual Role Role { get; set; }
         public virtual School School { get; set; }

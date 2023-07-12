@@ -219,7 +219,7 @@ namespace Service.Services.PlayerService
                         var playerData = new GetPlayerWithUserNameDto
                         {
                             Id = player.Id,
-                            Name = user.FullName,
+                            Name = user.Fullname,
                             TotalPoint = player.TotalPoint,
                             TotalTime = player.TotalTime,
                             NickName = player.NickName

@@ -45,7 +45,7 @@ namespace BusinessObjects.Model
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var builder = new ConfigurationBuilder()
-                         .SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                          .SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             IConfigurationRoot configuration = builder.Build();
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("CapstonProjectDbConnectionString"));
         }
@@ -105,7 +105,7 @@ namespace BusinessObjects.Model
 
             modelBuilder.Entity<EventTask>(entity =>
             {
-                entity.ToTable("Event_tasks");
+                entity.ToTable("EventTask");
 
                 entity.Property(e => e.Id)
                     .ValueGeneratedNever()
@@ -583,6 +583,11 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.Status)
                     .HasMaxLength(50)
                     .HasColumnName("status");
+
+                entity.Property(e => e.Username)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("username");
 
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.Users)

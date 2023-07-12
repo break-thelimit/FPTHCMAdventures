@@ -229,12 +229,14 @@ namespace Service.Services.UserService
                                 var playerData = new GetUserListWithSchoolNameDto
                                 {
                                     Id = user.Id,
-                                    FullName = user.FullName,
+                                    Fullname = user.Fullname,
                                     Email = user.Email,
                                     SchoolName = school.SchoolName,
                                     Gender = user.Gender,
                                     PhoneNumber = user.PhoneNumber,
-                                    Status = user.Status
+                                    Status = user.Status,
+                                    Username = user.Username
+
 
                                 };
                                 userList.Add(playerData);
@@ -246,11 +248,12 @@ namespace Service.Services.UserService
                             var playerData = new GetUserListWithSchoolNameDto
                             {
                                 Id = user.Id,
-                                FullName = user.FullName,
+                                Fullname = user.Fullname,
                                 Email = user.Email,
                                 Gender = user.Gender,
                                 PhoneNumber = user.PhoneNumber,
-                                Status = user.Status
+                                Status = user.Status,
+                                Username = user.Username
 
                             };
                             userList.Add(playerData);
@@ -261,11 +264,12 @@ namespace Service.Services.UserService
                         var playerData = new GetUserListWithSchoolNameDto
                         {
                             Id = user.Id,
-                            FullName = user.FullName,
+                            Fullname = user.Fullname,
                             Email = user.Email,
                             Gender = user.Gender,
                             PhoneNumber = user.PhoneNumber,
-                            Status = user.Status
+                            Status = user.Status,
+                            Username = user.Username
 
                         };
                         userList.Add(playerData);
