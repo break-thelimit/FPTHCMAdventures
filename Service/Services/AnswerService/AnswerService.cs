@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
+using DataAccess;
 using DataAccess.Configuration;
 using DataAccess.Dtos.AnswerDto;
 using DataAccess.Dtos.EventDto;
@@ -102,6 +103,18 @@ namespace Service.Services.AnswerService
 
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task<ServiceResponse<PagedResult<AnswerDto>>> GetAnswerWithPage(QueryParameters queryParameters)
+        {
+            var pagedsResult = await _answerRepository.GetAllAsync<AnswerDto>(queryParameters);
+            return new ServiceResponse<PagedResult<AnswerDto>>
+            {
+                Data = pagedsResult,
+                Message = "Successfully",
+                StatusCode = 200,
+                Success = true
+            };
         }
 
         public async Task<ServiceResponse<string>> UpdateAnswer(Guid id, UpdateAnswerDto eventDto)

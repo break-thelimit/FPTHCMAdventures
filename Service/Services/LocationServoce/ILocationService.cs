@@ -1,4 +1,6 @@
-﻿using DataAccess.Dtos.EventTaskDto;
+﻿using DataAccess.Dtos.AnswerDto;
+using DataAccess;
+using DataAccess.Dtos.EventTaskDto;
 using DataAccess.Dtos.LocationDto;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -16,6 +18,9 @@ namespace Service.Services.LocationServoce
         Task<ServiceResponse<Guid>> CreateNewLocation(CreateLocationDto createEventTaskDto);
         Task<ServiceResponse<string>> UpdateLocation(Guid id, UpdateLocationDto eventTaskDto);
         Task<ServiceResponse<byte[]>> DownloadExcelTemplate();
-        Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file);    
+        Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file);
+
+        Task<ServiceResponse<PagedResult<LocationDto>>> GetLocationWithPage(QueryParameters queryParameters);
+
     }
 }
