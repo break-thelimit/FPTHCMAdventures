@@ -30,13 +30,13 @@ namespace Service.Services.RankService
         public async Task<ServiceResponse<Guid>> CreateNewRank(CreateRankDto createRankDto)
         {
             var mapper = config.CreateMapper();
-            var eventTaskcreate = mapper.Map<Rank>(createRankDto);
-            eventTaskcreate.Id = Guid.NewGuid();
-            await _rankRepository.AddAsync(eventTaskcreate);
+            var rankcreate = mapper.Map<Rank>(createRankDto);
+            rankcreate.Id = Guid.NewGuid();
+            await _rankRepository.AddAsync(rankcreate);
 
             return new ServiceResponse<Guid>
             {
-                Data = eventTaskcreate.Id,
+                Data = rankcreate.Id,
                 Message = "Successfully",
                 Success = true,
                 StatusCode = 201
@@ -45,13 +45,13 @@ namespace Service.Services.RankService
 
         public async Task<ServiceResponse<IEnumerable<GetRankDto>>> GetRank()
         {
-            var majorList = await _rankRepository.GetAllAsync<GetRankDto>();
+            var rankList = await _rankRepository.GetAllAsync<GetRankDto>();
 
-            if (majorList != null)
+            if (rankList != null)
             {
                 return new ServiceResponse<IEnumerable<GetRankDto>>
                 {
-                    Data = majorList,
+                    Data = rankList,
                     Success = true,
                     Message = "Successfully",
                     StatusCode = 200
@@ -61,9 +61,9 @@ namespace Service.Services.RankService
             {
                 return new ServiceResponse<IEnumerable<GetRankDto>>
                 {
-                    Data = majorList,
+                    Data = rankList,
                     Success = false,
-                    Message = "Faile because List event null",
+                    Message = "Faile because List rank null",
                     StatusCode = 200
                 };
             }
@@ -115,7 +115,7 @@ namespace Service.Services.RankService
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await EventTaskExists(id))
+                if (!await RankExists(id))
                 {
                     return new ServiceResponse<string>
                     {
@@ -130,7 +130,9 @@ namespace Service.Services.RankService
                 }
             }
         }
-        private async Task<bool> EventTaskExists(Guid id)
+
+
+        private async Task<bool> RankExists(Guid id)
         {
             return await _rankRepository.Exists(id);
         }

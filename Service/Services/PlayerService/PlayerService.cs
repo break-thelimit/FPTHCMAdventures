@@ -261,7 +261,7 @@ namespace Service.Services.PlayerService
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await EventTaskExists(id))
+                if (!await PlayerExists(id))
                 {
                     return new ServiceResponse<string>
                     {
@@ -276,7 +276,32 @@ namespace Service.Services.PlayerService
                 }
             }
         }
-        private async Task<bool> EventTaskExists(Guid id)
+
+        public async Task<ServiceResponse<IEnumerable<Player>>> GetTop5PlayerInRank()
+        {
+            try
+            {
+                var context = new FPTHCMAdventuresDBContext();
+                List<Player> top5playerlist= context.Players.OrderByDescending(x => x.TotalPoint).ThenBy(x => x.TotalTime).Take(5).ToList();
+                return new ServiceResponse<IEnumerable<Player>>
+                {
+                    Data= top5playerlist,
+                    Message = "Success edit",
+                    Success = true,
+                    StatusCode = 202
+                };
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                    return new ServiceResponse<IEnumerable<Player>>
+                    {
+                        Message = "Invalid Record Id",
+                        Success = false,
+                        StatusCode = 500
+                    };
+            }
+        }
+        private async Task<bool> PlayerExists(Guid id)
         {
             return await _playerRepository.Exists(id);
         }

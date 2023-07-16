@@ -17,5 +17,6 @@ namespace Service.Services.PlayerService
         Task<ServiceResponse<PlayerDto>> CheckPlayerByUserName(string username);
         Task<ServiceResponse<Guid>> CreateNewPlayer(CreatePlayerDto createPlayerDto);
         Task<ServiceResponse<string>> UpdatePlayer(Guid id, UpdatePlayerDto PlayerDto);
+        Task<ServiceResponse<IEnumerable<BusinessObjects.Model.Player>>> GetTop5PlayerInRank();
     }
 }

@@ -41,6 +41,21 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
         }
 
+        [HttpGet("players/getTop5PlayerInRank")]
+
+        public async Task<ActionResult<ServiceResponse<BusinessObjects.Model.Player>>> GetTop5PlayerInRank()
+        {
+            try
+            {
+                var res = await _playerService.GetTop5PlayerInRank();
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
         [HttpGet("players/listPlayer-username",Name = "GetPlayerWithUserNames")]
 
         public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> GetPlayerListWithUserName()
