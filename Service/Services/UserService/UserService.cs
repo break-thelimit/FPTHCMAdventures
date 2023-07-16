@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
+using DataAccess;
 using DataAccess.Configuration;
 using DataAccess.Dtos.PlayerDto;
 using DataAccess.Dtos.SchoolDto;
@@ -292,6 +293,18 @@ namespace Service.Services.UserService
                     StatusCode = 200
                 };
             }
+        }
+
+        public async Task<ServiceResponse<PagedResult<UserDto>>> GetUserWithPage(QueryParameters queryParameters)
+        {
+            var pagedsResult = await _userRepository.GetAllAsync<UserDto>(queryParameters);
+            return new ServiceResponse<PagedResult<UserDto>>
+            {
+                Data = pagedsResult,
+                Message = "Successfully",
+                StatusCode = 200,
+                Success = true
+            };
         }
     }
 }

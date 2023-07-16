@@ -34,7 +34,7 @@ namespace FPTHCMAdventuresAPI.Controllers
      
         [HttpGet(Name = "GetTaskList")]
 
-        public async Task<ActionResult<ServiceResponse<GetTaskDto>>> GetEventList()
+        public async Task<ActionResult<ServiceResponse<GetTaskDto>>> GetTaskList()
         {
             try
             {
@@ -47,6 +47,22 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+
+        [HttpGet("/gettaskdonebymajor")]
+        public async Task<ActionResult<ServiceResponse<BusinessObjects.Model.Task>>> GetTaskDoneByMajor(Guid majorid)
+        {
+            try
+            {
+                var res = await _taskService.GetTaskDoneByMajor(majorid);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<TaskItemDto>> GetTaskById(Guid id)
         {
@@ -55,7 +71,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPost("task", Name = "CreateNewTask")]
 
-        public async Task<ActionResult<ServiceResponse<TaskDto>>> CreateNewEvent(CreateTaskDto taskDto)
+        public async Task<ActionResult<ServiceResponse<TaskDto>>> CreateNewTask(CreateTaskDto taskDto)
         {
             try
             {
@@ -70,7 +86,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<TaskDto>>> CreateNewEvent(Guid id, [FromBody] UpdateTaskDto updateTaskDto)
+        public async Task<ActionResult<ServiceResponse<TaskDto>>> UpdateTask(Guid id, [FromBody] UpdateTaskDto updateTaskDto)
         {
             try
             {

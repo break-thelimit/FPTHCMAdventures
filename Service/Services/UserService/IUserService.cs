@@ -1,4 +1,5 @@
-﻿using DataAccess.Dtos.TaskDto;
+﻿using DataAccess;
+using DataAccess.Dtos.TaskDto;
 using DataAccess.Dtos.UserDto;
 using System;
 using System.Collections.Generic;
@@ -17,5 +18,6 @@ namespace Service.Services.UserService
 
         Task<ServiceResponse<Guid>> CreateNewUser(CreateUserDto createUserDto);
         Task<ServiceResponse<string>> UpdateUser(Guid id, UpdateUserDto updateUserDto);
+        Task<ServiceResponse<PagedResult<UserDto>>> GetUserWithPage(QueryParameters queryParameters);
     }
 }

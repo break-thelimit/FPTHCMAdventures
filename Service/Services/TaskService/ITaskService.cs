@@ -15,5 +15,6 @@ namespace Service.Services.TaskService
 
         Task<ServiceResponse<Guid>> CreateNewTask(CreateTaskDto createEventDto);
         Task<ServiceResponse<string>> UpdateTask(Guid id, UpdateTaskDto updateTaskDto);
+        Task<ServiceResponse<IEnumerable<BusinessObjects.Model.Task>>> GetTaskDoneByMajor(Guid majorId);
     }
 }

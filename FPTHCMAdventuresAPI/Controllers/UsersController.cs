@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System;
 using Service.Services.UserService;
 using DataAccess.Dtos.UserDto;
-
+using DataAccess;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
@@ -28,12 +28,27 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpGet(Name = "GetUserList")]
 
-        public async Task<ActionResult<ServiceResponse<GetUserDto>>> GetTaskItemList()
+        public async Task<ActionResult<ServiceResponse<GetUserDto>>> GetUserList()
         {
             try
             {
                 var res = await _userService.GetUser();
                 return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpGet("user/pagination", Name = "GetUserListWithPagination")]
+
+        public async Task<ActionResult<ServiceResponse<UserDto>>> GetUserListWithPage([FromQuery] QueryParameters queryParameters)
+        {
+            try
+            {
+                var pagedsResult = await _userService.GetUserWithPage(queryParameters);
+                return Ok(pagedsResult);
             }
             catch (Exception ex)
             {
@@ -70,11 +85,11 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpPost("user", Name = "CreateNewUser")]
 
-        public async Task<ActionResult<ServiceResponse<UserDto>>> CreateNewTaskItem(CreateUserDto answerDto)
+        public async Task<ActionResult<ServiceResponse<UserDto>>> CreateNewUser(CreateUserDto userDto)
         {
             try
             {
-                var res = await _userService.CreateNewUser(answerDto);
+                var res = await _userService.CreateNewUser(userDto);
                 return Ok(res);
             }
             catch (Exception ex)
@@ -85,11 +100,11 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<UserDto>>> UpdateTaskItem(Guid id, [FromBody] UpdateUserDto eventDto)
+        public async Task<ActionResult<ServiceResponse<UserDto>>> UpdateUser(Guid id, [FromBody] UpdateUserDto userDto)
         {
             try
             {
-                var res = await _userService.UpdateUser(id, eventDto);
+                var res = await _userService.UpdateUser(id, userDto);
                 return Ok(res);
             }
             catch (Exception ex)

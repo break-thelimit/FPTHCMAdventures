@@ -12,7 +12,7 @@ namespace Service.Services.MajorService
     public interface IMajorService
     {
         Task<ServiceResponse<IEnumerable<GetMajorDto>>> GetMajor();
-        Task<ServiceResponse<MajorDto>> GetEventById(Guid eventId);
+        Task<ServiceResponse<MajorDto>> GetMajorById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewMajor(CreateMajorDto createMajorDto);
         Task<ServiceResponse<string>> UpdateMajor(Guid id, UpdateMajorDto majorDto);
         Task<string> getMajorName(Guid id); 

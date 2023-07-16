@@ -51,12 +51,12 @@ namespace Service.Services.MajorService
        
 
 
-        public async Task<ServiceResponse<MajorDto>> GetEventById(Guid eventId)
+        public async Task<ServiceResponse<MajorDto>> GetMajorById(Guid majorId)
         {
             try
             {
 
-                var eventDetail = await _majorRepository.GetAsync<MajorDto>(eventId);
+                var eventDetail = await _majorRepository.GetAsync<MajorDto>(majorId);
                
                 if (eventDetail == null)
                 {

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
+using DataAccess;
 using DataAccess.Configuration;
 using DataAccess.Dtos.SchoolDto;
 using DataAccess.Dtos.SchoolEventDto;
@@ -134,6 +135,18 @@ namespace Service.Services.SchoolService
         {
             return await _schoolRepository.Exists(id);
         }
-        
+
+        public async Task<ServiceResponse<PagedResult<SchoolDto>>> GetSchoolWithPage(QueryParameters queryParameters)
+        {
+            var pagedsResult = await _schoolRepository.GetAllAsync<SchoolDto>(queryParameters);
+            return new ServiceResponse<PagedResult<SchoolDto>>
+            {
+                Data = pagedsResult,
+                Message = "Successfully",
+                StatusCode = 200,
+                Success = true
+            };
+        }
+
     }
 }

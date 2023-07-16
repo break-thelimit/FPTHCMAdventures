@@ -43,7 +43,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<MajorDto>> GetEventTaskById(Guid id)
         {
-            var eventDetail = await _majorService.GetEventById(id);
+            var eventDetail = await _majorService.GetMajorById(id);
             return Ok(eventDetail);
         }
 

@@ -4,6 +4,7 @@ using DataAccess.Configuration;
 using DataAccess.Dtos.EventDto;
 using DataAccess.Dtos.TaskDto;
 using DataAccess.Repositories.EventRepositories;
+using DataAccess.Repositories.PlayerHistoryRepositories;
 using DataAccess.Repositories.TaskRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -19,6 +20,7 @@ namespace Service.Services.TaskService
     public class TaskService : ITaskService
     {
         private readonly ITaskRepositories _taskRepository;
+        private readonly IPlayerHistoryRepository _playerHistoryRepository;
         private readonly IMapper _mapper;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
@@ -67,7 +69,7 @@ namespace Service.Services.TaskService
                 {
                     Data = eventList,
                     Success = false,
-                    Message = "Faile because List event null",
+                    Message = "Failed because List event null",
                     StatusCode = 200
                 };
             }
@@ -168,6 +170,41 @@ namespace Service.Services.TaskService
         private async Task<bool> CountryExists(Guid id)
         {
             return await _taskRepository.Exists(id);
+        }
+
+        public async Task<ServiceResponse<IEnumerable<Task>>> GetTaskDoneByMajor(Guid majorId)
+        {
+            try
+            {
+                var context = new FPTHCMAdventuresDBContext();
+                List<Task> taskList = context.Tasks.Include(t => t.PlayHistories).Where(t => (t.PlayHistories.Count>0) && (t.MajorId==majorId)).ToList();
+
+                if (taskList != null)
+                {
+                    return new ServiceResponse<IEnumerable<Task>>
+                    {
+                        Data = taskList,
+                        Success = true,
+                        Message = "Successfully",
+                        StatusCode = 200
+                    };
+                }
+                else
+                {
+                    return new ServiceResponse<IEnumerable<Task>>
+                    {
+                        Data = taskList,
+                        Success = false,
+                        Message = "Failed because List task null",
+                        StatusCode = 200
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

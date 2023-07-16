@@ -14,6 +14,7 @@ using Service.Services.EventService;
 using AutoMapper;
 using DataAccess.Dtos.EventDto;
 using DataAccess.Exceptions;
+using DataAccess;
 
 namespace XavalorAdventuresAPI.Controllers
 {
@@ -44,6 +45,21 @@ namespace XavalorAdventuresAPI.Controllers
             catch (Exception ex)
             {
 
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpGet("event/pagination", Name = "GetEventListWithPagination")]
+
+        public async Task<ActionResult<ServiceResponse<EventDto>>> GetLocationListWithPage([FromQuery] QueryParameters queryParameters)
+        {
+            try
+            {
+                var pagedsResult = await _eventService.GetEventWithPage(queryParameters);
+                return Ok(pagedsResult);
+            }
+            catch (Exception ex)
+            {
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }

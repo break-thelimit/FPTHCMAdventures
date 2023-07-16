@@ -12,6 +12,7 @@ namespace DataAccess.Dtos.Users
         
         public string AccessToken { get; set; }
         public string RefreshToken { get; set; }
+        public string ValidateCode { get;set; }
 
     public UserWithToken(User user)
     {

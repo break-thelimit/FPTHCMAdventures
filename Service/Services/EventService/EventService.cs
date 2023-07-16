@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
+using DataAccess;
 using DataAccess.Configuration;
 using DataAccess.Dtos.EventDto;
 using DataAccess.Dtos.LocationDto;
@@ -331,6 +332,18 @@ namespace Service.Services.EventService
                 Data = fileContents,
                 Success = true,
                 StatusCode = 200
+            };
+        }
+
+        public async Task<ServiceResponse<PagedResult<EventDto>>> GetEventWithPage(QueryParameters queryParameters)
+        {
+            var pagedsResult = await _eventRepository.GetAllAsync<EventDto>(queryParameters);
+            return new ServiceResponse<PagedResult<EventDto>>
+            {
+                Data = pagedsResult,
+                Message = "Successfully",
+                StatusCode = 200,
+                Success = true
             };
         }
     }

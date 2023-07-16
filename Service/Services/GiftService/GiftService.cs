@@ -116,7 +116,7 @@ namespace Service.Services.GiftService
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await EventTaskExists(id))
+                if (!await GiftExists(id))
                 {
                     return new ServiceResponse<string>
                     {
@@ -131,7 +131,34 @@ namespace Service.Services.GiftService
                 }
             }
         }
-        private async Task<bool> EventTaskExists(Guid id)
+
+        public async Task<ServiceResponse<string>> GetTotalGift()
+        {
+            var context = new FPTHCMAdventuresDBContext();
+            try
+            {
+                long total = context.Gifts.Count();
+                return new ServiceResponse<string>
+                {
+                    Data=total.ToString(),
+                    Message = "Success!",
+                    Success = true,
+                    StatusCode = 202
+                };
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                    return new ServiceResponse<string>
+                    {
+                        Message = ex.ToString(),
+                        Success = false,
+                        StatusCode = 500
+                    };
+            }
+
+        }
+
+        private async Task<bool> GiftExists(Guid id)
         {
             return await _giftRepository.Exists(id);
         }
