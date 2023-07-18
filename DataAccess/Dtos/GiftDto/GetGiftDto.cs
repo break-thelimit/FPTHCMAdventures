@@ -9,5 +9,6 @@ namespace DataAccess.Dtos.GiftDto
     public class GetGiftDto : BaseGiftDto, IBaseDto
     {
         public Guid Id { get; set; }
+        public string RankNumber { get; set; }
     }
 }

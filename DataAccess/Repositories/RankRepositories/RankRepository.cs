@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
+using DataAccess.Dtos.RankDto;
 using DataAccess.GenericRepositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +20,20 @@ namespace DataAccess.Repositories.RankRepositories
         {
             _dbContext = dbContext;
             _mapper = mapper;
+        }
+
+        public async Task<List<GetRankDto>> GetAllRankAsync()
+        {
+            var ranklist1 = await _dbContext.Ranks.Include(x => x.Player).Include(r => r.Event).Select(x => new GetRankDto
+            {
+                Id = x.Id,
+                PlayerId=x.PlayerId,
+                EventId=x.EventId,
+                PlayerName=x.Player.Nickname,
+                EventName=x.Event.Name,
+                RankNumber=x.RankNumber
+            }).ToListAsync();
+            return ranklist1;
         }
     }
 }

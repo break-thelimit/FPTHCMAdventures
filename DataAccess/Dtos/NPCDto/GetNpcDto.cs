@@ -9,5 +9,6 @@ namespace DataAccess.Dtos.NPCDto
     public class GetNpcDto : BaseNpcDto, IBaseDto
     {
         public Guid Id { get ; set ; }
+        public string QuestionName { get; set; }
     }
 }

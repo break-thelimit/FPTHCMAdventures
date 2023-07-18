@@ -1,4 +1,5 @@
 ﻿using BusinessObjects.Model;
+using DataAccess.Dtos.RankDto;
 using DataAccess.GenericRepositories;
 using System;
 using System.Collections.Generic;
@@ -10,5 +11,6 @@ namespace DataAccess.Repositories.RankRepositories
 {
     public interface IRankRepository : IGenericRepository<Rank>
     {
+        Task<List<GetRankDto>> GetAllRankAsync();
     }
 }

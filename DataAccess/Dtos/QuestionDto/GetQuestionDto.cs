@@ -9,5 +9,6 @@ namespace DataAccess.Dtos.QuestionDto
     public class GetQuestionDto : BaseQuestionDto, IBaseDto
     {
         public Guid Id { get ; set ; }
+        public string MajorName { get; set; }
     }
 }

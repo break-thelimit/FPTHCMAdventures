@@ -51,13 +51,13 @@ namespace Service.Services.TaskService
 
         public async Task<ServiceResponse<IEnumerable<GetTaskDto>>> GetTask()
         {
-            var eventList = await _taskRepository.GetAllAsync<GetTaskDto>();
+            var taskList = await _taskRepository.GetAllTaskAsync();
             
-            if (eventList != null)
+            if (taskList != null)
             {
                 return new ServiceResponse<IEnumerable<GetTaskDto>>
                 {
-                    Data = eventList,
+                    Data = taskList,
                     Success = true,
                     Message = "Successfully",
                     StatusCode = 200
@@ -67,9 +67,9 @@ namespace Service.Services.TaskService
             {
                 return new ServiceResponse<IEnumerable<GetTaskDto>>
                 {
-                    Data = eventList,
+                    Data = taskList,
                     Success = false,
-                    Message = "Failed because List event null",
+                    Message = "Failed because List task null",
                     StatusCode = 200
                 };
             }

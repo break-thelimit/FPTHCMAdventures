@@ -13,9 +13,10 @@ namespace BusinessObjects.Model
         }
 
         public Guid Id { get; set; }
+        public Guid? QuestionId { get; set; }
         public string NpcName { get; set; }
         public string Introduce { get; set; }
-        public Guid? QuestionId { get; set; }
+        public string Status { get; set; }
 
         public virtual Question Question { get; set; }
         public virtual ICollection<Task> Tasks { get; set; }

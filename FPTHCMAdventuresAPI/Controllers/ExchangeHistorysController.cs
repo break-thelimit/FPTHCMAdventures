@@ -31,7 +31,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         {
             try
             {
-                var res = await _exchangeHistoryService.GetExchangeHistory();
+                var res = await _exchangeHistoryService.GetAllExchangeHistory();
                 return Ok(res);
             }
             catch (Exception ex)

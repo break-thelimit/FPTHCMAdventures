@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
+using DataAccess.Dtos.AnswerDto;
 using DataAccess.GenericRepositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +20,18 @@ namespace DataAccess.Repositories.AnswerRepositories
         {
             _dbContext = dbContext;
             _mapper = mapper;
+        }
+        public async Task<List<GetAnswerDto>> GetAllAnswerkAsync()
+        {
+            var ranklist1 = await _dbContext.Answers.Include(l => l.Question).Select(x => new GetAnswerDto
+            {
+                Id = x.Id,
+                QuestionId = x.QuestionId,
+                QuestionName = x.Question.QuestionName,
+                Answer=x.Answer1,
+                IsRight=x.IsRight
+            }).ToListAsync();
+            return ranklist1;
         }
     }
 }

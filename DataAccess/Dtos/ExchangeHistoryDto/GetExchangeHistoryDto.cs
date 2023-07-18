@@ -9,5 +9,7 @@ namespace DataAccess.Dtos.ExchangeHistoryDto
     public class GetExchangeHistoryDto : BaseExchangeHistoryDto, IBaseDto
     {
         public Guid Id { get; set; }
+        public string PlayerNickname { get; set; }
+        public string ItemName { get; set; }
     }
 }

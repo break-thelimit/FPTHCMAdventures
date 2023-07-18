@@ -19,5 +19,6 @@ namespace Service.Services.UserService
         Task<ServiceResponse<Guid>> CreateNewUser(CreateUserDto createUserDto);
         Task<ServiceResponse<string>> UpdateUser(Guid id, UpdateUserDto updateUserDto);
         Task<ServiceResponse<PagedResult<UserDto>>> GetUserWithPage(QueryParameters queryParameters);
+        Task<ServiceResponse<IEnumerable<UserDto>>> GetAllUser();
     }
 }

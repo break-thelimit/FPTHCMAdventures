@@ -1,4 +1,5 @@
 ﻿using BusinessObjects.Model;
+using DataAccess.Dtos.ExchangeHistoryDto;
 using DataAccess.GenericRepositories;
 using System;
 using System.Collections.Generic;
@@ -10,5 +11,6 @@ namespace DataAccess.Repositories.ExchangeHistoryRepositories
 {
     public interface IExchangeHistoryRepository : IGenericRepository<ExchangeHistory>
     {
+        Task<List<GetExchangeHistoryDto>> GetAllExchangeHistoryRepository();
     }
 }

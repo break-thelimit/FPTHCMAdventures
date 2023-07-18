@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
+using DataAccess.Dtos.ExchangeHistoryDto;
+using DataAccess.Dtos.PlayerDto;
 using DataAccess.GenericRepositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,5 +23,18 @@ namespace DataAccess.Repositories.PlayerRepositories
             _mapper = mapper;
         }
 
+        public async Task<List<GetPlayerWithUserNameDto>> GetAllPlayerAsync()
+        {
+            var playerlist1 = await _dbContext.Players.Include(x => x.User).Select(x => new GetPlayerWithUserNameDto
+            {
+                Id = x.Id,
+                UserId = x.UserId,
+                UserName= x.User.Fullname,
+                TotalPoint=x.TotalPoint,
+                TotalTime=x.TotalTime,
+                NickName=x.Nickname
+            }).ToListAsync();
+            return playerlist1;
+        }
     }
 }

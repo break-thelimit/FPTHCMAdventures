@@ -28,11 +28,11 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpGet(Name = "GetUserList")]
 
-        public async Task<ActionResult<ServiceResponse<GetUserDto>>> GetUserList()
+        public async Task<ActionResult<ServiceResponse<UserDto>>> GetUserList()
         {
             try
             {
-                var res = await _userService.GetUser();
+                var res = await _userService.GetAllUser();
                 return Ok(res);
             }
             catch (Exception ex)

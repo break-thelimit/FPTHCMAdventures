@@ -86,7 +86,7 @@ namespace BusinessObjects.Model
                     .HasColumnType("datetime")
                     .HasColumnName("end_time");
 
-                entity.Property(e => e.RankId).HasColumnName("rank_id");
+                entity.Property(e => e.Name).HasColumnName("name");
 
                 entity.Property(e => e.StartTime)
                     .HasColumnType("datetime")
@@ -97,10 +97,6 @@ namespace BusinessObjects.Model
                     .IsUnicode(false)
                     .HasColumnName("status");
 
-                entity.HasOne(d => d.Rank)
-                    .WithMany(p => p.Events)
-                    .HasForeignKey(d => d.RankId)
-                    .HasConstraintName("FK_Event.rank_id");
             });
 
             modelBuilder.Entity<EventTask>(entity =>
@@ -300,6 +296,11 @@ namespace BusinessObjects.Model
 
                 entity.Property(e => e.QuestionId).HasColumnName("question_id");
 
+                entity.Property(e => e.Status)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("status");
+
                 entity.HasOne(d => d.Question)
                     .WithMany(p => p.Npcs)
                     .HasForeignKey(d => d.QuestionId)
@@ -393,12 +394,19 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
+                entity.Property(e => e.EventId).HasColumnName("event_id");
+
                 entity.Property(e => e.PlayerId).HasColumnName("player_id");
 
                 entity.Property(e => e.RankNumber)
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("rank_number");
+
+                entity.HasOne(d => d.Event)
+                    .WithMany(p => p.Ranks)
+                    .HasForeignKey(d => d.EventId)
+                    .HasConstraintName("FK_Rank.event_id");
 
                 entity.HasOne(d => d.Player)
                     .WithMany(p => p.Ranks)

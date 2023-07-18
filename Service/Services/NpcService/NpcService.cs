@@ -76,7 +76,7 @@ namespace Service.Services.NpcService
 
         public async Task<ServiceResponse<IEnumerable<GetNpcDto>>> GetNpc()
         {
-            var majorList = await _npcRepository.GetAllAsync<GetNpcDto>();
+            var majorList = await _npcRepository.GetAllNpckAsync();
 
             if (majorList != null)
             {
@@ -94,7 +94,7 @@ namespace Service.Services.NpcService
                 {
                     Data = majorList,
                     Success = false,
-                    Message = "Faile because List event null",
+                    Message = "Faile because List npc null",
                     StatusCode = 200
                 };
             }

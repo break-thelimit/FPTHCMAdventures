@@ -9,16 +9,16 @@ namespace BusinessObjects.Model
     {
         public Rank()
         {
-            Events = new HashSet<Event>();
             Gifts = new HashSet<Gift>();
         }
 
         public Guid Id { get; set; }
         public Guid? PlayerId { get; set; }
+        public Guid? EventId { get; set; }
         public string RankNumber { get; set; }
 
+        public virtual Event Event { get; set; }
         public virtual Player Player { get; set; }
-        public virtual ICollection<Event> Events { get; set; }
         public virtual ICollection<Gift> Gifts { get; set; }
     }
 }

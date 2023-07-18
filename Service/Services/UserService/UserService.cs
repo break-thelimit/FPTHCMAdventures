@@ -72,7 +72,7 @@ namespace Service.Services.UserService
                 {
                     Data = eventList,
                     Success = false,
-                    Message = "Faile because List event null",
+                    Message = "Faile because List user null",
                     StatusCode = 200
                 };
             }
@@ -305,6 +305,32 @@ namespace Service.Services.UserService
                 StatusCode = 200,
                 Success = true
             };
+        }
+
+        public async Task<ServiceResponse<IEnumerable<UserDto>>> GetAllUser()
+        {
+            var userList = await _userRepository.GetAllUserAsync();
+
+            if (userList != null)
+            {
+                return new ServiceResponse<IEnumerable<UserDto>>
+                {
+                    Data = userList,
+                    Success = true,
+                    Message = "Successfully",
+                    StatusCode = 200
+                };
+            }
+            else
+            {
+                return new ServiceResponse<IEnumerable<UserDto>>
+                {
+                    Data = userList,
+                    Success = false,
+                    Message = "Faile because List user null",
+                    StatusCode = 200
+                };
+            }
         }
     }
 }

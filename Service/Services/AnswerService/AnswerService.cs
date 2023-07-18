@@ -48,14 +48,12 @@ namespace Service.Services.AnswerService
 
         public async Task<ServiceResponse<IEnumerable<GetAnswerDto>>> GetAnswer()
         {
-            var eventList = await _answerRepository.GetAllAsync();
-            var _mapper = config.CreateMapper();
-            var lstDto = _mapper.Map<List<GetAnswerDto>>(eventList);
+            var eventList = await _answerRepository.GetAllAnswerkAsync();
             if (eventList != null)
             {
                 return new ServiceResponse<IEnumerable<GetAnswerDto>>
                 {
-                    Data = lstDto,
+                    Data = eventList,
                     Success = true,
                     Message = "Successfully",
                     StatusCode = 200
@@ -65,9 +63,9 @@ namespace Service.Services.AnswerService
             {
                 return new ServiceResponse<IEnumerable<GetAnswerDto>>
                 {
-                    Data = lstDto,
+                    Data = eventList,
                     Success = false,
-                    Message = "Faile because List event null",
+                    Message = "Faile because List answer null",
                     StatusCode = 200
                 };
             }

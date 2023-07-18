@@ -11,5 +11,6 @@ namespace DataAccess.Dtos.NPCDto
         public string NpcName { get; set; }
         public string Introduce { get; set; }
         public Guid? QuestionId { get; set; }
+        public string Status { get; set; }
     }
 }

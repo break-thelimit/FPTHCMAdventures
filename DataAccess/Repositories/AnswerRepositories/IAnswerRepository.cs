@@ -1,4 +1,5 @@
 ﻿using BusinessObjects.Model;
+using DataAccess.Dtos.AnswerDto;
 using DataAccess.GenericRepositories;
 using System;
 using System.Collections.Generic;
@@ -10,5 +11,6 @@ namespace DataAccess.Repositories.AnswerRepositories
 {
     public interface IAnswerRepository : IGenericRepository<Answer>
     {
+        Task<List<GetAnswerDto>> GetAllAnswerkAsync();
     }
 }

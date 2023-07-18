@@ -46,13 +46,13 @@ namespace Service.Services.GiftService
 
         public async Task<ServiceResponse<IEnumerable<GetGiftDto>>> GetGift()
         {
-            var majorList = await _giftRepository.GetAllAsync<GetGiftDto>();
+            var giftList = await _giftRepository.GetAllGiftAsync();
 
-            if (majorList != null)
+            if (giftList != null)
             {
                 return new ServiceResponse<IEnumerable<GetGiftDto>>
                 {
-                    Data = majorList,
+                    Data = giftList,
                     Success = true,
                     Message = "Successfully",
                     StatusCode = 200
@@ -62,7 +62,7 @@ namespace Service.Services.GiftService
             {
                 return new ServiceResponse<IEnumerable<GetGiftDto>>
                 {
-                    Data = majorList,
+                    Data = giftList,
                     Success = false,
                     Message = "Faile because List event null",
                     StatusCode = 200

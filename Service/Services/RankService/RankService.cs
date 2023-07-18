@@ -45,7 +45,7 @@ namespace Service.Services.RankService
 
         public async Task<ServiceResponse<IEnumerable<GetRankDto>>> GetRank()
         {
-            var rankList = await _rankRepository.GetAllAsync<GetRankDto>();
+            var rankList = await _rankRepository.GetAllRankAsync();
 
             if (rankList != null)
             {

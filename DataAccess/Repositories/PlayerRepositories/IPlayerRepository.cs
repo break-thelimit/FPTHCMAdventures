@@ -1,4 +1,5 @@
 ﻿using BusinessObjects.Model;
+using DataAccess.Dtos.PlayerDto;
 using DataAccess.GenericRepositories;
 using System;
 using System.Collections.Generic;
@@ -10,5 +11,6 @@ namespace DataAccess.Repositories.PlayerRepositories
 {
     public interface IPlayerRepository : IGenericRepository<Player>
     {
+        Task<List<GetPlayerWithUserNameDto>> GetAllPlayerAsync();
     }
 }

@@ -206,31 +206,13 @@ namespace Service.Services.PlayerService
 
         public async Task<ServiceResponse<IEnumerable<GetPlayerWithUserNameDto>>> GetPlayerWithUserName()
         {
-            var players= await _playerRepository.GetAllAsync<GetPlayerDto>();
-            var playerList = new List<GetPlayerWithUserNameDto>();
+            var userList = await _playerRepository.GetAllPlayerAsync();
 
-            if (playerList != null)
+            if (userList != null)
             {
-                foreach (var player in players)
-                {
-                    var user = await _userRepository.GetAsync<UserDto>(player.UserId);
-                    if(user != null)
-                    {
-                        var playerData = new GetPlayerWithUserNameDto
-                        {
-                            Id = player.Id,
-                            Name = user.Fullname,
-                            TotalPoint = player.TotalPoint,
-                            TotalTime = player.TotalTime,
-                            NickName = player.NickName
-                        };
-                        playerList.Add(playerData);
-
-                    }
-                }
                 return new ServiceResponse<IEnumerable<GetPlayerWithUserNameDto>>
                 {
-                    Data = playerList,
+                    Data = userList,
                     Success = true,
                     Message = "Successfully",
                     StatusCode = 200
@@ -240,8 +222,9 @@ namespace Service.Services.PlayerService
             {
                 return new ServiceResponse<IEnumerable<GetPlayerWithUserNameDto>>
                 {
+                    Data = userList,
                     Success = false,
-                    Message = "Faile because List event null",
+                    Message = "Faile because List user null",
                     StatusCode = 200
                 };
             }

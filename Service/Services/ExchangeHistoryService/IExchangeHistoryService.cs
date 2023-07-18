@@ -14,5 +14,6 @@ namespace Service.Services.ExchangeHistoryService
         Task<ServiceResponse<ExchangeHistoryDto>> GetExchangeHistoryById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewExchangeHistory(CreateExchangeHistoryDto createEventTaskDto);
         Task<ServiceResponse<string>> UpdateExchangeHistory(Guid id, UpdateExchangeHistoryDto eventTaskDto);
+        Task<ServiceResponse<IEnumerable<GetExchangeHistoryDto>>> GetAllExchangeHistory();
     }
 }
