@@ -13,5 +13,6 @@ namespace DataAccess.Repositories.AnswerRepositories
     {
 
         Task<IEnumerable<GetAnswerAndQuestionNameDto>> GetListQuestionByMajorIdAsync(Guid majorId);
+
     }
 }

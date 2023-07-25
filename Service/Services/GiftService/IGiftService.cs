@@ -14,8 +14,12 @@ namespace Service.Services.GiftService
         Task<ServiceResponse<GiftDto>> GetGiftById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewGift(CreateGiftDto createGiftDto);
         Task<ServiceResponse<string>> UpdateGift(Guid id, UpdateGiftDto giftDto);
+<<<<<<< HEAD
 
         Task<ServiceResponse<string>> GetTotalGift();
 
+=======
+        Task<ServiceResponse<string>> GetTotalGift();
+>>>>>>> origin/main
     }
 }

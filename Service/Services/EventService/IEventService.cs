@@ -1,6 +1,9 @@
 ﻿using DataAccess;
 using DataAccess.Dtos.EventDto;
+<<<<<<< HEAD
 using DataAccess.Dtos.TaskDto;
+=======
+>>>>>>> origin/main
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -21,6 +24,9 @@ namespace Service.Services.EventService
         Task<ServiceResponse<byte[]>> DownloadExcelTemplate();
         Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file);
         Task<ServiceResponse<PagedResult<EventDto>>> GetEventWithPage(QueryParameters queryParameters);
+<<<<<<< HEAD
     
+=======
+>>>>>>> origin/main
     }
 }

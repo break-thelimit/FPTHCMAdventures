@@ -45,7 +45,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpGet("location/pagination", Name = "GetLocationListWithPagination")]
 
-        public async Task<ActionResult<ServiceResponse<AnswerDto>>> GetLocationListWithPage([FromQuery] QueryParameters queryParameters)
+        public async Task<ActionResult<ServiceResponse<LocationDto>>> GetLocationListWithPage([FromQuery] QueryParameters queryParameters)
         {
             try
             {

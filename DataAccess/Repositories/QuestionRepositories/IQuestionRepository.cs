@@ -1,4 +1,5 @@
 ﻿using BusinessObjects.Model;
+using DataAccess.Dtos.QuestionDto;
 using DataAccess.GenericRepositories;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,5 @@ namespace DataAccess.Repositories.QuestionRepositories
 {
     public interface IQuestionRepository : IGenericRepository<Question>
     {
-
     }
 }

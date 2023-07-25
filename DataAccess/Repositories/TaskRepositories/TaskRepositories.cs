@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
-using DataAccess.Dtos.EventTaskDto;
 using DataAccess.Dtos.TaskDto;
 using DataAccess.GenericRepositories;
 using DataAccess.Repositories.EventRepositories;

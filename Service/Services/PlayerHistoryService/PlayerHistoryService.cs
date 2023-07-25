@@ -74,13 +74,13 @@ namespace Service.Services.PlayerHistoryService
 
         public async Task<ServiceResponse<IEnumerable<GetPlayerHistoryDto>>> GetPlayerHistory()
         {
-            var majorList = await _playerHistoryRepository.GetAllAsync<GetPlayerHistoryDto>();
+            var playerhistoryList = await _playerHistoryRepository.GetAllAsync<GetPlayerHistoryDto>();
 
-            if (majorList != null)
+            if (playerhistoryList != null)
             {
                 return new ServiceResponse<IEnumerable<GetPlayerHistoryDto>>
                 {
-                    Data = majorList,
+                    Data = playerhistoryList,
                     Success = true,
                     Message = "Successfully",
                     StatusCode = 200
@@ -90,7 +90,7 @@ namespace Service.Services.PlayerHistoryService
             {
                 return new ServiceResponse<IEnumerable<GetPlayerHistoryDto>>
                 {
-                    Data = majorList,
+                    Data = playerhistoryList,
                     Success = false,
                     Message = "Faile because List event null",
                     StatusCode = 200

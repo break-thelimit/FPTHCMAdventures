@@ -18,5 +18,6 @@ namespace DataAccess.Dtos.UserDto
         public long PhoneNumber { get; set; }
         public string Gender { get; set; }
         public string Status { get; set; }
+
     }
 }

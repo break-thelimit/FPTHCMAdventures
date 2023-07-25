@@ -51,7 +51,7 @@ namespace FPTHCMAdventuresAPI.Controllers
             var eventDetail = await _itemInventoryService.getListItemInventoryByPlayer(PlayerNickName);
             return Ok(eventDetail);
         }
-        [HttpGet("iteminventory/byname/{itemName}")] 
+        [HttpGet("iteminventory/byname/{itemName}")]
         public async Task<ActionResult<ItemInventoryDto>> GetItemInventoryByItemName(string itemName)
         {
             var eventDetail = await _itemInventoryService.GetItemByItemName(itemName);

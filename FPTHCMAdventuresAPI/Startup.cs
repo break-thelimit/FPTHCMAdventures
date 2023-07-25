@@ -72,7 +72,7 @@ using DataAccess.Dtos.Users;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 
-namespace XavalorAdventuresAPI
+namespace FPTHCMAdventuresAPI
 {
     public class Startup
     {
@@ -234,8 +234,10 @@ namespace XavalorAdventuresAPI
             {
                *//* app.UseDeveloperExceptionPage();
                 app.UseSwagger();
+
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "XavalorAdventuresAPI v1"));*//*
             }*/
+
             app.UseSwagger();
             app.UseSwaggerUI(c => {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Documentation");

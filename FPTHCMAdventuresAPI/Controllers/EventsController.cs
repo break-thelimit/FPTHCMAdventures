@@ -26,7 +26,7 @@ namespace XavalorAdventuresAPI.Controllers
         private readonly IEventService _eventService;
         private readonly IMapper _mapper;
 
-        public EventsController(IMapper mapper,IEventService eventService)
+        public EventsController(IMapper mapper, IEventService eventService)
         {
             this._mapper = mapper;
             _eventService = eventService;
@@ -35,7 +35,7 @@ namespace XavalorAdventuresAPI.Controllers
 
         //Phan cua kiet
         [HttpGet(Name = "GetEventList")]
-        
+
         public async Task<ActionResult<ServiceResponse<GetEventDto>>> GetEventList()
         {
             try
@@ -76,7 +76,7 @@ namespace XavalorAdventuresAPI.Controllers
 
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
-        } 
+        }
         [HttpPut("{id}")]
 
         public async Task<ActionResult<ServiceResponse<EventDto>>> CreateNewEvent(Guid id, [FromBody] UpdateEventDto eventDto)

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
+using DataAccess.Dtos.UserDto;
 using DataAccess.GenericRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repositories.UserRepository
 {
-    public class UserRepository : GenericRepository<User>,IUserRepository
+    public class UserRepository : GenericRepository<User>, IUserRepository
     {
         private readonly FPTHCMAdventuresDBContext _dbContext;
         private readonly IMapper _mapper;
@@ -30,6 +31,8 @@ namespace DataAccess.Repositories.UserRepository
             }
             return user.Id;
         }
+
+      
     }
 }
 

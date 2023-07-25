@@ -1,4 +1,5 @@
 ﻿using BusinessObjects.Model;
+using DataAccess.Dtos.UserDto;
 using DataAccess.GenericRepositories;
 using System;
 using System.Collections.Generic;

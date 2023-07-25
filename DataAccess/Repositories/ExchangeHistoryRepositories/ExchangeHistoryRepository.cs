@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
+using DataAccess.Dtos.ExchangeHistoryDto;
 using DataAccess.GenericRepositories;
 using DataAccess.Repositories.EventTaskRepositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +23,19 @@ namespace DataAccess.Repositories.ExchangeHistoryRepositories
             _mapper = mapper;
         }
 
+        public async Task<List<GetExchangeHistoryDto>> GetAllExchangeHistoryRepository()
+        {
+            var userlist1 = await _dbContext.ExchangeHistories.Include(x => x.Player).Include(r => r.Item).Select(x => new GetExchangeHistoryDto
+            {
+                Id = x.Id,
+                PlayerId=x.PlayerId,
+                PlayerNickname=x.Player.Nickname,
+                ItemId=x.ItemId,
+                ItemName=x.Item.Name,
+                ExchangeDate=x.ExchangeDate
+            }).ToListAsync();
+            return userlist1;
+        }
 
     }
 }

@@ -9,5 +9,7 @@ namespace DataAccess.Dtos.RankDto
     public class GetRankDto : BaseRankDto,IBaseDto
     {
         public Guid Id { get; set; }
+        public string PlayerName { get; set; }
+        public string EventName { get; set; }
     }
 }

@@ -82,10 +82,12 @@ namespace BusinessObjects.Model
                     .HasColumnType("datetime")
                     .HasColumnName("end_time");
 
+
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(100)
                     .HasColumnName("name");
+
 
                 entity.Property(e => e.StartTime)
                     .HasColumnType("datetime")
@@ -327,6 +329,7 @@ namespace BusinessObjects.Model
                     .IsRequired()
                     .HasMaxLength(100)
                     .HasColumnName("status");
+
             });
 
             modelBuilder.Entity<PlayHistory>(entity =>
@@ -443,17 +446,18 @@ namespace BusinessObjects.Model
                     .HasMaxLength(100)
                     .HasColumnName("name");
 
-                entity.Property(e => e.Place)
-                    .IsRequired()
-                    .HasMaxLength(100)
-                    .HasColumnName("place");
-
+              
                 entity.Property(e => e.PlayerId).HasColumnName("player_id");
 
                 entity.HasOne(d => d.Event)
                     .WithMany(p => p.Ranks)
                     .HasForeignKey(d => d.EventId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Rank.event_id");
+
+                entity.HasOne(d => d.Event)
+                    .WithMany(p => p.Ranks)
+                    .HasForeignKey(d => d.EventId)
                     .HasConstraintName("FK_Rank.event_id");
 
                 entity.HasOne(d => d.Player)

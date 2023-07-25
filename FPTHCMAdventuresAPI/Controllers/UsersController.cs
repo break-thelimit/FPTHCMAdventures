@@ -73,13 +73,13 @@ namespace FPTHCMAdventuresAPI.Controllers
             return Ok(eventDetail);
         }
         [HttpGet("user/{username}/{password}")]
-        public async Task<ActionResult<UserDto>> GetUserByUserNameAndPassword(string username , string password)
+        public async Task<ActionResult<UserDto>> GetUserByUserNameAndPassword(string username, string password)
         {
-            var eventDetail = await _userService.CheckUserByUserNameAndPassword(username,password);
+            var eventDetail = await _userService.CheckUserByUserNameAndPassword(username, password);
             return Ok(eventDetail);
         }
 
-       
+
         [HttpPut("{id}")]
 
         public async Task<ActionResult<ServiceResponse<GetUserDto>>> UpdateUser(Guid id, [FromBody] UpdateUserDto eventDto)

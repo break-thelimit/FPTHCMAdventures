@@ -69,6 +69,32 @@ namespace Service.Services.ExchangeHistoryService
             }
         }
 
+        public async Task<ServiceResponse<IEnumerable<GetExchangeHistoryDto>>> GetAllExchangeHistory()
+        {
+            var exchangeHistoryList = await _exchangeHistoryRepository.GetAllExchangeHistoryRepository();
+
+            if (exchangeHistoryList != null)
+            {
+                return new ServiceResponse<IEnumerable<GetExchangeHistoryDto>>
+                {
+                    Data = exchangeHistoryList,
+                    Success = true,
+                    Message = "Successfully",
+                    StatusCode = 200
+                };
+            }
+            else
+            {
+                return new ServiceResponse<IEnumerable<GetExchangeHistoryDto>>
+                {
+                    Data = exchangeHistoryList,
+                    Success = false,
+                    Message = "Faile because List event null",
+                    StatusCode = 200
+                };
+            }
+        }
+
         public async Task<ServiceResponse<ExchangeHistoryDto>> GetExchangeHistoryById(Guid eventId)
         {
             try

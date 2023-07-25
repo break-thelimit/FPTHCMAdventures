@@ -13,5 +13,6 @@ namespace DataAccess.Dtos.RankDto
         public string Name { get; set; }
         public string Place { get; set; }
 
+
     }
 }

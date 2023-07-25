@@ -313,6 +313,7 @@ namespace Service.Services.EventService
             };
         }
 
+
         public async Task<ServiceResponse<IEnumerable<GetEventDto>>> GetEventByDate(DateTime dateTimeStart)
         {
             try
@@ -378,6 +379,7 @@ namespace Service.Services.EventService
                 throw new Exception(ex.Message);
             }
         }
+
         public async Task<ServiceResponse<PagedResult<EventDto>>> GetEventWithPage(QueryParameters queryParameters)
         {
             var pagedsResult = await _eventRepository.GetAllAsync<EventDto>(queryParameters);
@@ -389,6 +391,7 @@ namespace Service.Services.EventService
                 Success = true
             };
         }
+
 
         public async Task<ServiceResponse<IEnumerable<GetTaskAndEventDto>>> GetTaskAndEventListByTimeNow()
         {
@@ -414,5 +417,6 @@ namespace Service.Services.EventService
                 };
             }
         }
+
     }
 }

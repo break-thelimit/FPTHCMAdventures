@@ -27,5 +27,6 @@ namespace DataAccess.Repositories.NPCRepository
             var npc = await _dbContext.Set<Npc>().FirstOrDefaultAsync(x => x.Name == npcName);          
             return _mapper.Map<NpcDto>(npc);
         }
+
     }
 }

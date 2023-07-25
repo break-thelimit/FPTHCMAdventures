@@ -24,13 +24,13 @@ namespace FPTHCMAdventuresAPI.Controllers
         private readonly ITaskService _taskService;
         private readonly IMapper _mapper;
 
-        public TasksController(ITaskService taskService,IMapper mapper)
+        public TasksController(ITaskService taskService, IMapper mapper)
         {
             _taskService = taskService;
             _mapper = mapper;
         }
 
-     
+
         [HttpGet(Name = "GetTaskList")]
 
         public async Task<ActionResult<ServiceResponse<GetTaskDto>>> GetEventList()
@@ -59,7 +59,7 @@ namespace FPTHCMAdventuresAPI.Controllers
             {
                 var res = await _taskService.GetTaskDoneByMajor(majorid);
                 return Ok(res);
-            }   
+            }
             catch (Exception ex)
             {
 

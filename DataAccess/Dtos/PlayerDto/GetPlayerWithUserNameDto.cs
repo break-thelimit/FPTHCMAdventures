@@ -16,5 +16,6 @@ namespace DataAccess.Dtos.PlayerDto
         public string Nickname { get; set; }
         public DateTime CreatedAt { get; set; }
 
+
     }
 }
