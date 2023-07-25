@@ -101,11 +101,24 @@ namespace Service.Services.SchoolService
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<ServiceResponse<PagedResult<SchoolDto>>> GetSchoolWithPage(QueryParameters queryParameters)
+        {
+            var pagedsResult = await _schoolRepository.GetAllAsync<SchoolDto>(queryParameters);
+            return new ServiceResponse<PagedResult<SchoolDto>>
+            {
+                Data = pagedsResult,
+                Message = "Successfully",
+                StatusCode = 200,
+                Success = true
+            };
+        }
 
         public async Task<ServiceResponse<string>> UpdateSchool(Guid id, UpdateSchoolDto schoolDto)
         {
             try
-            {
+            {   
+                
+                schoolDto.Id = id;
                 await _schoolRepository.UpdateAsync(id, schoolDto);
                 return new ServiceResponse<string>
                 {

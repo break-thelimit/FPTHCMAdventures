@@ -11,6 +11,5 @@ namespace DataAccess.Repositories.QuestionRepositories
 {
     public interface IQuestionRepository : IGenericRepository<Question>
     {
-        Task<List<GetQuestionDto>> GetAllQuestionAsync();
     }
 }

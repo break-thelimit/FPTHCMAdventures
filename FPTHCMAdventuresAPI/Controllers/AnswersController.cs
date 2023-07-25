@@ -15,7 +15,6 @@ using DataAccess;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AnswersController : ControllerBase
@@ -37,6 +36,20 @@ namespace FPTHCMAdventuresAPI.Controllers
             try
             {
                 var res = await _answerService.GetAnswer();
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        [HttpGet("GetAnswers/{majorId}", Name = "GetAnswersByMajor")]
+
+        public async Task<ActionResult<ServiceResponse<GetAnswerAndQuestionNameDto>>> GetAnswerListWithQuestionId(Guid majorId)
+        {
+            try
+            {
+                var res = await _answerService.GetListQuestionByMajorIdAsync(majorId);
                 return Ok(res);
             }
             catch (Exception ex)

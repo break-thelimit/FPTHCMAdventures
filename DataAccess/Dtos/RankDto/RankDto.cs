@@ -6,9 +6,14 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.RankDto
 {
-    public class RankDto : BaseRankDto, IBaseDto
+    public class RankDto : IBaseDto
     {
         public Guid Id { get; set; }
+
+        public string PlayerName { get; set; }
+        public string EventName { get; set; }
+        public string Name { get; set; }
+        public string Place { get; set; }
     }
 }
 

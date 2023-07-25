@@ -15,6 +15,7 @@ using AutoMapper;
 using DataAccess.Dtos.EventDto;
 using DataAccess.Exceptions;
 using DataAccess;
+using DataAccess.Dtos.TaskDto;
 
 namespace XavalorAdventuresAPI.Controllers
 {
@@ -25,7 +26,7 @@ namespace XavalorAdventuresAPI.Controllers
         private readonly IEventService _eventService;
         private readonly IMapper _mapper;
 
-        public EventsController(IMapper mapper,IEventService eventService)
+        public EventsController(IMapper mapper, IEventService eventService)
         {
             this._mapper = mapper;
             _eventService = eventService;
@@ -34,7 +35,7 @@ namespace XavalorAdventuresAPI.Controllers
 
         //Phan cua kiet
         [HttpGet(Name = "GetEventList")]
-        
+
         public async Task<ActionResult<ServiceResponse<GetEventDto>>> GetEventList()
         {
             try
@@ -48,25 +49,16 @@ namespace XavalorAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-
-        [HttpGet("event/pagination", Name = "GetEventListWithPagination")]
-
-        public async Task<ActionResult<ServiceResponse<EventDto>>> GetLocationListWithPage([FromQuery] QueryParameters queryParameters)
-        {
-            try
-            {
-                var pagedsResult = await _eventService.GetEventWithPage(queryParameters);
-                return Ok(pagedsResult);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Internal server error: " + ex.Message);
-            }
-        }
         [HttpGet("{id}")]
         public async Task<ActionResult<EventDto>> GetEventById(Guid id)
         {
             var eventDetail = await _eventService.GetEventById(id);
+            return Ok(eventDetail);
+        }
+        [HttpGet("event/{startTime}")]
+        public async Task<ActionResult<GetEventDto>> GetEventByStartTime(DateTime startTime)
+        {
+            var eventDetail = await _eventService.GetEventByDate(startTime);
             return Ok(eventDetail);
         }
 
@@ -84,7 +76,7 @@ namespace XavalorAdventuresAPI.Controllers
 
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
-        } 
+        }
         [HttpPut("{id}")]
 
         public async Task<ActionResult<ServiceResponse<EventDto>>> CreateNewEvent(Guid id, [FromBody] UpdateEventDto eventDto)
@@ -100,7 +92,35 @@ namespace XavalorAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+        [HttpGet("event/pagination", Name = "GetEventListWithPagination")]
 
+        public async Task<ActionResult<ServiceResponse<EventDto>>> GetLocationListWithPage([FromQuery] QueryParameters queryParameters)
+        {
+            try
+            {
+                var pagedsResult = await _eventService.GetEventWithPage(queryParameters);
+                return Ok(pagedsResult);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpGet("events/time", Name = "GetEventListWithTime")]
+
+        public async Task<ActionResult<ServiceResponse<GetTaskAndEventDto>>> GetEventListWithTimeNow()
+        {
+            try
+            {
+                var events = await _eventService.GetTaskAndEventListByTimeNow();
+                return Ok(events);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
         [HttpPost("upload-excel-event")]
         public async Task<IActionResult> UploadExcel(IFormFile file)
         {

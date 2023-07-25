@@ -8,9 +8,8 @@ namespace DataAccess.Dtos.EventTaskDto
 {
     public abstract class BaseEventTaskDto
     {
-        public Guid? TaskId { get; set; }
-        public Guid? EventId { get; set; }
+        public Guid TaskId { get; set; }
+        public Guid EventId { get; set; }
 
-       
     }
 }

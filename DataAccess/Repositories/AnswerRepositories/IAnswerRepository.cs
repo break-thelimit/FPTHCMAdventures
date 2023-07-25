@@ -11,6 +11,8 @@ namespace DataAccess.Repositories.AnswerRepositories
 {
     public interface IAnswerRepository : IGenericRepository<Answer>
     {
-        Task<List<GetAnswerDto>> GetAllAnswerkAsync();
+
+        Task<IEnumerable<GetAnswerAndQuestionNameDto>> GetListQuestionByMajorIdAsync(Guid majorId);
+
     }
 }

@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.ExchangeHistoryDto
 {
-    public class ExchangeHistoryDto : BaseExchangeHistoryDto , IBaseDto
+    public class ExchangeHistoryDto :  IBaseDto
     {
         public Guid Id { get; set; }
+        public string PlayerName { get; set; }
+        public string ItemName { get; set; }
+        public DateTime ExchangeDate { get; set; }
     }
 }

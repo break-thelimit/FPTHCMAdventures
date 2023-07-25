@@ -49,13 +49,17 @@ namespace Service.Services.QuestionService
         }
 
        
-        public async Task<ServiceResponse<IEnumerable<GetQuestionDto>>> GetQuestion()
+        public async Task<ServiceResponse<IEnumerable<QuestionDto>>> GetQuestion()
         {
+<<<<<<< HEAD
+            var majorList = await _questionRepository.GetAllAsync<QuestionDto>();
+=======
             var questionList = await _questionRepository.GetAllQuestionAsync();
+>>>>>>> origin/main
 
             if (questionList != null)
             {
-                return new ServiceResponse<IEnumerable<GetQuestionDto>>
+                return new ServiceResponse<IEnumerable<QuestionDto>>
                 {
                     Data = questionList,
                     Success = true,
@@ -65,7 +69,7 @@ namespace Service.Services.QuestionService
             }
             else
             {
-                return new ServiceResponse<IEnumerable<GetQuestionDto>>
+                return new ServiceResponse<IEnumerable<QuestionDto>>
                 {
                     Data = questionList,
                     Success = false,
@@ -112,6 +116,7 @@ namespace Service.Services.QuestionService
         {
             try
             {
+                questionDto.Id = id;
                 await _questionRepository.UpdateAsync(id, questionDto);
                 return new ServiceResponse<string>
                 {
@@ -192,8 +197,8 @@ namespace Service.Services.QuestionService
                                 var data = new QuestionDto
                                 {
                                     Id = Guid.NewGuid(),
-                                    QuestionName = worksheet.Cells[row, 1].Value?.ToString(),
-                                    MajorId = majorDictionary[worksheet.Cells[row, 2].Value?.ToString()]
+                                    Name = worksheet.Cells[row, 1].Value.ToString(),
+                                    MajorName = worksheet.Cells[row, 2].Value.ToString(),
 
                                 };
 

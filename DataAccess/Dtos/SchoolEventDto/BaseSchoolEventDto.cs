@@ -8,7 +8,8 @@ namespace DataAccess.Dtos.SchoolEventDto
 {
     public abstract class BaseSchoolEventDto
     {
-        public Guid? EventId { get; set; }
-        public Guid? SchoolId { get; set; }
+        public Guid EventId { get; set; }
+        public Guid SchoolId { get; set; }
+
     }
 }

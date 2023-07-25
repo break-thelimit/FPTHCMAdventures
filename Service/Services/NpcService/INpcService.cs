@@ -10,8 +10,9 @@ namespace Service.Services.NpcService
 {
     public interface INpcService
     {
-        Task<ServiceResponse<IEnumerable<GetNpcDto>>> GetNpc();
+        Task<ServiceResponse<IEnumerable<NpcDto>>> GetNpc();
         Task<ServiceResponse<NpcDto>> GetNpcById(Guid eventId);
+        Task<ServiceResponse<NpcDto>> GetNpcByName(string npcName);
         Task<ServiceResponse<Guid>> CreateNewNpc(CreateNpcDto createMajorDto);
         Task<ServiceResponse<string>> UpdateNpc(Guid id, UpdateNpcDto majorDto);
     }

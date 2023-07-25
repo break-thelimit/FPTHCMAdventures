@@ -1,4 +1,5 @@
-﻿using DataAccess.Dtos.Users;
+﻿using DataAccess.Dtos.UserDto;
+using DataAccess.Dtos.Users;
 using DataAccess.GoogleAuthSetting;
 using DataAccess.Repositories.UserRepositories;
 using Microsoft.AspNetCore.Authentication;
@@ -98,7 +99,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> Register([FromBody] ApiUserDto apiUserDto)
+        public async Task<ActionResult<BaseResponse<AuthResponseDto>>> Register([FromBody] ApiUserDto apiUserDto)
         {
             var errors = await _authManager.RegisterUser(apiUserDto);
 
@@ -111,7 +112,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> Login([FromBody] LoginDto loginDto)
+        public async Task<ActionResult<BaseResponse<AuthResponseDto>>> Login([FromBody] LoginDto loginDto)
         {
             var authResponse = await _authManager.Login(loginDto);
 

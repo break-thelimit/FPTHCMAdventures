@@ -131,6 +131,8 @@ namespace Service.Services.ExchangeHistoryService
         {
             try
             {
+
+                eventTaskDto.Id = id;
                 await _exchangeHistoryRepository.UpdateAsync(id, eventTaskDto);
                 return new ServiceResponse<string>
                 {

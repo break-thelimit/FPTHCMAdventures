@@ -104,7 +104,8 @@ namespace Service.Services.SchoolEventService
         public async Task<ServiceResponse<string>> UpdateSchoolEvent(Guid id, UpdateSchoolEventDto schoolEventDto)
         {
             try
-            {
+            {   
+                schoolEventDto.Id = id;
                 await _schoolEventRepository.UpdateAsync(id, schoolEventDto);
                 return new ServiceResponse<string>
                 {

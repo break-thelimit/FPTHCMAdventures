@@ -50,11 +50,17 @@ namespace FPTHCMAdventuresAPI.Controllers
         {
             var eventDetail = await _playerHistoryService.GetPlayerHistoryByTaskId(id);
             return Ok(eventDetail);
+        } 
+        [HttpGet("task/{taskId}/{playerId}")]
+        public async Task<ActionResult<PlayerHistoryDto>> GetPlayerHistorywithtaskIdandPlayerId(Guid taskId, Guid playerId)
+        {
+            var eventDetail = await _playerHistoryService.GetPlayerHistoryByTaskIdAndPlayerId(taskId, playerId);
+            return Ok(eventDetail);
         }
 
         [HttpPost("playerhistory", Name = "CreateNewPlayerHistory")]
 
-        public async Task<ActionResult<ServiceResponse<PlayerHistoryDto>>> CreateNewPlayerHistory(CreatePlayerHistoryDto answerDto)
+        public async Task<ActionResult<ServiceResponse<GetPlayerHistoryDto>>> CreateNewPlayerHistory(CreatePlayerHistoryDto answerDto)
         {
             try
             {
@@ -69,7 +75,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<PlayerHistoryDto>>> UpdatePlayerHistory(Guid id, [FromBody] UpdatePlayerHistoryDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetPlayerHistoryDto>>> UpdatePlayerHistory(Guid id, [FromBody] UpdatePlayerHistoryDto eventDto)
         {
             try
             {

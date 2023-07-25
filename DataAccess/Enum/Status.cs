@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccess.Dtos.TaskItemDto
+namespace DataAccess.Enum
 {
-    public class GetTaskItemDto : BaseTaskItemDto,IBaseDto
+    public enum Status
     {
-        public Guid Id { get; set; }
+        ACTIVE,
+        INACTIVE
     }
 }

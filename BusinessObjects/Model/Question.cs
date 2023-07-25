@@ -7,18 +7,13 @@ namespace BusinessObjects.Model
 {
     public partial class Question
     {
-        public Question()
-        {
-            Answers = new HashSet<Answer>();
-            Npcs = new HashSet<Npc>();
-        }
-
         public Guid Id { get; set; }
-        public string QuestionName { get; set; }
-        public Guid? MajorId { get; set; }
+        public Guid AnswerId { get; set; }
+        public Guid MajorId { get; set; }
+        public string Name { get; set; }
+        public string Status { get; set; }
 
+        public virtual Answer Answer { get; set; }
         public virtual Major Major { get; set; }
-        public virtual ICollection<Answer> Answers { get; set; }
-        public virtual ICollection<Npc> Npcs { get; set; }
     }
 }

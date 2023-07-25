@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System;
 using Service.Services.RankService;
 using DataAccess.Dtos.RankDto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {

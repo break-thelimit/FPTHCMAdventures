@@ -14,7 +14,6 @@ using Service.Services.TaskService;
 using DataAccess.Dtos.EventDto;
 using Service;
 using DataAccess.Dtos.TaskDto;
-using DataAccess.Dtos.TaskItemDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
@@ -25,16 +24,16 @@ namespace FPTHCMAdventuresAPI.Controllers
         private readonly ITaskService _taskService;
         private readonly IMapper _mapper;
 
-        public TasksController(ITaskService taskService,IMapper mapper)
+        public TasksController(ITaskService taskService, IMapper mapper)
         {
             _taskService = taskService;
             _mapper = mapper;
         }
 
-     
+
         [HttpGet(Name = "GetTaskList")]
 
-        public async Task<ActionResult<ServiceResponse<GetTaskDto>>> GetTaskList()
+        public async Task<ActionResult<ServiceResponse<GetTaskDto>>> GetEventList()
         {
             try
             {
@@ -47,7 +46,12 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TaskDto>> GetTaskById(Guid id)
+        {
+            var eventDetail = await _taskService.GetTaskById(id);
+            return Ok(eventDetail);
+        }
         [HttpGet("/gettaskdonebymajor")]
         public async Task<ActionResult<ServiceResponse<BusinessObjects.Model.Task>>> GetTaskDoneByMajor(Guid majorid)
         {
@@ -63,15 +67,9 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<TaskItemDto>> GetTaskById(Guid id)
-        {
-            var eventDetail = await _taskService.GetTaskById(id);
-            return Ok(eventDetail);
-        }
         [HttpPost("task", Name = "CreateNewTask")]
 
-        public async Task<ActionResult<ServiceResponse<TaskDto>>> CreateNewTask(CreateTaskDto taskDto)
+        public async Task<ActionResult<ServiceResponse<TaskDto>>> CreateNewEvent(CreateTaskDto taskDto)
         {
             try
             {
@@ -86,7 +84,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<TaskDto>>> UpdateTask(Guid id, [FromBody] UpdateTaskDto updateTaskDto)
+        public async Task<ActionResult<ServiceResponse<GetTaskDto>>> CreateNewEvent(Guid id, [FromBody] UpdateTaskDto updateTaskDto)
         {
             try
             {

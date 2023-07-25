@@ -8,6 +8,6 @@ namespace DataAccess.Dtos.RoleDto
 {
     public abstract class BaseRoleDto
     {
-        public string RoleName { get; set; }
+        public string Name { get; set; }
     }
 }

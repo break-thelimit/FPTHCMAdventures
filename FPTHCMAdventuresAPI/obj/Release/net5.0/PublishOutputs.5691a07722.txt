@@ -14,6 +14,7 @@ F:\FPTHCMAdventures\FPTHCMAdventuresAPI\obj\Release\net5.0\PubTmp\Out\ExcelNumbe
 F:\FPTHCMAdventures\FPTHCMAdventuresAPI\obj\Release\net5.0\PubTmp\Out\Humanizer.dll
 F:\FPTHCMAdventures\FPTHCMAdventuresAPI\obj\Release\net5.0\PubTmp\Out\Irony.dll
 F:\FPTHCMAdventures\FPTHCMAdventuresAPI\obj\Release\net5.0\PubTmp\Out\MathNet.Numerics.dll
+F:\FPTHCMAdventures\FPTHCMAdventuresAPI\obj\Release\net5.0\PubTmp\Out\Microsoft.AspNetCore.Authentication.Google.dll
 F:\FPTHCMAdventures\FPTHCMAdventuresAPI\obj\Release\net5.0\PubTmp\Out\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 F:\FPTHCMAdventures\FPTHCMAdventuresAPI\obj\Release\net5.0\PubTmp\Out\Microsoft.AspNetCore.Cryptography.Internal.dll
 F:\FPTHCMAdventures\FPTHCMAdventuresAPI\obj\Release\net5.0\PubTmp\Out\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll

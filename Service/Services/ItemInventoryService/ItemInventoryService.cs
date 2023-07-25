@@ -6,6 +6,7 @@ using DataAccess.Dtos.ItemInventoryDto;
 using DataAccess.Repositories.InventoryRepositories;
 using DataAccess.Repositories.ItemInventoryRepositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +42,30 @@ namespace Service.Services.ItemInventoryService
                 Success = true,
                 StatusCode = 201
             };
+        }
+
+        public async Task<ServiceResponse<ItemInventoryDto>> GetItemByItemName(string itemName)
+        {
+            var item = await _itemInventoryRepository.getItemByItemName(itemName);
+            if(item == null)
+            {
+                return new ServiceResponse<ItemInventoryDto>
+                {
+                    Message = "No rows",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            else
+            {
+                return new ServiceResponse<ItemInventoryDto>
+                {
+                    Data = item,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
         }
 
         public async Task<ServiceResponse<IEnumerable<GetItemInventoryDto>>> GetItemInventory()
@@ -101,10 +126,43 @@ namespace Service.Services.ItemInventoryService
             }
         }
 
-        public async Task<ServiceResponse<string>> UpdateItemInventory(Guid id, UpdateItemInventoryDto ItemInventoryDto)
+        public async Task<ServiceResponse<GetListItemInventoryByPlayer>> getListItemInventoryByPlayer(string PlayerNickName)
         {
             try
             {
+
+                var eventDetail = await _itemInventoryRepository.GetListItemInventoryByPlayer(PlayerNickName);
+
+                if (eventDetail == null)
+                {
+
+                    return new ServiceResponse<GetListItemInventoryByPlayer>
+                    {
+                        Message = "No rows",
+                        StatusCode = 200,
+                        Success = true
+                    };
+                }
+                return new ServiceResponse<GetListItemInventoryByPlayer>
+                {
+                    Data = eventDetail,
+                    Message = "Successfully",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<string>> UpdateItemInventory(Guid id, UpdateItemInventoryDto ItemInventoryDto)
+        {
+            try
+            {   
+                ItemInventoryDto.Id = id;
                 await _itemInventoryRepository.UpdateAsync(id, ItemInventoryDto);
                 return new ServiceResponse<string>
                 {

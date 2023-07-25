@@ -1,5 +1,6 @@
 ﻿using BusinessObjects.Model;
 using DataAccess.Dtos.EventDto;
+using DataAccess.Dtos.TaskDto;
 using DataAccess.GenericRepositories;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace DataAccess.Repositories.EventRepositories
 {
     public interface IEventRepositories : IGenericRepository<Event>
     {
-        
 
+        Task<IEnumerable<GetTaskAndEventDto>> GetTaskAndEventListByTimeNow();
     }
 }

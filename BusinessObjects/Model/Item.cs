@@ -11,19 +11,21 @@ namespace BusinessObjects.Model
         {
             ExchangeHistories = new HashSet<ExchangeHistory>();
             ItemIventories = new HashSet<ItemIventory>();
-            TaskItems = new HashSet<TaskItem>();
+            Tasks = new HashSet<Task>();
         }
 
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public int? Price { get; set; }
+        public double Price { get; set; }
         public string Description { get; set; }
         public string Type { get; set; }
-        public string ImageUrl { get; set; }
+        public bool? LimitExchange { get; set; }
+        public string Status { get; set; }
         public int? Quantity { get; set; }
+        public string ImageUrl { get; set; }
 
         public virtual ICollection<ExchangeHistory> ExchangeHistories { get; set; }
         public virtual ICollection<ItemIventory> ItemIventories { get; set; }
-        public virtual ICollection<TaskItem> TaskItems { get; set; }
+        public virtual ICollection<Task> Tasks { get; set; }
     }
 }

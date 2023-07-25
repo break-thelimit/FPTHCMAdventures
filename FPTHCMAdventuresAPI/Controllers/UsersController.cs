@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using DataAccess.Dtos.TaskItemDto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Service.Services.TaskItemService;
 using Service;
 using System.Threading.Tasks;
 using System;
@@ -28,27 +26,12 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpGet(Name = "GetUserList")]
 
-        public async Task<ActionResult<ServiceResponse<UserDto>>> GetUserList()
+        public async Task<ActionResult<ServiceResponse<GetUserDto>>> GetTaskItemList()
         {
             try
             {
-                var res = await _userService.GetAllUser();
+                var res = await _userService.GetUser();
                 return Ok(res);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Internal server error: " + ex.Message);
-            }
-        }
-
-        [HttpGet("user/pagination", Name = "GetUserListWithPagination")]
-
-        public async Task<ActionResult<ServiceResponse<UserDto>>> GetUserListWithPage([FromQuery] QueryParameters queryParameters)
-        {
-            try
-            {
-                var pagedsResult = await _userService.GetUserWithPage(queryParameters);
-                return Ok(pagedsResult);
             }
             catch (Exception ex)
             {
@@ -71,7 +54,7 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserDto>> GetUserById(Guid id)
+        public async Task<ActionResult<GetUserDto>> GetUserById(Guid id)
         {
             var eventDetail = await _userService.GetUserById(id);
             return Ok(eventDetail);
@@ -83,13 +66,27 @@ namespace FPTHCMAdventuresAPI.Controllers
             return Ok(eventDetail);
         }
 
-        [HttpPost("user", Name = "CreateNewUser")]
+        [HttpGet("user/{username}", Name = "GetUserWithUserName")]
+        public async Task<ActionResult<UserDto>> GetUserByUserName(string userName)
+        {
+            var eventDetail = await _userService.GetUserByUserName(userName);
+            return Ok(eventDetail);
+        }
+        [HttpGet("user/{username}/{password}")]
+        public async Task<ActionResult<UserDto>> GetUserByUserNameAndPassword(string username, string password)
+        {
+            var eventDetail = await _userService.CheckUserByUserNameAndPassword(username, password);
+            return Ok(eventDetail);
+        }
 
-        public async Task<ActionResult<ServiceResponse<UserDto>>> CreateNewUser(CreateUserDto userDto)
+
+        [HttpPut("{id}")]
+
+        public async Task<ActionResult<ServiceResponse<GetUserDto>>> UpdateUser(Guid id, [FromBody] UpdateUserDto eventDto)
         {
             try
             {
-                var res = await _userService.CreateNewUser(userDto);
+                var res = await _userService.UpdateUser(id, eventDto);
                 return Ok(res);
             }
             catch (Exception ex)
@@ -98,18 +95,19 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-        [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<UserDto>>> UpdateUser(Guid id, [FromBody] UpdateUserDto userDto)
+
+        [HttpGet("user/pagination", Name = "GetUserListWithPagination")]
+
+        public async Task<ActionResult<ServiceResponse<UserDto>>> GetUserListWithPage([FromQuery] QueryParameters queryParameters)
         {
             try
             {
-                var res = await _userService.UpdateUser(id, userDto);
-                return Ok(res);
+                var pagedsResult = await _userService.GetUserWithPage(queryParameters);
+                return Ok(pagedsResult);
             }
             catch (Exception ex)
             {
-
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }

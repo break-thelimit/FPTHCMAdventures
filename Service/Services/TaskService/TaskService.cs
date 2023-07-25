@@ -4,7 +4,11 @@ using DataAccess.Configuration;
 using DataAccess.Dtos.EventDto;
 using DataAccess.Dtos.TaskDto;
 using DataAccess.Repositories.EventRepositories;
+<<<<<<< HEAD
+using DataAccess.Repositories.EventTaskRepositories;
+=======
 using DataAccess.Repositories.PlayerHistoryRepositories;
+>>>>>>> origin/main
 using DataAccess.Repositories.TaskRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -20,15 +24,22 @@ namespace Service.Services.TaskService
     public class TaskService : ITaskService
     {
         private readonly ITaskRepositories _taskRepository;
+<<<<<<< HEAD
+        private readonly IEventRepositories _eventRepository;
+        private readonly IEventTaskRepository _eventTaskRepository;
+=======
         private readonly IPlayerHistoryRepository _playerHistoryRepository;
+>>>>>>> origin/main
         private readonly IMapper _mapper;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MapperConfig());
         });
-        public TaskService(ITaskRepositories taskRepository, IMapper mapper)
+        public TaskService(ITaskRepositories taskRepository, IMapper mapper,IEventTaskRepository eventTaskRepository , IEventRepositories eventRepositories)
         {
             _taskRepository = taskRepository;
+            _eventRepository = eventRepositories;
+            _eventTaskRepository = eventTaskRepository;
             _mapper = mapper;
         }
         public async Task<ServiceResponse<Guid>> CreateNewTask(CreateTaskDto createEventDto)
@@ -47,15 +58,58 @@ namespace Service.Services.TaskService
             };
         }
 
-        
 
-        public async Task<ServiceResponse<IEnumerable<GetTaskDto>>> GetTask()
+        public async Task<ServiceResponse<IEnumerable<Task>>> GetTaskDoneByMajor(Guid majorId)
         {
+<<<<<<< HEAD
+            try
+            {
+                var context = new FPTHCMAdventuresDBContext();
+                List<Task> taskList = context.Tasks.Include(t => t.PlayHistories).Where(t => (t.PlayHistories.Count > 0) && (t.MajorId == majorId)).ToList();
+
+                if (taskList != null)
+                {
+                    return new ServiceResponse<IEnumerable<Task>>
+                    {
+                        Data = taskList,
+                        Success = true,
+                        Message = "Successfully",
+                        StatusCode = 200
+                    };
+                }
+                else
+                {
+                    return new ServiceResponse<IEnumerable<Task>>
+                    {
+                        Data = taskList,
+                        Success = false,
+                        Message = "Failed because List task null",
+                        StatusCode = 200
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task<ServiceResponse<IEnumerable<TaskDto>>> GetTask()
+        {
+            List<Expression<Func<Task, object>>> includes = new List<Expression<Func<Task, object>>>
+                {
+                    x => x.Location,
+                    x => x.Major,
+                    x => x.Npc
+                };
+            var eventList = await _taskRepository.GetAllAsync<TaskDto>();
+=======
             var taskList = await _taskRepository.GetAllTaskAsync();
+>>>>>>> origin/main
             
             if (taskList != null)
             {
-                return new ServiceResponse<IEnumerable<GetTaskDto>>
+                return new ServiceResponse<IEnumerable<TaskDto>>
                 {
                     Data = taskList,
                     Success = true,
@@ -65,7 +119,7 @@ namespace Service.Services.TaskService
             }
             else
             {
-                return new ServiceResponse<IEnumerable<GetTaskDto>>
+                return new ServiceResponse<IEnumerable<TaskDto>>
                 {
                     Data = taskList,
                     Success = false,
@@ -82,7 +136,6 @@ namespace Service.Services.TaskService
                 List<Expression<Func<Task, object>>> includes = new List<Expression<Func<Task, object>>>
                 {
                     x => x.PlayHistories,
-                    x => x.TaskItems,
                     x => x.EventTasks,
                 };
                 var taskDetail = await _taskRepository.GetByWithCondition(x => x.Id == eventId, includes, true);
@@ -115,56 +168,32 @@ namespace Service.Services.TaskService
 
         public async Task<ServiceResponse<string>> UpdateTask(Guid id, UpdateTaskDto updateTaskDto)
         {
-            if (id != updateTaskDto.Id)
+            try
             {
+                updateTaskDto.Id = id;
+                await _taskRepository.UpdateAsync(id, updateTaskDto);
                 return new ServiceResponse<string>
                 {
-                    Message = "Invalid Record Id",
-                    Success = false,
-                    StatusCode = 500
-                };
-
-            }
-            var checkTask = await _taskRepository.GetAsync(id);
-            if (checkTask == null)
-            {
-                return new ServiceResponse<string>
-                {
-                    Message = "Task null",
-                    Success = false,
-                    StatusCode = 500
-                };
-            }
-            else
-            {
-                _mapper.Map(updateTaskDto, checkTask);
-
-                try
-                {
-                    await _taskRepository.UpdateAsync(checkTask);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await CountryExists(id))
-                    {
-                        return new ServiceResponse<string>
-                        {
-                            Message = "No rows",
-                            Success = false,
-                            StatusCode = 500
-                        };
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return new ServiceResponse<string>
-                {
-                    Message = "Update Success",
+                    Message = "Success edit",
                     Success = true,
-                    StatusCode = 500
+                    StatusCode = 202
                 };
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await CountryExists(id))
+                {
+                    return new ServiceResponse<string>
+                    {
+                        Message = "No rows",
+                        Success = false,
+                        StatusCode = 500
+                    };
+                }
+                else
+                {
+                    throw;
+                }
             }
         }
         private async Task<bool> CountryExists(Guid id)

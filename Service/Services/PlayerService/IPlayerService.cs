@@ -1,4 +1,5 @@
-﻿using DataAccess.Dtos.PlayerDto;
+﻿using BusinessObjects.Model;
+using DataAccess.Dtos.PlayerDto;
 using DataAccess.Dtos.PlayerHistoryDto;
 using System;
 using System.Collections.Generic;
@@ -15,8 +16,10 @@ namespace Service.Services.PlayerService
         Task<ServiceResponse<PlayerDto>> GetPlayerById(Guid eventId);
         Task<ServiceResponse<PlayerDto>> GetPlayerByUserId(Guid userId);
         Task<ServiceResponse<PlayerDto>> CheckPlayerByUserName(string username);
-        Task<ServiceResponse<Guid>> CreateNewPlayer(CreatePlayerDto createPlayerDto);
+        Task<ServiceResponse<GetPlayerDto>> CheckPlayerByNickName(string nickName);
+        Task<ServiceResponse<Guid?>> CreateNewPlayer(CreatePlayerDto createPlayerDto);
         Task<ServiceResponse<string>> UpdatePlayer(Guid id, UpdatePlayerDto PlayerDto);
-        Task<ServiceResponse<IEnumerable<BusinessObjects.Model.Player>>> GetTop5PlayerInRank();
+        Task<ServiceResponse<IEnumerable<Player>>> GetTop5PlayerInRank();
+
     }
 }

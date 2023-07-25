@@ -12,6 +12,5 @@ namespace DataAccess.Repositories.UserRepository
     public interface IUserRepository : IGenericRepository<User>
     {
         public Task<Guid> GetUserIdByUserName(string userName);
-        public  Task<List<UserDto>> GetAllUserAsync();
     }
 }

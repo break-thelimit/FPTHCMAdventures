@@ -1,4 +1,5 @@
 ﻿using BusinessObjects.Model;
+using DataAccess.Dtos.ItemInventoryDto;
 using DataAccess.GenericRepositories;
 using System;
 using System.Collections.Generic;
@@ -10,5 +11,7 @@ namespace DataAccess.Repositories.ItemInventoryRepositories
 {
     public interface IItemInventoryRepositories : IGenericRepository<ItemIventory>
     {
+        Task<GetListItemInventoryByPlayer> GetListItemInventoryByPlayer(string PlayerNickName);
+        Task<ItemInventoryDto> getItemByItemName(string itemName);
     }
 }

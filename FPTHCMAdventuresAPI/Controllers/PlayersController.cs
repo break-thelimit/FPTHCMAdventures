@@ -28,7 +28,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpGet(Name = "GetPlayer")]
 
-        public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> GetPlayerList()
+        public async Task<ActionResult<ServiceResponse<PlayerDto>>> GetPlayerList()
         {
             try
             {
@@ -41,22 +41,7 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
         }
 
-        [HttpGet("players/getTop5PlayerInRank")]
-
-        public async Task<ActionResult<ServiceResponse<BusinessObjects.Model.Player>>> GetTop5PlayerInRank()
-        {
-            try
-            {
-                var res = await _playerService.GetTop5PlayerInRank();
-                return Ok(res);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Internal server error: " + ex.Message);
-            }
-        }
-
-        [HttpGet("players/listPlayer-username",Name = "GetPlayerWithUserNames")]
+        [HttpGet("players/listPlayer-username", Name = "GetPlayerWithUserNames")]
 
         public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> GetPlayerListWithUserName()
         {
@@ -83,16 +68,22 @@ namespace FPTHCMAdventuresAPI.Controllers
             var eventDetail = await _playerService.GetPlayerByUserId(id);
             return Ok(eventDetail);
         }
-        [HttpGet("player/{email}")]
-        public async Task<ActionResult<PlayerDto>> GetPlayerByUserId(string email)
+        [HttpGet("player/player-{nickname}")]
+        public async Task<ActionResult<GetPlayerDto>> GetPlayerByNickName(string nickname)
         {
-            var eventDetail = await _playerService.CheckPlayerByUserName(email);
+            var eventDetail = await _playerService.CheckPlayerByNickName(nickname);
+            return Ok(eventDetail);
+        }
+        [HttpGet("player/{username}")]
+        public async Task<ActionResult<PlayerDto>> GetPlayerByUserName(string username)
+        {
+            var eventDetail = await _playerService.CheckPlayerByUserName(username);
             return Ok(eventDetail);
         }
 
         [HttpPost("player", Name = "CreateNewPlayer")]
 
-        public async Task<ActionResult<ServiceResponse<PlayerDto>>> CreateNewPlayer(CreatePlayerDto answerDto)
+        public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> CreateNewPlayer(CreatePlayerDto answerDto)
         {
             try
             {
@@ -107,7 +98,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<PlayerDto>>> UpdatePlayer(Guid id, [FromBody] UpdatePlayerDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> UpdatePlayer(Guid id, [FromBody] UpdatePlayerDto eventDto)
         {
             try
             {

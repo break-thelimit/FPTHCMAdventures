@@ -24,29 +24,15 @@ namespace DataAccess.Repositories.UserRepository
 
         public async Task<Guid> GetUserIdByUserName(string userName)
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == userName);
+            var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Username == userName);
+            if(user == null)
+            {
+                throw new Exception("Loi user null");
+            }
             return user.Id;
         }
 
-        public async Task<List<UserDto>> GetAllUserAsync()
-        {
-            var userlist1 = await _dbContext.Users.Include(x=>x.School).Include(r=>r.Role).Select(x => new UserDto
-            {
-                Id=x.Id,
-                SchoolId= x.SchoolId,
-                SchoolName = x.School.SchoolName,
-                RoleId=x.RoleId,
-                RoleName=x.Role.RoleName,
-                Fullname= x.Fullname,
-                Email= x.Email,
-                Username = x.Username,
-                Password= x.Password,
-                PhoneNumber= x.PhoneNumber,
-                Gender= x.Gender,
-                Status=x.Status
-            }).ToListAsync();
-            return userlist1;
-        }
+      
     }
 }
 

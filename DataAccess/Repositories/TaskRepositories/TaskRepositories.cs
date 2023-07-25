@@ -24,26 +24,24 @@ namespace DataAccess.Repositories.TaskRepositories
             _mapper = mapper;
         }
 
-        public async Task<List<GetTaskDto>> GetAllTaskAsync()
+        public async Task<IEnumerable<TaskDto>> GetTaskByEventTaskWithEventId(Guid EventId)
         {
-            var ranklist1 = await _dbContext.Tasks.Include(x => x.Major).Include(l=>l.Location).Include(n=>n.Npc).Select(x => new GetTaskDto
+            var eventtask = await _dbContext.EventTasks.Where(x => x.EventId == EventId).ToListAsync();
+            if(eventtask.Any() || eventtask == null)
             {
-                Id = x.Id,
-                LocationId=x.LocationId,
-                LocationName=x.Location.LocationName,
-                MajorId = x.MajorId,
-                MajorName = x.Major.Name,
-                NpcId=x.NpcId,
-                NpcName=x.Npc.NpcName,
-                EndTime=x.EndTime,
-                IsRequireitem=x.IsRequireitem,
-                TimeOutAmount=x.TimeOutAmount,
-                ActivityName=x.ActivityName,
-                Point=x.Point,
-                Type=x.Type,
-                Status=x.Status
-            }).ToListAsync();
-            return ranklist1;
+                return null;
+            }
+            else
+            {
+                foreach (var item in eventtask)
+                {
+                    var task = await _dbContext.Tasks.Where(x => x.Id == item.TaskId).ToListAsync();
+                    var taskDtos = _mapper.Map<IEnumerable<TaskDto>>(task);
+
+                    return taskDtos;
+                }
+            }
+            return null;
         }
     }
 }

@@ -8,6 +8,6 @@ namespace DataAccess.Dtos.InventoryDto
 {
     public abstract class BaseInventoryDto
     {
-        public Guid? PlayerId { get; set; }
+        public Guid PlayerId { get; set; }
     }
 }

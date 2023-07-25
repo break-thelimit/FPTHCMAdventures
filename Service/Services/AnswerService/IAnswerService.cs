@@ -13,6 +13,7 @@ namespace Service.Services.AnswerService
     public interface IAnswerService
     {
         Task<ServiceResponse<IEnumerable<GetAnswerDto>>> GetAnswer();
+        Task<ServiceResponse<IEnumerable<GetAnswerAndQuestionNameDto>>> GetListQuestionByMajorIdAsync(Guid majorId);       
         Task<ServiceResponse<PagedResult<AnswerDto>>> GetAnswerWithPage(QueryParameters queryParameters);
         Task<ServiceResponse<AnswerDto>> GetAnswerById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewAnswer(CreateAnswerDto createAnswerDto);

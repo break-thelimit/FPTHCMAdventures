@@ -9,8 +9,10 @@ namespace DataAccess.Dtos.GiftDto
     public abstract class BaseGiftDto
     {
         public Guid? RankId { get; set; }
-        public string GiftName { get; set; }
+        public string Name { get; set; }
         public string Decription { get; set; }
-        public int? Price { get; set; }
+        public double? Price { get; set; }
+        public string Status { get; set; }
+
     }
 }

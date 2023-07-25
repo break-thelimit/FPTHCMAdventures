@@ -4,11 +4,13 @@ using DataAccess;
 using DataAccess.Configuration;
 using DataAccess.Dtos.EventDto;
 using DataAccess.Dtos.LocationDto;
+using DataAccess.Dtos.TaskDto;
 using DataAccess.Exceptions;
 using DataAccess.Repositories.EventRepositories;
 using DataAccess.Repositories.RankRepositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -119,57 +121,33 @@ namespace Service.Services.EventService
        
         public async Task<ServiceResponse<string>> UpdateEvent(Guid id, UpdateEventDto eventDto)
         {
-            if (id != eventDto.Id)
+            try
             {
-                return new ServiceResponse<string>
-                {
-                    Message = "Invalid Record Id",
-                    Success = false,
-                    StatusCode = 500
-                };
-                
+                eventDto.Id = id;
+                await _eventRepository.UpdateAsync(id, eventDto);
             }
-            var checkEvent = await _eventRepository.GetAsync(id);
-            if(checkEvent == null)
+            catch (DbUpdateConcurrencyException)
             {
-                return new ServiceResponse<string>
+                if (!await CountryExists(id))
                 {
-                    Message = "No rows",
-                    Success = false,
-                    StatusCode = 500
-                };
-            }
-            else
-            {
-                _mapper.Map(eventDto, checkEvent);
-
-                try
-                {
-                    await _eventRepository.UpdateAsync(checkEvent);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await CountryExists(id))
+                    return new ServiceResponse<string>
                     {
-                        return new ServiceResponse<string>
-                        {
-                            Message = "No rows",
-                            Success = false,
-                            StatusCode = 500
-                        };
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                        Message = "No rows",
+                        Success = false,
+                        StatusCode = 500
+                    };
                 }
-                return new ServiceResponse<string>
+                else
                 {
-                    Message = "Update Success",
-                    Success = true,
-                    StatusCode = 500
-                };
+                    throw;
+                }
             }
+            return new ServiceResponse<string>
+            {
+                Message = "Update Success",
+                Success = true,
+                StatusCode = 200
+            };
         }
 
         private async Task<bool> CountryExists(Guid id)
@@ -220,7 +198,7 @@ namespace Service.Services.EventService
                                 var data = new EventDto
                                 {
                                     Id = Guid.NewGuid(),
-                                    EventName = worksheet.Cells[row, 1].Value?.ToString(),
+                                    Name = worksheet.Cells[row, 1].Value?.ToString(),
                                     StartTime = Convert.ToDateTime(worksheet.Cells[row, 2].Value),
                                     EndTime = Convert.ToDateTime(worksheet.Cells[row, 3].Value),
                                     Status = worksheet.Cells[row, 4].Value?.ToString()
@@ -335,6 +313,73 @@ namespace Service.Services.EventService
             };
         }
 
+
+        public async Task<ServiceResponse<IEnumerable<GetEventDto>>> GetEventByDate(DateTime dateTimeStart)
+        {
+            try
+            {
+                DateTime startDate = dateTimeStart.Date; // Lấy ngày bắt đầu của ngày đầu vào
+                DateTime endDate = startDate.AddDays(1).AddTicks(-1); // Lấy ngày kết thúc của ngày đầu vào
+
+               
+                var eventList = await _eventRepository.GetAllAsync();
+             
+                if (eventList == null || eventList.Count == 0)
+                {
+                    return new ServiceResponse<IEnumerable<GetEventDto>>
+                    {
+                        Message = "No events found",
+                        StatusCode = 200,
+                        Success = true
+                    };
+                }
+                else
+                {
+                    var eventListByDate = eventList.Where(x => x.StartTime.Date == startDate && x.EndTime.Date == startDate).ToList();
+                    if (eventListByDate == null || eventListByDate.Count == 0)
+                    {
+                        return new ServiceResponse<IEnumerable<GetEventDto>>
+                        {
+                            Message = "No events found for the specified date",
+                            StatusCode = 200,
+                            Success = true
+                        };
+                    }
+                    else
+                    {
+                        var filteredEvents = eventListByDate.Where(x => x.StartTime.TimeOfDay <= dateTimeStart.TimeOfDay && x.EndTime.TimeOfDay >= dateTimeStart.TimeOfDay).ToList();
+
+                        if (filteredEvents.Count == 0 )
+                        {
+                            return new ServiceResponse<IEnumerable<GetEventDto>>
+                            {
+                                Message = "No events found within the specified time range",
+                                StatusCode = 200,
+                                Success = true
+                            };
+                        }
+                        var _mapper = config.CreateMapper();
+                        var lstDto = _mapper.Map<List<GetEventDto>>(filteredEvents);
+
+                        return new ServiceResponse<IEnumerable<GetEventDto>>
+                        {
+                            Data = lstDto,
+                            Message = "Successfully retrieved events",
+                            StatusCode = 200,
+                            Success = true
+                        };
+                    }
+
+                }
+              
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<ServiceResponse<PagedResult<EventDto>>> GetEventWithPage(QueryParameters queryParameters)
         {
             var pagedsResult = await _eventRepository.GetAllAsync<EventDto>(queryParameters);
@@ -346,5 +391,32 @@ namespace Service.Services.EventService
                 Success = true
             };
         }
+
+
+        public async Task<ServiceResponse<IEnumerable<GetTaskAndEventDto>>> GetTaskAndEventListByTimeNow()
+        {
+            var events = await _eventRepository.GetTaskAndEventListByTimeNow();
+            if(events == null)
+            {
+                return new ServiceResponse<IEnumerable<GetTaskAndEventDto>>
+                {
+                    Data = null,
+                    Message = "Failed Data null",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            else
+            {
+                return new ServiceResponse<IEnumerable<GetTaskAndEventDto>>
+                {
+                    Data = events,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+        }
+
     }
 }

@@ -11,6 +11,5 @@ namespace DataAccess.Repositories.PlayerRepositories
 {
     public interface IPlayerRepository : IGenericRepository<Player>
     {
-        Task<List<GetPlayerWithUserNameDto>> GetAllPlayerAsync();
     }
 }

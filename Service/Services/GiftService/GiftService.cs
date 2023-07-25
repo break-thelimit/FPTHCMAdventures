@@ -70,6 +70,32 @@ namespace Service.Services.GiftService
             }
         }
 
+        public async Task<ServiceResponse<string>> GetTotalGift()
+        {
+            var context = new FPTHCMAdventuresDBContext();
+            try
+            {
+                long total = context.Gifts.Count();
+                return new ServiceResponse<string>
+                {
+                    Data = total.ToString(),
+                    Message = "Success!",
+                    Success = true,
+                    StatusCode = 202
+                };
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return new ServiceResponse<string>
+                {
+                    Message = ex.ToString(),
+                    Success = false,
+                    StatusCode = 500
+                };
+            }
+
+        }
+
         public async Task<ServiceResponse<GiftDto>> GetGiftById(Guid eventId)
         {
             try
@@ -106,6 +132,7 @@ namespace Service.Services.GiftService
         {
             try
             {
+                giftDto.Id = id;
                 await _giftRepository.UpdateAsync(id, giftDto);
                 return new ServiceResponse<string>
                 {

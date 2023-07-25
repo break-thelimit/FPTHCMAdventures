@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.EventTaskDto
 {
-    public class EventTaskDto : BaseEventTaskDto, IBaseDto
+    public class EventTaskDto :  IBaseDto
     {
         public Guid Id { get; set; }
+
+        public string TaskName { get; set; }
+        public string EventName { get; set; }
     }
 }

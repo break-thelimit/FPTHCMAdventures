@@ -21,18 +21,11 @@ namespace DataAccess.Repositories.NPCRepository
             _dbContext = dbContext;
             _mapper = mapper;
         }
-        public async Task<List<GetNpcDto>> GetAllNpckAsync()
+
+        public async Task<NpcDto> GetNpcByName(string npcName)
         {
-            var ranklist1 = await _dbContext.Npcs.Include(l => l.Question).Select(x => new GetNpcDto
-            {
-                Id = x.Id,
-                QuestionId=x.QuestionId,
-                QuestionName=x.Question.QuestionName,
-                NpcName=x.NpcName,
-                Introduce=x.Introduce,
-                Status=x.Status
-            }).ToListAsync();
-            return ranklist1;
+            var npc = await _dbContext.Set<Npc>().FirstOrDefaultAsync(x => x.Name == npcName);          
+            return _mapper.Map<NpcDto>(npc);
         }
 
     }
