@@ -11,7 +11,7 @@ namespace Service.Services.QuestionService
 {
     public interface IQuestionService
     {
-        Task<ServiceResponse<IEnumerable<GetQuestionDto>>> GetQuestion();
+        Task<ServiceResponse<IEnumerable<QuestionDto>>> GetQuestion();
         Task<ServiceResponse<QuestionDto>> GetQuestionById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewQuestion(CreateQuestionDto createQuestionDto);
         Task<ServiceResponse<string>> UpdateQuestion(Guid id, UpdateQuestionDto questionDto);

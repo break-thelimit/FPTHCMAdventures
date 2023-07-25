@@ -48,7 +48,6 @@ using DataAccess.Repositories.GiftRepositories;
 using DataAccess.Repositories.PlayerRepositories;
 using DataAccess.Repositories.PlayerHistoryRepositories;
 using DataAccess.Repositories.RoleRepositories;
-using DataAccess.Repositories.TaskItemRepositories;
 using DataAccess.Repositories.ExchangeHistoryRepositories;
 using Service.Services.RankService;
 using Service.Services.SchoolEventService;
@@ -60,7 +59,6 @@ using Service.Services.GiftService;
 using Service.Services.PlayerService;
 using Service.Services.PlayerHistoryService;
 using Service.Services.RoleService;
-using Service.Services.TaskItemService;
 using Service.Services.ExchangeHistoryService;
 using Service.Services.ItemInventoryService;
 using DataAccess.Repositories.ItemInventoryRepositories;
@@ -93,18 +91,15 @@ namespace XavalorAdventuresAPI
 
             services.AddControllers();
 
-
-
-
             services.AddDbContext<FPTHCMAdventuresDBContext>(options => options.UseSqlServer(ConectionString));
             services.AddControllersWithViews().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddAutoMapper(typeof(MapperConfig));
-           
+
             services.AddCors(options => {
                 options.AddPolicy("AllowAll",
                     b => b.AllowAnyHeader()
-                        .AllowAnyOrigin()
-                        .AllowAnyMethod());
+                          .AllowAnyOrigin()
+                          .AllowAnyMethod());
             });
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IEventRepositories, EventRepositories>();
@@ -112,8 +107,7 @@ namespace XavalorAdventuresAPI
             services.AddScoped<IEventTaskRepository, EventTaskRepository>();
             services.AddScoped<IMajorRepository, MajorRepository>();
             services.AddScoped<IQuestionRepository, QuestionRepository>();
-/*            services.AddScoped<IAuthManager, AuthManager>();
-*/            services.AddScoped<ILocationRepository, LocationRepository>();
+            services.AddScoped<ILocationRepository, LocationRepository>();
             services.AddScoped<INpcRepository, NpcRepository>();
             services.AddScoped<IRankRepository, RankRepository>();
             services.AddScoped<ISchoolEventRepository, SchoolEventRepository>();
@@ -126,7 +120,6 @@ namespace XavalorAdventuresAPI
             services.AddScoped<IPlayerRepository, PlayerRepository>();
             services.AddScoped<IPlayerHistoryRepository, PlayerHistoryRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
-            services.AddScoped<ITaskItemRepository, TaskItemRepository>();
             services.AddScoped<IExchangeHistoryRepository, ExchangeHistoryRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IAuthManager, AuthManager>();
@@ -204,8 +197,13 @@ namespace XavalorAdventuresAPI
                     }
                 });
             });
-             
-                  
+
+
+            services.AddResponseCaching(options =>
+            {
+                options.UseCaseSensitivePaths = true;
+                options.MaximumBodySize = 1024;
+            });
             //For DI Service
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<ITaskService, TaskService>();
@@ -225,7 +223,6 @@ namespace XavalorAdventuresAPI
             services.AddScoped<IPlayerService, PlayerService>();
             services.AddScoped<IPlayerHistoryService, PlayerHistoryService>();
             services.AddScoped<IRoleService, RoleService>();
-            services.AddScoped<ITaskItemService, TaskItemService>();
             services.AddScoped<IExchangeHistoryService, ExchangHistoryService>();
             services.AddScoped<IUserService, UserService>();
         }
@@ -233,24 +230,27 @@ namespace XavalorAdventuresAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+          /*  if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+               *//* app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "XavalorAdventuresAPI v1"));
-            }
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "XavalorAdventuresAPI v1"));*//*
+            }*/
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(c => {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Documentation");
+            }); 
             app.UseHttpsRedirection();
 
-            app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+            app.UseCors("AllowAll");
+
+            app.UseResponseCaching();
 
             app.UseRouting();
 
             app.UseAuthentication();
 
             app.UseAuthorization();
-            app.UseResponseCaching();
 
             app.UseEndpoints(endpoints =>
             {

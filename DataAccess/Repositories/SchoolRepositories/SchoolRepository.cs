@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
 using DataAccess.GenericRepositories;
-using DataAccess.Repositories.TaskItemRepositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;

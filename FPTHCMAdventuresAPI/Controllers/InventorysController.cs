@@ -29,7 +29,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpGet(Name = "GetInventoryList")]
 
-        public async Task<ActionResult<ServiceResponse<GetInventoryDto>>> GetInventoryList()
+        public async Task<ActionResult<ServiceResponse<InventoryDto>>> GetInventoryList()
         {
             try
             {

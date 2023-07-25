@@ -8,7 +8,9 @@ namespace DataAccess.Dtos.QuestionDto
 {
     public abstract class BaseQuestionDto
     {
-        public string QuestionName { get; set; }
-        public Guid? MajorId { get; set; }
+        public Guid AnswerId { get; set; }
+        public Guid MajorId { get; set; }
+        public string Name { get; set; }
+        public string Status { get; set; }
     }
 }

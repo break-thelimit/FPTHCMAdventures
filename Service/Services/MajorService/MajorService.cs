@@ -111,7 +111,8 @@ namespace Service.Services.MajorService
         public async Task<ServiceResponse<string>> UpdateMajor(Guid id, UpdateMajorDto majorDto)
         {
             try
-            {
+            {   
+                majorDto.Id = id;
                 await _majorRepository.UpdateAsync(id, majorDto);
                 return new ServiceResponse<string>
                 {
@@ -185,7 +186,7 @@ namespace Service.Services.MajorService
                                     Id = Guid.NewGuid(),
                                     Name = worksheet.Cells[row, 1].Value?.ToString(),
                                     Description = worksheet.Cells[row, 2].Value?.ToString(),
-                                  
+                                    Status = worksheet.Cells[row, 3].Value?.ToString(),
                                 };
 
                                 dataList.Add(data);
@@ -223,11 +224,12 @@ namespace Service.Services.MajorService
         {
             using (var package = new ExcelPackage())
             {
-                var worksheet = package.Workbook.Worksheets.Add("SampleData");
+                var worksheet = package.Workbook.Worksheets.Add("SampleDataMajor");
 
                 // Thiết lập header cho các cột
                 worksheet.Cells[1, 1].Value = "Major Name";
                 worksheet.Cells[1, 2].Value = "Description";
+                worksheet.Cells[1, 3].Value = "Status";
                
 
                 // Lưu file Excel vào MemoryStream

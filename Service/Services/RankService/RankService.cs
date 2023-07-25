@@ -104,7 +104,8 @@ namespace Service.Services.RankService
         public async Task<ServiceResponse<string>> UpdateRank(Guid id, UpdateRankDto rankDto)
         {
             try
-            {
+            {   
+                rankDto.Id = id;
                 await _rankRepository.UpdateAsync(id, rankDto);
                 return new ServiceResponse<string>
                 {

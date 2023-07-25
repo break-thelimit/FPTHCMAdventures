@@ -40,6 +40,21 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+        [HttpGet("GetTotalGift")]
+
+        public async Task<ActionResult<ServiceResponse<string>>> GetTotalGift()
+        {
+            try
+            {
+                var res = await _giftService.GetTotalGift();
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<GiftDto>> GetGiftById(Guid id)
         {

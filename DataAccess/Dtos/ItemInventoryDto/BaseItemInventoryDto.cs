@@ -8,7 +8,7 @@ namespace DataAccess.Dtos.ItemInventoryDto
 {
     public abstract class BaseItemInventoryDto
     {
-        public Guid? InventoryId { get; set; }
+        public Guid InventoryId { get; set; }
         public Guid? ItemId { get; set; }
         public int? Quantity { get; set; }
     }

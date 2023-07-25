@@ -8,8 +8,7 @@ namespace DataAccess.Dtos.AnswerDto
 {
     public abstract class BaseAnswerDto
     {
-        public Guid? QuestionId { get; set; }
-        public string Answer { get; set; }
-        public bool? IsRight { get; set; }
+        public string AnswerName { get; set; }
+        public bool IsRight { get; set; }
     }
 }

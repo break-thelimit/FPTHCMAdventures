@@ -1,4 +1,5 @@
-﻿using DataAccess.Dtos.SchoolDto;
+﻿using DataAccess;
+using DataAccess.Dtos.SchoolDto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,7 @@ namespace Service.Services.SchoolService
         Task<ServiceResponse<SchoolDto>> GetSchoolById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewSchool(CreateSchoolDto createSchoolDto);
         Task<ServiceResponse<string>> UpdateSchool(Guid id, UpdateSchoolDto schoolDto);
+        Task<ServiceResponse<PagedResult<SchoolDto>>> GetSchoolWithPage(QueryParameters queryParameters);
+
     }
 }

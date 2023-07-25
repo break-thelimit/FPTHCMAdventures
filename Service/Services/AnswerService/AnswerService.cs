@@ -5,8 +5,11 @@ using DataAccess.Configuration;
 using DataAccess.Dtos.AnswerDto;
 using DataAccess.Dtos.EventDto;
 using DataAccess.Dtos.LocationDto;
+using DataAccess.Dtos.QuestionDto;
 using DataAccess.Repositories.AnswerRepositories;
 using DataAccess.Repositories.EventRepositories;
+using DataAccess.Repositories.NPCRepository;
+using DataAccess.Repositories.QuestionRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -21,14 +24,18 @@ namespace Service.Services.AnswerService
     {
         private readonly IAnswerRepository _answerRepository;
         private readonly IMapper _mapper;
+        private readonly IQuestionRepository _questionRepository;
+        private readonly INpcRepository _npcRepository;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MapperConfig());
         });
-        public AnswerService(IAnswerRepository answerRepository, IMapper mapper)
+        public AnswerService(IAnswerRepository answerRepository, IMapper mapper, IQuestionRepository questionRepository,INpcRepository npcRepository)
         {
             _answerRepository = answerRepository;
             _mapper = mapper;
+            _questionRepository = questionRepository;
+            _npcRepository = npcRepository;
         }
         public async Task<ServiceResponse<Guid>> CreateNewAnswer(CreateAnswerDto createEventDto)
         {
@@ -48,14 +55,13 @@ namespace Service.Services.AnswerService
 
         public async Task<ServiceResponse<IEnumerable<GetAnswerDto>>> GetAnswer()
         {
-            var eventList = await _answerRepository.GetAllAsync();
-            var _mapper = config.CreateMapper();
-            var lstDto = _mapper.Map<List<GetAnswerDto>>(eventList);
+            var eventList = await _answerRepository.GetAllAsync<GetAnswerDto>();
+           
             if (eventList != null)
             {
                 return new ServiceResponse<IEnumerable<GetAnswerDto>>
                 {
-                    Data = lstDto,
+                    Data = eventList,
                     Success = true,
                     Message = "Successfully",
                     StatusCode = 200
@@ -65,8 +71,8 @@ namespace Service.Services.AnswerService
             {
                 return new ServiceResponse<IEnumerable<GetAnswerDto>>
                 {
-                    Data = lstDto,
-                    Success = false,
+                    Data = null,
+                    Success = true,
                     Message = "Faile because List event null",
                     StatusCode = 200
                 };
@@ -105,6 +111,8 @@ namespace Service.Services.AnswerService
             }
         }
 
+      
+
         public async Task<ServiceResponse<PagedResult<AnswerDto>>> GetAnswerWithPage(QueryParameters queryParameters)
         {
             var pagedsResult = await _answerRepository.GetAllAsync<AnswerDto>(queryParameters);
@@ -117,59 +125,64 @@ namespace Service.Services.AnswerService
             };
         }
 
-        public async Task<ServiceResponse<string>> UpdateAnswer(Guid id, UpdateAnswerDto eventDto)
-        {
-            if (id != eventDto.Id)
-            {
-                return new ServiceResponse<string>
-                {
-                    Message = "Invalid Record Id",
-                    Success = false,
-                    StatusCode = 500
-                };
+       
 
-            }
-            var checkEvent = await _answerRepository.GetAsync(id);
-            if (checkEvent == null)
+        public async Task<ServiceResponse<IEnumerable<GetAnswerAndQuestionNameDto>>> GetListQuestionByMajorIdAsync(Guid majorId)
+        {
+            var listAnswer = await _answerRepository.GetListQuestionByMajorIdAsync(majorId);
+            if(listAnswer == null)
             {
-                return new ServiceResponse<string>
+                return new ServiceResponse<IEnumerable<GetAnswerAndQuestionNameDto>>
                 {
-                    Message = "No rows",
+                    Data = null,
                     Success = false,
-                    StatusCode = 500
+                    Message = "No answers found for the specified NPC name.",
+                    StatusCode = 404
                 };
             }
             else
             {
-                _mapper.Map(eventDto, checkEvent);
-
-                try
+                return new ServiceResponse<IEnumerable<GetAnswerAndQuestionNameDto>>
                 {
-                    await _answerRepository.UpdateAsync(checkEvent);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await CountryExists(id))
-                    {
-                        return new ServiceResponse<string>
-                        {
-                            Message = "No rows",
-                            Success = false,
-                            StatusCode = 500
-                        };
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return new ServiceResponse<string>
-                {
-                    Message = "Update Success",
+                    Data = listAnswer,
                     Success = true,
-                    StatusCode = 500
+                    Message = "Successfully",
+                    StatusCode = 200
                 };
             }
+        }
+
+        public async Task<ServiceResponse<string>> UpdateAnswer(Guid id, UpdateAnswerDto eventDto)
+        {
+            
+            try
+            {
+                eventDto.Id = id;
+                await _answerRepository.UpdateAsync(id,eventDto);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await CountryExists(id))
+                {
+                    return new ServiceResponse<string>
+                    {
+                        Message = "No rows",
+                        Success = false,
+                        StatusCode = 500
+                    };
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return new ServiceResponse<string>
+            {
+                Message = "Update Success",
+                Success = true,
+                StatusCode = 200
+            };
+            
         }
 
         private async Task<bool> CountryExists(Guid id)

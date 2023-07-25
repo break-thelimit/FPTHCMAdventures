@@ -104,7 +104,8 @@ namespace Service.Services.RoleService
         public async Task<ServiceResponse<string>> UpdateRole(Guid id, UpdateRoleDto roleDto)
         {
             try
-            {
+            {   
+                roleDto.Id = id;
                 await _roleRepository.UpdateAsync(id, roleDto);
                 return new ServiceResponse<string>
                 {

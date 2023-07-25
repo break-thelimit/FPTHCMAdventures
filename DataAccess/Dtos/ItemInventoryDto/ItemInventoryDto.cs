@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.ItemInventoryDto
 {
-    public class ItemInventoryDto : BaseItemInventoryDto, IBaseDto
+    public class ItemInventoryDto : IBaseDto
     {
         public Guid Id { get; set; }
+        public Guid InventoryId { get; set; }
+        public string ItemName { get; set; }
+        public int? Quantity { get; set; }
     }
 }

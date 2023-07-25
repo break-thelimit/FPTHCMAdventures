@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
+using DataAccess.Dtos.EventTaskDto;
+using DataAccess.Dtos.TaskDto;
 using DataAccess.GenericRepositories;
 using DataAccess.Repositories.EventRepositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +23,26 @@ namespace DataAccess.Repositories.TaskRepositories
         {
             _dbContext = dbContext;
             _mapper = mapper;
+        }
+
+        public async Task<IEnumerable<TaskDto>> GetTaskByEventTaskWithEventId(Guid EventId)
+        {
+            var eventtask = await _dbContext.EventTasks.Where(x => x.EventId == EventId).ToListAsync();
+            if(eventtask.Any() || eventtask == null)
+            {
+                return null;
+            }
+            else
+            {
+                foreach (var item in eventtask)
+                {
+                    var task = await _dbContext.Tasks.Where(x => x.Id == item.TaskId).ToListAsync();
+                    var taskDtos = _mapper.Map<IEnumerable<TaskDto>>(task);
+
+                    return taskDtos;
+                }
+            }
+            return null;
         }
     }
 }

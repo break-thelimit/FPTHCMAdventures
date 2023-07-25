@@ -34,7 +34,7 @@ namespace Service.Services.PlayerHistoryService
             var majorList = await _playerHistoryRepository.GetAllAsync<GetPlayerHistoryDto>();
             if (majorList != null)
             {
-               var playerHistory =  majorList.FirstOrDefault(x => x.TaskId == createPlayerHistoryDto.TaskId);
+               var playerHistory =  majorList.FirstOrDefault(x => x.PlayerId == createPlayerHistoryDto.PlayerId && x.TaskId == createPlayerHistoryDto.TaskId);
                 if(playerHistory != null)
                 {
                     return new ServiceResponse<Guid>
@@ -166,10 +166,48 @@ namespace Service.Services.PlayerHistoryService
             }
         }
 
-        public async Task<ServiceResponse<string>> UpdatePlayerHistory(Guid id, UpdatePlayerHistoryDto PlayerHistoryDto)
+        public async Task<ServiceResponse<PlayerHistoryDto>> GetPlayerHistoryByTaskIdAndPlayerId(Guid taskId, Guid PlayerId)
         {
             try
             {
+                List<Expression<Func<PlayHistory, object>>> includes = new List<Expression<Func<PlayHistory, object>>>
+                {
+
+                };
+                var taskDetail = await _playerHistoryRepository.GetByWithCondition(x => x.TaskId == taskId && x.PlayerId == PlayerId, includes, true);
+                var _mapper = config.CreateMapper();
+                var taskDetailDto = _mapper.Map<PlayerHistoryDto>(taskDetail);
+                if (taskDetail == null)
+                {
+
+                    return new ServiceResponse<PlayerHistoryDto>
+                    {
+                        Message = "No rows",
+                        StatusCode = 200,
+                        Success = true
+                    };
+                }
+                return new ServiceResponse<PlayerHistoryDto>
+                {
+                    Data = taskDetailDto,
+                    Message = "Successfully",
+                    StatusCode = 200,
+                    Success = true
+                };
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<string>> UpdatePlayerHistory(Guid id, UpdatePlayerHistoryDto PlayerHistoryDto)
+        {
+            try
+            {   
+                PlayerHistoryDto.Id = id;
                 await _playerHistoryRepository.UpdateAsync(id, PlayerHistoryDto);
                 return new ServiceResponse<string>
                 {

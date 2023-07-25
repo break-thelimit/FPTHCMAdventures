@@ -28,7 +28,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpGet(Name = "GetQuestionList")]
 
-        public async Task<ActionResult<ServiceResponse<GetEventTaskDto>>> GetQuestionList()
+        public async Task<ActionResult<ServiceResponse<QuestionDto>>> GetQuestionList()
         {
             try
             {

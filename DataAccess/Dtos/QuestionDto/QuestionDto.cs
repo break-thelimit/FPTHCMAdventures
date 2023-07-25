@@ -6,8 +6,13 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.QuestionDto
 {
-    public class QuestionDto : BaseQuestionDto, IBaseDto
+    public class QuestionDto : IBaseDto
     {
         public Guid Id { get; set; }
+
+        public string AnswerName { get; set; }
+        public string MajorName { get; set; }
+        public string Name { get; set; }
+        public string Status { get; set; }
     }
 }

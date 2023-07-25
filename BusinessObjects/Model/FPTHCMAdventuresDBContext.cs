@@ -39,15 +39,15 @@ namespace BusinessObjects.Model
         public virtual DbSet<School> Schools { get; set; }
         public virtual DbSet<SchoolEvent> SchoolEvents { get; set; }
         public virtual DbSet<Task> Tasks { get; set; }
-        public virtual DbSet<TaskItem> TaskItems { get; set; }
         public virtual DbSet<User> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var builder = new ConfigurationBuilder()
-                          .SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                            .SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             IConfigurationRoot configuration = builder.Build();
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("CapstonProjectDbConnectionString"));
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -62,16 +62,12 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
-                entity.Property(e => e.Answer1).HasColumnName("answer");
+                entity.Property(e => e.AnswerName)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("answer_name");
 
                 entity.Property(e => e.IsRight).HasColumnName("is_right");
-
-                entity.Property(e => e.QuestionId).HasColumnName("question_id");
-
-                entity.HasOne(d => d.Question)
-                    .WithMany(p => p.Answers)
-                    .HasForeignKey(d => d.QuestionId)
-                    .HasConstraintName("FK_Answer.question_id");
             });
 
             modelBuilder.Entity<Event>(entity =>
@@ -86,21 +82,19 @@ namespace BusinessObjects.Model
                     .HasColumnType("datetime")
                     .HasColumnName("end_time");
 
-                entity.Property(e => e.RankId).HasColumnName("rank_id");
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("name");
 
                 entity.Property(e => e.StartTime)
                     .HasColumnType("datetime")
                     .HasColumnName("start_time");
 
                 entity.Property(e => e.Status)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
+                    .IsRequired()
+                    .HasMaxLength(100)
                     .HasColumnName("status");
-
-                entity.HasOne(d => d.Rank)
-                    .WithMany(p => p.Events)
-                    .HasForeignKey(d => d.RankId)
-                    .HasConstraintName("FK_Event.rank_id");
             });
 
             modelBuilder.Entity<EventTask>(entity =>
@@ -118,12 +112,14 @@ namespace BusinessObjects.Model
                 entity.HasOne(d => d.Event)
                     .WithMany(p => p.EventTasks)
                     .HasForeignKey(d => d.EventId)
-                    .HasConstraintName("FK_Event_tasks.event_id");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EventTask.event_id");
 
                 entity.HasOne(d => d.Task)
                     .WithMany(p => p.EventTasks)
                     .HasForeignKey(d => d.TaskId)
-                    .HasConstraintName("FK_Event_tasks.task_id");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EventTask.task_id");
             });
 
             modelBuilder.Entity<ExchangeHistory>(entity =>
@@ -142,18 +138,18 @@ namespace BusinessObjects.Model
 
                 entity.Property(e => e.PlayerId).HasColumnName("player_id");
 
-                entity.Property(e => e.Status)
-                    .HasMaxLength(50)
-                    .HasColumnName("status");
+                entity.Property(e => e.Quantity).HasColumnName("quantity");
 
                 entity.HasOne(d => d.Item)
                     .WithMany(p => p.ExchangeHistories)
                     .HasForeignKey(d => d.ItemId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ExchangeHistory.item_id");
 
                 entity.HasOne(d => d.Player)
                     .WithMany(p => p.ExchangeHistories)
                     .HasForeignKey(d => d.PlayerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ExchangeHistory.player_id");
             });
 
@@ -165,13 +161,22 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
-                entity.Property(e => e.Decription).HasColumnName("decription");
+                entity.Property(e => e.Decription)
+                    .HasMaxLength(500)
+                    .HasColumnName("decription");
 
-                entity.Property(e => e.GiftName).HasColumnName("gift_name");
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("name");
 
                 entity.Property(e => e.Price).HasColumnName("price");
 
                 entity.Property(e => e.RankId).HasColumnName("rank_id");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(100)
+                    .HasColumnName("status");
 
                 entity.HasOne(d => d.Rank)
                     .WithMany(p => p.Gifts)
@@ -192,6 +197,7 @@ namespace BusinessObjects.Model
                 entity.HasOne(d => d.Player)
                     .WithMany(p => p.Inventories)
                     .HasForeignKey(d => d.PlayerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Inventory.player_id");
             });
 
@@ -205,16 +211,27 @@ namespace BusinessObjects.Model
 
                 entity.Property(e => e.Description).HasColumnName("description");
 
-                entity.Property(e => e.ImageUrl).HasColumnName("image_url");
+                entity.Property(e => e.ImageUrl).HasColumnName("image_Url");
 
-                entity.Property(e => e.Name).HasColumnName("name");
+                entity.Property(e => e.LimitExchange).HasColumnName("limit_exchange");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("name");
 
                 entity.Property(e => e.Price).HasColumnName("price");
 
                 entity.Property(e => e.Quantity).HasColumnName("quantity");
 
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("status");
+
                 entity.Property(e => e.Type)
-                    .HasMaxLength(50)
+                    .IsRequired()
+                    .HasMaxLength(100)
                     .HasColumnName("type");
             });
 
@@ -235,6 +252,7 @@ namespace BusinessObjects.Model
                 entity.HasOne(d => d.Inventory)
                     .WithMany(p => p.ItemIventories)
                     .HasForeignKey(d => d.InventoryId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ItemIventory.inventory_id");
 
                 entity.HasOne(d => d.Item)
@@ -252,13 +270,15 @@ namespace BusinessObjects.Model
                     .HasColumnName("id");
 
                 entity.Property(e => e.LocationName)
-                    .HasMaxLength(50)
+                    .IsRequired()
+                    .HasMaxLength(100)
                     .HasColumnName("location_name");
 
                 entity.Property(e => e.Status)
-                    .HasMaxLength(50)
+                    .IsRequired()
+                    .HasMaxLength(100)
                     .IsUnicode(false)
-                    .HasColumnName("status ");
+                    .HasColumnName("status");
 
                 entity.Property(e => e.X).HasColumnName("x");
 
@@ -275,13 +295,17 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
-                entity.Property(e => e.Description)
-                    .HasMaxLength(150)
-                    .HasColumnName("description");
+                entity.Property(e => e.Description).HasColumnName("description");
 
                 entity.Property(e => e.Name)
-                    .HasMaxLength(150)
+                    .IsRequired()
+                    .HasMaxLength(100)
                     .HasColumnName("name");
+
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("status");
             });
 
             modelBuilder.Entity<Npc>(entity =>
@@ -294,16 +318,15 @@ namespace BusinessObjects.Model
 
                 entity.Property(e => e.Introduce).HasColumnName("introduce");
 
-                entity.Property(e => e.NpcName)
-                    .HasMaxLength(50)
-                    .HasColumnName("npc_name");
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("name");
 
-                entity.Property(e => e.QuestionId).HasColumnName("question_id");
-
-                entity.HasOne(d => d.Question)
-                    .WithMany(p => p.Npcs)
-                    .HasForeignKey(d => d.QuestionId)
-                    .HasConstraintName("FK_NPC_Question");
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("status");
             });
 
             modelBuilder.Entity<PlayHistory>(entity =>
@@ -314,32 +337,29 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
-                entity.Property(e => e.AcceptTime)
-                    .HasColumnType("datetime")
-                    .HasColumnName("accept_time");
-
-                entity.Property(e => e.CompleteTime).HasColumnName("complete_time");
+                entity.Property(e => e.CompletedTime).HasColumnName("completed_time");
 
                 entity.Property(e => e.PlayerId).HasColumnName("player_id");
 
                 entity.Property(e => e.Status)
-                    .HasMaxLength(50)
+                    .IsRequired()
+                    .HasMaxLength(100)
                     .HasColumnName("status");
 
                 entity.Property(e => e.TaskId).HasColumnName("task_id");
 
                 entity.Property(e => e.TaskPoint).HasColumnName("task_point");
 
-                entity.Property(e => e.Time).HasColumnName("time");
-
                 entity.HasOne(d => d.Player)
                     .WithMany(p => p.PlayHistories)
                     .HasForeignKey(d => d.PlayerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_PlayHistory.player_id");
 
                 entity.HasOne(d => d.Task)
                     .WithMany(p => p.PlayHistories)
                     .HasForeignKey(d => d.TaskId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_PlayHistory.task_id");
             });
 
@@ -351,8 +371,13 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at");
+
                 entity.Property(e => e.Nickname)
-                    .HasMaxLength(255)
+                    .IsRequired()
+                    .HasMaxLength(100)
                     .HasColumnName("nickname");
 
                 entity.Property(e => e.TotalPoint).HasColumnName("total_point");
@@ -364,6 +389,7 @@ namespace BusinessObjects.Model
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Players)
                     .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Player.user_id");
             });
 
@@ -375,14 +401,31 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
+                entity.Property(e => e.AnswerId).HasColumnName("answer_id");
+
                 entity.Property(e => e.MajorId).HasColumnName("major_id");
 
-                entity.Property(e => e.QuestionName).HasColumnName("question_name");
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("name");
+
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("status");
+
+                entity.HasOne(d => d.Answer)
+                    .WithMany(p => p.Questions)
+                    .HasForeignKey(d => d.AnswerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Question.answer_id");
 
                 entity.HasOne(d => d.Major)
                     .WithMany(p => p.Questions)
                     .HasForeignKey(d => d.MajorId)
-                    .HasConstraintName("FK_Question_Major");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Question.major_id");
             });
 
             modelBuilder.Entity<Rank>(entity =>
@@ -393,16 +436,30 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
+                entity.Property(e => e.EventId).HasColumnName("event_id");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("name");
+
+                entity.Property(e => e.Place)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("place");
+
                 entity.Property(e => e.PlayerId).HasColumnName("player_id");
 
-                entity.Property(e => e.RankNumber)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("rank_number");
+                entity.HasOne(d => d.Event)
+                    .WithMany(p => p.Ranks)
+                    .HasForeignKey(d => d.EventId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Rank.event_id");
 
                 entity.HasOne(d => d.Player)
                     .WithMany(p => p.Ranks)
                     .HasForeignKey(d => d.PlayerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Rank.player_id");
             });
 
@@ -429,7 +486,7 @@ namespace BusinessObjects.Model
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.RefreshTokens)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__RefreshTo__user___1DB06A4F");
+                    .HasConstraintName("FK__RefreshTo__user___05D8E0BE");
             });
 
             modelBuilder.Entity<Role>(entity =>
@@ -440,9 +497,10 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
-                entity.Property(e => e.RoleName)
-                    .HasMaxLength(50)
-                    .HasColumnName("role_name ");
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("name");
             });
 
             modelBuilder.Entity<School>(entity =>
@@ -453,13 +511,25 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
-                entity.Property(e => e.Address).HasColumnName("address");
+                entity.Property(e => e.Address)
+                    .HasMaxLength(255)
+                    .HasColumnName("address");
 
-                entity.Property(e => e.Email).HasColumnName("email");
+                entity.Property(e => e.Email)
+                    .HasMaxLength(100)
+                    .HasColumnName("email");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("name");
 
                 entity.Property(e => e.PhoneNumber).HasColumnName("phone_number");
 
-                entity.Property(e => e.SchoolName).HasColumnName("school_name");
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("status");
             });
 
             modelBuilder.Entity<SchoolEvent>(entity =>
@@ -477,11 +547,13 @@ namespace BusinessObjects.Model
                 entity.HasOne(d => d.Event)
                     .WithMany(p => p.SchoolEvents)
                     .HasForeignKey(d => d.EventId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_SchoolEvent.event_id");
 
                 entity.HasOne(d => d.School)
                     .WithMany(p => p.SchoolEvents)
                     .HasForeignKey(d => d.SchoolId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_SchoolEvent.school_id");
             });
 
@@ -493,69 +565,57 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
-                entity.Property(e => e.ActivityName).HasColumnName("activity_name");
+                entity.Property(e => e.DurationCheckin).HasColumnName("duration_checkin");
 
-                entity.Property(e => e.EndTime).HasColumnName("end_time");
-
-                entity.Property(e => e.IsRequireitem).HasColumnName("is_requireitem");
+                entity.Property(e => e.ItemId).HasColumnName("item_id");
 
                 entity.Property(e => e.LocationId).HasColumnName("location_id");
 
                 entity.Property(e => e.MajorId).HasColumnName("major_id");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("name");
 
                 entity.Property(e => e.NpcId).HasColumnName("npc_id");
 
                 entity.Property(e => e.Point).HasColumnName("point");
 
                 entity.Property(e => e.Status)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
+                    .IsRequired()
+                    .HasMaxLength(100)
                     .HasColumnName("status");
 
                 entity.Property(e => e.TimeOutAmount).HasColumnName("time_out_amount");
 
                 entity.Property(e => e.Type)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
+                    .IsRequired()
+                    .HasMaxLength(100)
                     .HasColumnName("type");
+
+                entity.HasOne(d => d.Item)
+                    .WithMany(p => p.Tasks)
+                    .HasForeignKey(d => d.ItemId)
+                    .HasConstraintName("FK_Task.item_id");
 
                 entity.HasOne(d => d.Location)
                     .WithMany(p => p.Tasks)
                     .HasForeignKey(d => d.LocationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Task.location_id");
 
                 entity.HasOne(d => d.Major)
                     .WithMany(p => p.Tasks)
                     .HasForeignKey(d => d.MajorId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Task.major_id");
 
                 entity.HasOne(d => d.Npc)
                     .WithMany(p => p.Tasks)
                     .HasForeignKey(d => d.NpcId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Task.npc_id");
-            });
-
-            modelBuilder.Entity<TaskItem>(entity =>
-            {
-                entity.ToTable("TaskItem");
-
-                entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
-                    .HasColumnName("id");
-
-                entity.Property(e => e.ItemId).HasColumnName("item_id");
-
-                entity.Property(e => e.TaskId).HasColumnName("task_id");
-
-                entity.HasOne(d => d.Item)
-                    .WithMany(p => p.TaskItems)
-                    .HasForeignKey(d => d.ItemId)
-                    .HasConstraintName("FK_TaskItem.item_id");
-
-                entity.HasOne(d => d.Task)
-                    .WithMany(p => p.TaskItems)
-                    .HasForeignKey(d => d.TaskId)
-                    .HasConstraintName("FK_TaskItem.task_id");
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -566,13 +626,25 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
-                entity.Property(e => e.Email).HasColumnName("email");
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("email");
 
-                entity.Property(e => e.Fullname).HasColumnName("fullname");
+                entity.Property(e => e.Fullname)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("fullname");
 
-                entity.Property(e => e.Gender).HasColumnName("gender");
+                entity.Property(e => e.Gender)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("gender");
 
-                entity.Property(e => e.Password).HasColumnName("password");
+                entity.Property(e => e.Password)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnName("password");
 
                 entity.Property(e => e.PhoneNumber).HasColumnName("phone_number");
 
@@ -581,22 +653,25 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.SchoolId).HasColumnName("school_id");
 
                 entity.Property(e => e.Status)
-                    .HasMaxLength(50)
+                    .IsRequired()
+                    .HasMaxLength(100)
                     .HasColumnName("status");
 
                 entity.Property(e => e.Username)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
+                    .IsRequired()
+                    .HasMaxLength(100)
                     .HasColumnName("username");
 
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.Users)
                     .HasForeignKey(d => d.RoleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_User.role_id");
 
                 entity.HasOne(d => d.School)
                     .WithMany(p => p.Users)
                     .HasForeignKey(d => d.SchoolId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_User.school_id");
             });
 

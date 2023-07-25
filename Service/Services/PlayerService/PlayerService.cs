@@ -5,6 +5,7 @@ using DataAccess.Dtos.PlayerDto;
 using DataAccess.Dtos.PlayerHistoryDto;
 using DataAccess.Dtos.TaskDto;
 using DataAccess.Dtos.UserDto;
+using DataAccess.Repositories.InventoryRepositories;
 using DataAccess.Repositories.PlayerHistoryRepositories;
 using DataAccess.Repositories.PlayerRepositories;
 using DataAccess.Repositories.SchoolRepositories;
@@ -17,6 +18,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.IO.RecyclableMemoryStreamManager;
 
 namespace Service.Services.PlayerService
 {
@@ -25,18 +27,22 @@ namespace Service.Services.PlayerService
         private readonly IPlayerRepository _playerRepository;
         private readonly IUserRepository _userRepository;
         private readonly ISchoolRepository _schoolRepository;
+        private readonly IInventoryRepository _inventoryRepository;
         private readonly IMapper _mapper;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MapperConfig());
         });
-        public PlayerService(IPlayerRepository playerRepository, IMapper mapper,IUserRepository userRepository, ISchoolRepository schoolRepository)
+        public PlayerService(IPlayerRepository playerRepository, IMapper mapper,IUserRepository userRepository, ISchoolRepository schoolRepository,IInventoryRepository inventoryRepository)
         {
             _playerRepository = playerRepository;
             _mapper = mapper;
             _userRepository = userRepository;
             _schoolRepository = schoolRepository;   
+            _inventoryRepository = inventoryRepository;
         }
+
+        
 
         public async Task<ServiceResponse<PlayerDto>> CheckPlayerByUserName(string username)
         {
@@ -46,12 +52,12 @@ namespace Service.Services.PlayerService
                 try
                 {
                     List<Expression<Func<Player, object>>> includes = new List<Expression<Func<Player, object>>>
-                {
-                    x => x.Ranks,
-                    x => x.Inventories,
-                    x => x.ExchangeHistories,
-                    x => x.PlayHistories
-                };
+                    {
+                        x => x.Ranks,
+                        x => x.Inventories,
+                        x => x.ExchangeHistories,
+                        x => x.PlayHistories
+                    };
                     var taskDetail = await _playerRepository.GetByWithCondition(x => x.UserId == userId, includes, true);
                     var _mapper = config.CreateMapper();
                     var taskDetailDto = _mapper.Map<PlayerDto>(taskDetail);
@@ -83,7 +89,7 @@ namespace Service.Services.PlayerService
             {
                 return new ServiceResponse<PlayerDto>
                 {
-                    Message = "No User ",
+                    Message = "No User",
                     StatusCode = 404,
                     Success = false
                 };
@@ -91,22 +97,76 @@ namespace Service.Services.PlayerService
           
         }
 
-        public async Task<ServiceResponse<Guid>> CreateNewPlayer(CreatePlayerDto createPlayerDto)
+        public async Task<ServiceResponse<Guid?>> CreateNewPlayer(CreatePlayerDto createPlayerDto)
         {
-            var mapper = config.CreateMapper();
-            var eventTaskcreate = mapper.Map<Player>(createPlayerDto);
-            eventTaskcreate.Id = Guid.NewGuid();
-            await _playerRepository.AddAsync(eventTaskcreate);
-
-            return new ServiceResponse<Guid>
+            var playerNickName = await CheckPlayerByNickName(createPlayerDto.Nickname);
+            if(playerNickName.Data == null)
             {
-                Data = eventTaskcreate.Id,
-                Message = "Successfully",
-                Success = true,
-                StatusCode = 201
-            };
-        }
+                var mapper = config.CreateMapper();
+                var eventTaskcreate = mapper.Map<Player>(createPlayerDto);
+                eventTaskcreate.Id = Guid.NewGuid();
+                eventTaskcreate.CreatedAt = DateTime.Now;
+                await _playerRepository.AddAsync(eventTaskcreate);
 
+                return new ServiceResponse<Guid?>
+                {
+                    Data = eventTaskcreate.Id,
+                    Message = "Successfully",
+                    Success = true,
+                    StatusCode = 201
+                };
+            }
+            else
+            {
+                return new ServiceResponse<Guid?>
+                {
+                    Data = null,
+                    Message = "Failed because nick name is exists",
+                    Success = false,
+                    StatusCode = 404
+                };
+            }
+          
+        }
+        public async Task<ServiceResponse<GetPlayerDto>> CheckPlayerByNickName(string nickName)
+        {
+            try
+            {
+                List<Expression<Func<Player, object>>> includes = new List<Expression<Func<Player, object>>>
+                {
+                    x => x.PlayHistories,
+                    x => x.Ranks,
+                    x => x.Inventories,
+                    x => x.ExchangeHistories,
+                    
+                };
+                var taskDetail = await _playerRepository.GetByWithCondition(x => x.Nickname.Equals(nickName), null, true);
+                var _mapper = config.CreateMapper();
+                var taskDetailDto = _mapper.Map<GetPlayerDto>(taskDetail);
+                if (taskDetail == null)
+                {
+
+                    return new ServiceResponse<GetPlayerDto>
+                    {
+                        Message = "No rows",
+                        StatusCode = 200,
+                        Success = true
+                    };
+                }
+                return new ServiceResponse<GetPlayerDto>
+                {
+                    Data = taskDetailDto,
+                    Message = "Successfully",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
         public async Task<ServiceResponse<IEnumerable<GetPlayerDto>>> GetPlayer()
         {
             var majorList = await _playerRepository.GetAllAsync<GetPlayerDto>();
@@ -219,10 +279,11 @@ namespace Service.Services.PlayerService
                         var playerData = new GetPlayerWithUserNameDto
                         {
                             Id = player.Id,
-                            Name = user.Fullname,
+                            Fullname = user.Fullname,
                             TotalPoint = player.TotalPoint,
                             TotalTime = player.TotalTime,
-                            NickName = player.NickName
+                            Nickname = player.Nickname,
+                            
                         };
                         playerList.Add(playerData);
 
@@ -251,6 +312,7 @@ namespace Service.Services.PlayerService
         {
             try
             {
+                PlayerDto.Id = id;
                 await _playerRepository.UpdateAsync(id, PlayerDto);
                 return new ServiceResponse<string>
                 {
@@ -280,6 +342,29 @@ namespace Service.Services.PlayerService
         {
             return await _playerRepository.Exists(id);
         }
-       
+        public async Task<ServiceResponse<IEnumerable<Player>>> GetTop5PlayerInRank()
+        {
+            try
+            {
+                var context = new FPTHCMAdventuresDBContext();
+                List<Player> top5playerlist = context.Players.OrderByDescending(x => x.TotalPoint).ThenBy(x => x.TotalTime).Take(5).ToList();
+                return new ServiceResponse<IEnumerable<Player>>
+                {
+                    Data = top5playerlist,
+                    Message = "Success edit",
+                    Success = true,
+                    StatusCode = 202
+                };
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return new ServiceResponse<IEnumerable<Player>>
+                {
+                    Message = "Invalid Record Id",
+                    Success = false,
+                    StatusCode = 500
+                };
+            }
+        }
     }
 }

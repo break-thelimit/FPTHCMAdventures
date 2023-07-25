@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using BusinessObjects.Model;
 using DataAccess.Dtos.EventDto;
+using DataAccess.Dtos.EventTaskDto;
 using DataAccess.Exceptions;
 using DataAccess.GenericRepositories;
 using DataAccess.Repositories.EventRepositories;
@@ -25,6 +26,14 @@ namespace DataAccess.Repositories.EventTaskRepositories
             _mapper = mapper;
         }
 
-       
+        public async Task<IEnumerable<EventTaskDto>> GetEventTaskByEventId(Guid eventId)
+        {
+            var eventTasks = await _dbContext.EventTasks
+                .Where(x => x.EventId == eventId)
+                .ToListAsync();
+
+            var eventTaskDtos = _mapper.Map<IEnumerable<EventTaskDto>>(eventTasks);
+            return eventTaskDtos;
+        }
     }
 }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System;
 using Service.Services.SchoolService;
 using DataAccess.Dtos.SchoolDto;
+using DataAccess;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
@@ -33,6 +34,21 @@ namespace FPTHCMAdventuresAPI.Controllers
             {
                 var res = await _schoolService.GetSchool();
                 return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpGet("school/pagination", Name = "GetSchoolListWithPagination")]
+
+        public async Task<ActionResult<ServiceResponse<SchoolDto>>> GetLocationListWithPage([FromQuery] QueryParameters queryParameters)
+        {
+            try
+            {
+                var pagedsResult = await _schoolService.GetSchoolWithPage(queryParameters);
+                return Ok(pagedsResult);
             }
             catch (Exception ex)
             {

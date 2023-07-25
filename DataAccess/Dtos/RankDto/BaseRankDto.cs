@@ -8,7 +8,10 @@ namespace DataAccess.Dtos.RankDto
 {
     public abstract class BaseRankDto
     {
-        public Guid? PlayerId { get; set; }
-        public string RankNumber { get; set; }
+        public Guid PlayerId { get; set; }
+        public Guid EventId { get; set; }
+        public string Name { get; set; }
+        public string Place { get; set; }
+
     }
 }

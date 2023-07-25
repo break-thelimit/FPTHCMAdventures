@@ -64,7 +64,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<MajorDto>>> CreateNewEvent(Guid id, [FromBody] UpdateMajorDto eventDto)
+        public async Task<ActionResult<ServiceResponse<MajorDto>>> UpdateNewEvent(Guid id, [FromBody] UpdateMajorDto eventDto)
         {
             try
             {

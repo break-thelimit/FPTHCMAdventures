@@ -13,6 +13,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class NpcsController : ControllerBase
     {
         private readonly INpcService _npcService;

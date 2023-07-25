@@ -3,9 +3,11 @@ using BusinessObjects.Model;
 using DataAccess.Configuration;
 using DataAccess.Dtos.EventDto;
 using DataAccess.Dtos.EventTaskDto;
+using DataAccess.Dtos.PlayerDto;
 using DataAccess.Repositories.EventRepositories;
 using DataAccess.Repositories.EventTaskRepositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,10 +76,7 @@ namespace Service.Services.EventTaskService
         {
             try
             {
-              
                 var eventDetail = await _eventTaskRepository.GetAsync<EventTaskDto>(eventId);
-                var _mapper = config.CreateMapper();
-                var eventDetailDto = _mapper.Map<EventTaskDto>(eventDetail);
                 if (eventDetail == null)
                 {
 
@@ -107,6 +106,7 @@ namespace Service.Services.EventTaskService
         {
             try
             {
+                eventTaskDto.Id = id;   
                 await _eventTaskRepository.UpdateAsync(id, eventTaskDto);
                 return new ServiceResponse<string>
                 {
@@ -136,6 +136,43 @@ namespace Service.Services.EventTaskService
         private async Task<bool> EventTaskExists(Guid id)
         {
             return await _eventTaskRepository.Exists(id);
+        }
+
+        public async Task<ServiceResponse<EventTaskDto>> GetEventTaskByTaskId(Guid taskId)
+        {
+            try
+            {
+                List<Expression<Func<EventTask, object>>> includes = new List<Expression<Func<EventTask, object>>>
+                {
+                   
+
+                };
+                var taskDetail = await _eventTaskRepository.GetByWithCondition(x => x.TaskId == taskId, includes, true);
+                var _mapper = config.CreateMapper();
+                var taskDetailDto = _mapper.Map<EventTaskDto>(taskDetail);
+                if (taskDetail == null)
+                {
+
+                    return new ServiceResponse<EventTaskDto>
+                    {
+                        Message = "No rows",
+                        StatusCode = 200,
+                        Success = true
+                    };
+                }
+                return new ServiceResponse<EventTaskDto>
+                {
+                    Data = taskDetailDto,
+                    Message = "Successfully",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

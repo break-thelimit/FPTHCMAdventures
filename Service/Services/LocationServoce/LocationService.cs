@@ -113,6 +113,7 @@ namespace Service.Services.LocationServoce
         {
             try
             {
+                eventTaskDto.Id = id;
                 await _locationRepository.UpdateAsync(id, eventTaskDto);
                 return new ServiceResponse<string>
                 {
@@ -179,7 +180,7 @@ namespace Service.Services.LocationServoce
                             var rowCount = worksheet.Dimension.Rows;
                             var dataList = new List<LocationDto>();
                             
-                            for (int row = 2; row <= rowCount; row++)
+                            for (int row = 2; row <= rowCount-1; row++)
                             {
                                 var data = new LocationDto
                                 {
@@ -187,8 +188,8 @@ namespace Service.Services.LocationServoce
                                     X = Convert.ToDouble(worksheet.Cells[row, 1].Value),
                                     Y = Convert.ToDouble(worksheet.Cells[row, 2].Value),
                                     Z = Convert.ToDouble(worksheet.Cells[row, 3].Value),
-                                    LocationName = worksheet.Cells[row, 4].Value?.ToString(),
-                                    Status = worksheet.Cells[row, 5].Value?.ToString()
+                                    LocationName = worksheet.Cells[row, 4].Value.ToString(),
+                                    Status = worksheet.Cells[row, 5].Value.ToString()
                                 };
 
                                 dataList.Add(data);

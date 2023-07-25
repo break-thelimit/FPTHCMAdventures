@@ -48,6 +48,12 @@ namespace FPTHCMAdventuresAPI.Controllers
             return Ok(eventDetail);
         }
 
+        [HttpGet("eventtask/{taskId}")]
+        public async Task<ActionResult<EventTaskDto>> GetEventTaskByTaskId(Guid taskId)
+        {
+            var eventDetail = await _eventTaskService.GetEventTaskByTaskId(taskId);
+            return Ok(eventDetail);
+        }
         [HttpPost("eventtask", Name = "CreateNewEventTask")]
 
         public async Task<ActionResult<ServiceResponse<EventDto>>> CreateNewEvent(CreateEventTaskDto eventTaskDto)

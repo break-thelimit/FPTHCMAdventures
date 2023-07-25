@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
 using DataAccess.Dtos.Users;
+using DataAccess.GenericRepositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repositories.UserRepositories
 {
-    public class AuthManager : IAuthManager
+    public class AuthManager : IAuthManager 
     {
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
@@ -32,7 +33,7 @@ namespace DataAccess.Repositories.UserRepositories
         private readonly FPTHCMAdventuresDBContext _dbContext;
         private readonly JWTSettings _jwtsettings;
 
-        public AuthManager(FPTHCMAdventuresDBContext dbContext, IOptions<JWTSettings> jwtsettings, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public AuthManager(FPTHCMAdventuresDBContext dbContext, IOptions<JWTSettings> jwtsettings, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor) 
         {
             this._mapper = mapper;
             this._configuration = configuration;
@@ -41,42 +42,73 @@ namespace DataAccess.Repositories.UserRepositories
             this._jwtsettings = jwtsettings.Value;
 
         }
-        public async Task<BaseResponse<UserWithToken>> Login(LoginDto loginDto)
+        public async Task<BaseResponse<AuthResponseDto>> Login(LoginDto loginDto)
         {
-            var user = await _dbContext.Users.Include(u => u.Role)
-                                        .Where(u => u.Email == loginDto.Email
-                                                && u.Password == loginDto.Password).FirstOrDefaultAsync();
-
-            UserWithToken userWithToken = null;
-
-            if(user != null)
+            string pass = PasswordHash(loginDto.Password);
+            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Username == loginDto.Username);
+            var adminEmail = _configuration.GetSection("DefaultAccount").GetSection("Email").Value;
+            var adminPassowrd = _configuration.GetSection("DefaultAccount").GetSection("Password").Value;
+            AuthResponseDto userWithToken = null;
+            if(loginDto.Username.Equals(adminEmail) && loginDto.Password.Equals(adminPassowrd))
             {
                 RefreshToken refreshToken = GenerateRefreshToken();
-                user.RefreshTokens.Add(refreshToken);
-                await _dbContext.SaveChangesAsync();
-
-                userWithToken = new UserWithToken(user);
+                var id = Guid.NewGuid();
+                userWithToken = new AuthResponseDto();
                 userWithToken.RefreshToken = refreshToken.Token;
-            }
-            
-            if(userWithToken == null)
-            {
-                return new BaseResponse<UserWithToken>
+                userWithToken.Token = GenerateAccessToken(id);
+               
+                return new BaseResponse<AuthResponseDto>
                 {
-                    Data = null,
-                    Message = "Faile data is null ",
-                    Success = false
+                    Data = userWithToken,
+                    Message = "Success",
+                    Success = true
                 };
             }
-            userWithToken.AccessToken = GenerateAccessToken(user.Id);
-            return new BaseResponse<UserWithToken>
+            else
             {
-                Data = userWithToken,
-                Message = "Success",
-                Success = true
-            };
-        }
+                if (user != null && pass == user.Password)
+                {
+                    RefreshToken refreshToken = GenerateRefreshToken();
+                    user.RefreshTokens.Add(refreshToken);
+                    await _dbContext.SaveChangesAsync();
 
+                    userWithToken = new AuthResponseDto();
+                    userWithToken.RefreshToken = refreshToken.Token;
+                    userWithToken.Token = GenerateAccessToken(user.Id);
+                    userWithToken.Email = user.Email;
+                    userWithToken.UserId = user.Id;
+                    userWithToken.Username = user.Username;
+                    if (userWithToken == null)
+                    {
+                        return new BaseResponse<AuthResponseDto>
+                        {
+                            Data = null,
+                            Message = "Failed, data is null",
+                            Success = false
+                        };
+                    }
+                    else
+                    {
+                        return new BaseResponse<AuthResponseDto>
+                        {
+                            Data = userWithToken,
+                            Message = "Success",
+                            Success = true
+                        };
+                    }
+                }
+                else
+                {
+                    return new BaseResponse<AuthResponseDto>
+                    {
+                        Data = null,
+                        Message = "Failed, data is null",
+                        Success = false
+                    };
+                }
+            }
+           
+        }
 
         private RefreshToken GenerateRefreshToken()
         {
@@ -179,14 +211,14 @@ namespace DataAccess.Repositories.UserRepositories
                 {
                     new Claim(ClaimTypes.Name, Convert.ToString(userId))
                 }),
-                Expires = DateTime.Now.AddMinutes(Convert.ToInt32(_configuration["JwtSettings:DurationInMinutes"])),
+                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_configuration["JwtSettings:DurationInMinutes"])),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
-        public  string PasswordHash(string password)
+        public string PasswordHash(string password)
         {
             using (var sha256 = SHA256.Create())
             {
@@ -206,21 +238,46 @@ namespace DataAccess.Repositories.UserRepositories
                 return builder.ToString();
             }
         }
-        public async Task<BaseResponse<UserWithToken>> RegisterUser(ApiUserDto apiUser)
+        public Guid getRoleId()
+        {
+            var role = _dbContext.Roles.FirstOrDefault(x => x.Name =="USER");
+            if(role == null)
+            {
+                role.Id = Guid.NewGuid();
+                _dbContext.Roles.Add(role);
+                _dbContext.SaveChangesAsync();
+                return role.Id;
+            }
+            else
+            {
+                return role.Id;
+            }
+        }
+        public async Task<BaseResponse<AuthResponseDto>> RegisterUser(ApiUserDto apiUser)
         {
             var user = _mapper.Map<User>(apiUser);
             user.Id = Guid.NewGuid();
-            user.RoleId = Guid.Parse("13c1b3fe-a3ac-44df-a4a0-22f0594834c0");
+            user.RoleId = Guid.Parse("3f9f9720-e050-4d27-b148-c4dc17fbf891");
             string hashedPassword = PasswordHash(apiUser.Password);
             user.Password = hashedPassword;
-            _dbContext.Users.Add(user);
+            user.Status = "active";
+            if (!long.TryParse(apiUser.PhoneNumber, out long phoneNumber))
+            {
+                return new BaseResponse<AuthResponseDto>
+                {
+                    Data = null,
+                    Success = false,
+                    Message = "Error because phone is failed",
+                };
+            }
+            user.PhoneNumber = phoneNumber;
+            await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
-
+            
             //load role for registered user
-            user = await _dbContext.Users.Include(u => u.Role)
-                                        .Where(u => u.Id == user.Id).FirstOrDefaultAsync();
+            user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == user.Id);
 
-            UserWithToken userWithToken = null;
+            AuthResponseDto userWithToken = null;
 
             if (user != null)
             {
@@ -228,28 +285,40 @@ namespace DataAccess.Repositories.UserRepositories
                 user.RefreshTokens.Add(refreshToken);
                 await _dbContext.SaveChangesAsync();
 
-                userWithToken = new UserWithToken(user);
+                userWithToken = new AuthResponseDto();
                 userWithToken.RefreshToken = refreshToken.Token;
+                userWithToken.Token = GenerateAccessToken(user.Id);
+                userWithToken.Email = user.Email;
+                userWithToken.UserId = user.Id;
+                userWithToken.Username = user.Username;
+                if (userWithToken == null)
+                {
+                    return new BaseResponse<AuthResponseDto>
+                    {
+                        Data = null,
+                        Success = false,
+                        Message = "Error because userwithtoken is null",
+                    };
+                }
+                else
+                {
+                    return new BaseResponse<AuthResponseDto>
+                    {
+                        Data = userWithToken,
+                        Success = true,
+                        Message = "Success",
+                    };
+                }
             }
-
-            if (userWithToken == null)
+            else
             {
-                return new BaseResponse<UserWithToken>
+                return new BaseResponse<AuthResponseDto>
                 {
                     Data = null,
                     Success = false,
                     Message = "Error because userwithtoken is null",
                 };
             }
-
-            //sign your token here here..
-            userWithToken.AccessToken = GenerateAccessToken(user.Id);
-            return new BaseResponse<UserWithToken>
-            {
-                Data = userWithToken,
-                Success = true,
-                Message = "Success",
-            };
         }
 
         public async Task<BaseResponse<UserWithToken>> RefreshToken(RefreshRequest refreshRequest)

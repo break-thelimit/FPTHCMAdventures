@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
+using DataAccess.Dtos.NPCDto;
 using DataAccess.GenericRepositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +22,10 @@ namespace DataAccess.Repositories.NPCRepository
             _mapper = mapper;
         }
 
-
+        public async Task<NpcDto> GetNpcByName(string npcName)
+        {
+            var npc = await _dbContext.Set<Npc>().FirstOrDefaultAsync(x => x.Name == npcName);          
+            return _mapper.Map<NpcDto>(npc);
+        }
     }
 }

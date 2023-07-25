@@ -104,7 +104,8 @@ namespace Service.Services.InventoryService
         public async Task<ServiceResponse<string>> UpdateInventory(Guid id, UpdateInventoryDto giftDto)
         {
             try
-            {
+            {   
+                giftDto.Id = id;
                 await _inventoryRepository.UpdateAsync(id, giftDto);
                 return new ServiceResponse<string>
                 {

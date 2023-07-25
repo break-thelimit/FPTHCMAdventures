@@ -27,7 +27,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpGet(Name = "GetExchangHistory")]
 
-        public async Task<ActionResult<ServiceResponse<GetExchangeHistoryDto>>> GetExchangeHistoryList()
+        public async Task<ActionResult<ServiceResponse<ExchangeHistoryDto>>> GetExchangeHistoryList()
         {
             try
             {
@@ -40,7 +40,7 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<ExchangeHistoryDto>> GetExchangeHistoryById(Guid id)
+        public async Task<ActionResult<GetExchangeHistoryDto>> GetExchangeHistoryById(Guid id)
         {
             var eventDetail = await _exchangeHistoryService.GetExchangeHistoryById(id);
             return Ok(eventDetail);
@@ -48,7 +48,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpPost("exchangeHistory", Name = "CreateNewExchangeHistory")]
 
-        public async Task<ActionResult<ServiceResponse<ExchangeHistoryDto>>> CreateNewExchangeHistory(CreateExchangeHistoryDto answerDto)
+        public async Task<ActionResult<ServiceResponse<GetExchangeHistoryDto>>> CreateNewExchangeHistory(CreateExchangeHistoryDto answerDto)
         {
             try
             {
@@ -63,7 +63,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<ExchangeHistoryDto>>> UpdateExchangeHistory(Guid id, [FromBody] UpdateExchangeHistoryDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetExchangeHistoryDto>>> UpdateExchangeHistory(Guid id, [FromBody] UpdateExchangeHistoryDto eventDto)
         {
             try
             {

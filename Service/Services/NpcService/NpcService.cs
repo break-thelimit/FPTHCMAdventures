@@ -6,6 +6,7 @@ using DataAccess.Dtos.NPCDto;
 using DataAccess.Repositories.MajorRepositories;
 using DataAccess.Repositories.NPCRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -103,7 +104,8 @@ namespace Service.Services.NpcService
         public async Task<ServiceResponse<string>> UpdateNpc(Guid id, UpdateNpcDto majorDto)
         {
             try
-            {
+            {   
+                majorDto.Id = id;
                 await _npcRepository.UpdateAsync(id, majorDto);
                 return new ServiceResponse<string>
                 {
@@ -132,6 +134,38 @@ namespace Service.Services.NpcService
         private async Task<bool> EventTaskExists(Guid id)
         {
             return await _npcRepository.Exists(id);
+        }
+
+        public async Task<ServiceResponse<NpcDto>> GetNpcByName(string npcName)
+        {
+            try
+            {
+
+                var npcDetail = await _npcRepository.GetNpcByName(npcName);
+
+                if (npcDetail == null)
+                {
+
+                    return new ServiceResponse<NpcDto>
+                    {
+                        Message = "No rows",
+                        StatusCode = 200,
+                        Success = true
+                    };
+                }
+                return new ServiceResponse<NpcDto>
+                {
+                    Data = npcDetail,
+                    Message = "Successfully",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

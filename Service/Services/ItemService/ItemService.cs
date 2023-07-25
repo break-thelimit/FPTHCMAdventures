@@ -104,7 +104,8 @@ namespace Service.Services.ItemService
         public async Task<ServiceResponse<string>> UpdateItem(Guid id, UpdateItemDto ItemDto)
         {
             try
-            {
+            {   
+                ItemDto.Id = id;
                 await _itemRepository.UpdateAsync(id, ItemDto);
                 return new ServiceResponse<string>
                 {

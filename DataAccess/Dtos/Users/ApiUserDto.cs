@@ -9,10 +9,12 @@ namespace DataAccess.Dtos.Users
 {
     public class ApiUserDto : LoginDto
     {
-        public long? PhoneNumber { get; set; }
-        public bool? Gender { get; set; }
-        public string Status { get; set; }
+        public Guid SchoolId { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Gender { get; set; }
         public string Fullname { get; set; }
+        [EmailAddress]
+        public string Email { get; set; }
 
     }
 }

@@ -17,12 +17,10 @@ namespace DataAccess.Dtos.Users
     {
         this.Id = user.Id;
         this.Email = user.Email;
-        this.School = user.School;
         this.PhoneNumber = user.PhoneNumber;
         this.Fullname = user.Fullname;
         this.Gender = user.Gender;
-
-        this.Role = user.Role;
+        this.Username = user.Username;
     }
 }
 }

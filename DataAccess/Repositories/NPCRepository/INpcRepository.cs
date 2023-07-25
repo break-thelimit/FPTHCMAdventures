@@ -1,4 +1,5 @@
 ﻿using BusinessObjects.Model;
+using DataAccess.Dtos.NPCDto;
 using DataAccess.GenericRepositories;
 using System;
 using System.Collections.Generic;
@@ -10,5 +11,7 @@ namespace DataAccess.Repositories.NPCRepository
 {
     public interface INpcRepository : IGenericRepository<Npc>
     {
+        Task<NpcDto> GetNpcByName(string npcName);
+
     }
 }

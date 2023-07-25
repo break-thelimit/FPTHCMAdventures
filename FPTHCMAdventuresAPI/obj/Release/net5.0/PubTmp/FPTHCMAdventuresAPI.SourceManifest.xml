@@ -1,5 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <sitemanifest>
   <IisApp path="F:\FPTHCMAdventures\FPTHCMAdventuresAPI\obj\Release\net5.0\PubTmp\Out\" />
-  <dbfullsql path="F:\FPTHCMAdventures\FPTHCMAdventuresAPI\obj\Release\net5.0\PubTmp\EFSQLScripts\BusinessObjects.Model.FPTHCMAdventuresDBContext.sql" />
 </sitemanifest>

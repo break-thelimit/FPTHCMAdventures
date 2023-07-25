@@ -23,7 +23,11 @@ namespace DataAccess.Repositories.UserRepository
 
         public async Task<Guid> GetUserIdByUserName(string userName)
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == userName);
+            var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Username == userName);
+            if(user == null)
+            {
+                throw new Exception("Loi user null");
+            }
             return user.Id;
         }
     }

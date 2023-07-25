@@ -27,7 +27,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpGet(Name = "GetItemInventory")]
 
-        public async Task<ActionResult<ServiceResponse<GetItemInventoryDto>>> GetItemInventoryList()
+        public async Task<ActionResult<ServiceResponse<ItemInventoryDto>>> GetItemInventoryList()
         {
             try
             {
@@ -45,7 +45,18 @@ namespace FPTHCMAdventuresAPI.Controllers
             var eventDetail = await _itemInventoryService.GetItemInventoryById(id);
             return Ok(eventDetail);
         }
-
+        [HttpGet("iteminventory/{PlayerNickName}")]
+        public async Task<ActionResult<ItemInventoryDto>> GetItemInventoryByPlayerId(string PlayerNickName)
+        {
+            var eventDetail = await _itemInventoryService.getListItemInventoryByPlayer(PlayerNickName);
+            return Ok(eventDetail);
+        }
+        [HttpGet("iteminventory/byname/{itemName}")] 
+        public async Task<ActionResult<ItemInventoryDto>> GetItemInventoryByItemName(string itemName)
+        {
+            var eventDetail = await _itemInventoryService.GetItemByItemName(itemName);
+            return Ok(eventDetail);
+        }
         [HttpPost("itemInventory", Name = "CreateNewItemInventory")]
 
         public async Task<ActionResult<ServiceResponse<ItemInventoryDto>>> CreateNewItemInventory(CreateItemInventoryDto answerDto)
