@@ -40,10 +40,6 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
         [HttpGet("GetTotalGift")]
 
         public async Task<ActionResult<ServiceResponse<string>>> GetTotalGift()

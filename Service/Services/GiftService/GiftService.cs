@@ -44,13 +44,13 @@ namespace Service.Services.GiftService
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<GetGiftDto>>> GetGift()
+        public async Task<ServiceResponse<IEnumerable<GiftDto>>> GetGift()
         {
-            var giftList = await _giftRepository.GetAllGiftAsync();
+            var giftList = await _giftRepository.GetAllAsync<GiftDto>();
 
             if (giftList != null)
             {
-                return new ServiceResponse<IEnumerable<GetGiftDto>>
+                return new ServiceResponse<IEnumerable<GiftDto>>
                 {
                     Data = giftList,
                     Success = true,
@@ -60,7 +60,7 @@ namespace Service.Services.GiftService
             }
             else
             {
-                return new ServiceResponse<IEnumerable<GetGiftDto>>
+                return new ServiceResponse<IEnumerable<GiftDto>>
                 {
                     Data = giftList,
                     Success = false,
@@ -159,31 +159,7 @@ namespace Service.Services.GiftService
             }
         }
 
-        public async Task<ServiceResponse<string>> GetTotalGift()
-        {
-            var context = new FPTHCMAdventuresDBContext();
-            try
-            {
-                long total = context.Gifts.Count();
-                return new ServiceResponse<string>
-                {
-                    Data=total.ToString(),
-                    Message = "Success!",
-                    Success = true,
-                    StatusCode = 202
-                };
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                    return new ServiceResponse<string>
-                    {
-                        Message = ex.ToString(),
-                        Success = false,
-                        StatusCode = 500
-                    };
-            }
-
-        }
+       
 
         private async Task<bool> GiftExists(Guid id)
         {

@@ -21,16 +21,6 @@ namespace DataAccess.Repositories.QuestionRepositories
             _dbContext = dbContext;
             _mapper = mapper;
         }
-        public async Task<List<GetQuestionDto>> GetAllQuestionAsync()
-        {
-            var ranklist1 = await _dbContext.Questions.Include(x => x.Major).Select(x => new GetQuestionDto
-            {
-                Id = x.Id,
-                MajorId=x.MajorId,
-                MajorName=x.Major.Name,
-                QuestionName=x.QuestionName
-            }).ToListAsync();
-            return ranklist1;
-        }
+       
     }
 }

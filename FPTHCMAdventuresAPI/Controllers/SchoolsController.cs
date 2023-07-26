@@ -40,10 +40,7 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/main
         [HttpGet("school/pagination", Name = "GetSchoolListWithPagination")]
 
         public async Task<ActionResult<ServiceResponse<SchoolDto>>> GetLocationListWithPage([FromQuery] QueryParameters queryParameters)
