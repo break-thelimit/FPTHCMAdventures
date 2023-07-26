@@ -11,6 +11,5 @@ namespace DataAccess.Repositories.GiftRepositories
 {
     public interface IGiftRepository : IGenericRepository<Gift>
     {
-        Task<List<GetGiftDto>> GetAllGiftAsync();
     }
 }

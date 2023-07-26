@@ -11,11 +11,8 @@ namespace DataAccess.Repositories.NPCRepository
 {
     public interface INpcRepository : IGenericRepository<Npc>
     {
-<<<<<<< HEAD
         Task<NpcDto> GetNpcByName(string npcName);
 
-=======
-        Task<List<GetNpcDto>> GetAllNpckAsync();
->>>>>>> origin/main
+
     }
 }

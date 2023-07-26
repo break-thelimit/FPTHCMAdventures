@@ -267,7 +267,6 @@ namespace Service.Services.UserService
                 };
             }
         }
-<<<<<<< HEAD
         private string PasswordHash(string password)
         {
             using (var sha256 = SHA256.Create())
@@ -372,46 +371,11 @@ namespace Service.Services.UserService
             {
 
                 throw new Exception(ex.Message);
-=======
 
-        public async Task<ServiceResponse<PagedResult<UserDto>>> GetUserWithPage(QueryParameters queryParameters)
-        {
-            var pagedsResult = await _userRepository.GetAllAsync<UserDto>(queryParameters);
-            return new ServiceResponse<PagedResult<UserDto>>
-            {
-                Data = pagedsResult,
-                Message = "Successfully",
-                StatusCode = 200,
-                Success = true
-            };
-        }
-
-        public async Task<ServiceResponse<IEnumerable<UserDto>>> GetAllUser()
-        {
-            var userList = await _userRepository.GetAllUserAsync();
-
-            if (userList != null)
-            {
-                return new ServiceResponse<IEnumerable<UserDto>>
-                {
-                    Data = userList,
-                    Success = true,
-                    Message = "Successfully",
-                    StatusCode = 200
-                };
-            }
-            else
-            {
-                return new ServiceResponse<IEnumerable<UserDto>>
-                {
-                    Data = userList,
-                    Success = false,
-                    Message = "Faile because List user null",
-                    StatusCode = 200
-                };
->>>>>>> origin/main
             }
         }
+
+       
     }
 }
 

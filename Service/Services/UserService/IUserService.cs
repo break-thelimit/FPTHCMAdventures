@@ -20,6 +20,5 @@ namespace Service.Services.UserService
         Task<ServiceResponse<PagedResult<UserDto>>> GetUserWithPage(QueryParameters queryParameters);
 
         Task<ServiceResponse<string>> UpdateUser(Guid id, UpdateUserDto updateUserDto);
-        Task<ServiceResponse<IEnumerable<UserDto>>> GetAllUser();
     }
 }

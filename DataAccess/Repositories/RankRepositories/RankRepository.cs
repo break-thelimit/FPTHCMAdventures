@@ -31,7 +31,7 @@ namespace DataAccess.Repositories.RankRepositories
                 EventId=x.EventId,
                 PlayerName=x.Player.Nickname,
                 EventName=x.Event.Name,
-                RankNumber=x.RankNumber
+                Place = x.Place
             }).ToListAsync();
             return ranklist1;
         }

@@ -4,11 +4,7 @@ using DataAccess.Configuration;
 using DataAccess.Dtos.EventDto;
 using DataAccess.Dtos.TaskDto;
 using DataAccess.Repositories.EventRepositories;
-<<<<<<< HEAD
 using DataAccess.Repositories.EventTaskRepositories;
-=======
-using DataAccess.Repositories.PlayerHistoryRepositories;
->>>>>>> origin/main
 using DataAccess.Repositories.TaskRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -24,12 +20,9 @@ namespace Service.Services.TaskService
     public class TaskService : ITaskService
     {
         private readonly ITaskRepositories _taskRepository;
-<<<<<<< HEAD
         private readonly IEventRepositories _eventRepository;
         private readonly IEventTaskRepository _eventTaskRepository;
-=======
-        private readonly IPlayerHistoryRepository _playerHistoryRepository;
->>>>>>> origin/main
+
         private readonly IMapper _mapper;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
@@ -61,7 +54,6 @@ namespace Service.Services.TaskService
 
         public async Task<ServiceResponse<IEnumerable<Task>>> GetTaskDoneByMajor(Guid majorId)
         {
-<<<<<<< HEAD
             try
             {
                 var context = new FPTHCMAdventuresDBContext();
@@ -103,15 +95,13 @@ namespace Service.Services.TaskService
                     x => x.Npc
                 };
             var eventList = await _taskRepository.GetAllAsync<TaskDto>();
-=======
-            var taskList = await _taskRepository.GetAllTaskAsync();
->>>>>>> origin/main
+
             
-            if (taskList != null)
+            if (eventList != null)
             {
                 return new ServiceResponse<IEnumerable<TaskDto>>
                 {
-                    Data = taskList,
+                    Data = eventList,
                     Success = true,
                     Message = "Successfully",
                     StatusCode = 200
@@ -121,7 +111,7 @@ namespace Service.Services.TaskService
             {
                 return new ServiceResponse<IEnumerable<TaskDto>>
                 {
-                    Data = taskList,
+                    Data = eventList,
                     Success = false,
                     Message = "Failed because List task null",
                     StatusCode = 200
@@ -201,39 +191,6 @@ namespace Service.Services.TaskService
             return await _taskRepository.Exists(id);
         }
 
-        public async Task<ServiceResponse<IEnumerable<Task>>> GetTaskDoneByMajor(Guid majorId)
-        {
-            try
-            {
-                var context = new FPTHCMAdventuresDBContext();
-                List<Task> taskList = context.Tasks.Include(t => t.PlayHistories).Where(t => (t.PlayHistories.Count>0) && (t.MajorId==majorId)).ToList();
-
-                if (taskList != null)
-                {
-                    return new ServiceResponse<IEnumerable<Task>>
-                    {
-                        Data = taskList,
-                        Success = true,
-                        Message = "Successfully",
-                        StatusCode = 200
-                    };
-                }
-                else
-                {
-                    return new ServiceResponse<IEnumerable<Task>>
-                    {
-                        Data = taskList,
-                        Success = false,
-                        Message = "Failed because List task null",
-                        StatusCode = 200
-                    };
-                }
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception(ex.Message);
-            }
-        }
+      
     }
 }

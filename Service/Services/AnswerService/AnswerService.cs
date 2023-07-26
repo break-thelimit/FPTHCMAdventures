@@ -55,12 +55,9 @@ namespace Service.Services.AnswerService
 
         public async Task<ServiceResponse<IEnumerable<GetAnswerDto>>> GetAnswer()
         {
-<<<<<<< HEAD
             var eventList = await _answerRepository.GetAllAsync<GetAnswerDto>();
            
-=======
-            var eventList = await _answerRepository.GetAllAnswerkAsync();
->>>>>>> origin/main
+
             if (eventList != null)
             {
                 return new ServiceResponse<IEnumerable<GetAnswerDto>>
@@ -75,15 +72,9 @@ namespace Service.Services.AnswerService
             {
                 return new ServiceResponse<IEnumerable<GetAnswerDto>>
                 {
-<<<<<<< HEAD
                     Data = null,
                     Success = true,
                     Message = "Faile because List event null",
-=======
-                    Data = eventList,
-                    Success = false,
-                    Message = "Faile because List answer null",
->>>>>>> origin/main
                     StatusCode = 200
                 };
             }
