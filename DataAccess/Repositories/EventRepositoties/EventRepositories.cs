@@ -59,6 +59,12 @@ namespace DataAccess.Repositories.EventRepositories
             DateTime vietnamTime = TimeZoneInfo.ConvertTimeFromUtc(dateTimeUtc, vietnamTimeZone);
             return vietnamTime;
         }
+
+        public async Task<string> GetTotalEventsToday()
+        {
+            string total = _dbContext.Events.Where(p => p.StartTime.Equals(DateTime.Today)).Count().ToString();
+            return total;
+        }
     }
 } 
 

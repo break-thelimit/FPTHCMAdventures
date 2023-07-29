@@ -14,5 +14,6 @@ namespace DataAccess.Repositories.EventRepositories
     {
 
         Task<IEnumerable<GetTaskAndEventDto>> GetTaskAndEventListByTimeNow();
+        Task<string> GetTotalEventsToday();
     }
 }

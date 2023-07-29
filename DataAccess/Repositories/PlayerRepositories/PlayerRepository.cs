@@ -23,6 +23,10 @@ namespace DataAccess.Repositories.PlayerRepositories
             _mapper = mapper;
         }
 
-        
+        public async Task<string> GetTotalPlayerToday()
+        {
+            var total = _dbContext.Players.Where(p => p.CreatedAt.Equals(DateTime.Today)).Count().ToString();
+            return total;
+        }
     }
 }

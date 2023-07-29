@@ -55,11 +55,25 @@ namespace XavalorAdventuresAPI.Controllers
             var eventDetail = await _eventService.GetEventById(id);
             return Ok(eventDetail);
         }
-        [HttpGet("event/{startTime}")]
+        [HttpGet("events/{startTime}")]
         public async Task<ActionResult<GetEventDto>> GetEventByStartTime(DateTime startTime)
         {
             var eventDetail = await _eventService.GetEventByDate(startTime);
             return Ok(eventDetail);
+        }
+
+        [HttpGet("event/getTotalEventToday")]
+        public async Task<ActionResult<ServiceResponse<string>>> GetTotalEventToday()
+        {
+            try
+            {
+                var res = await _eventService.GetTotalEventToday();
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
         }
 
         [HttpPost("event", Name = "CreateNewEvent")]

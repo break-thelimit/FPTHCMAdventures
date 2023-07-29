@@ -11,5 +11,6 @@ namespace DataAccess.Repositories.PlayerRepositories
 {
     public interface IPlayerRepository : IGenericRepository<Player>
     {
+        Task<string> GetTotalPlayerToday();
     }
 }

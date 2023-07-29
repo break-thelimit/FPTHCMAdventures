@@ -418,5 +418,16 @@ namespace Service.Services.EventService
             }
         }
 
+        public async Task<ServiceResponse<string>> GetTotalEventToday()
+        {
+            var total = await _eventRepository.GetTotalEventsToday();
+            return new ServiceResponse<string>
+            {
+                Data = total,
+                Message = "Successfully",
+                StatusCode = 200,
+                Success = true
+            };
+        }
     }
 }

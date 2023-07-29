@@ -366,5 +366,17 @@ namespace Service.Services.PlayerService
                 };
             }
         }
+
+        public async Task<ServiceResponse<string>> GetTotalPlayerToday()
+        {
+           var total= await _playerRepository.GetTotalPlayerToday();
+           return new ServiceResponse<string>
+            {
+                Data = total,
+                Message = "Success",
+                Success = true,
+                StatusCode = 202
+            };
+        }
     }
 }
