@@ -4,7 +4,6 @@ using DataAccess.Dtos.AnswerDto;
 using DataAccess.Dtos.EventDto;
 using DataAccess.Dtos.EventTaskDto;
 using DataAccess.Dtos.ExchangeHistoryDto;
-using DataAccess.Dtos.GiftDto;
 using DataAccess.Dtos.InventoryDto;
 using DataAccess.Dtos.ItemDto;
 using DataAccess.Dtos.ItemInventoryDto;
@@ -13,13 +12,14 @@ using DataAccess.Dtos.MajorDto;
 using DataAccess.Dtos.NPCDto;
 using DataAccess.Dtos.PlayerDto;
 using DataAccess.Dtos.PlayerHistoryDto;
+using DataAccess.Dtos.PlayerPrizeDto;
+using DataAccess.Dtos.PrizeDto;
 using DataAccess.Dtos.QuestionDto;
-using DataAccess.Dtos.RankDto;
 using DataAccess.Dtos.RoleDto;
 using DataAccess.Dtos.SchoolDto;
 using DataAccess.Dtos.SchoolEventDto;
+using DataAccess.Dtos.StudentDto;
 using DataAccess.Dtos.TaskDto;
-using DataAccess.Dtos.UserDto;
 using DataAccess.Dtos.Users;
 using System;
 using System.Collections.Generic;
@@ -59,7 +59,14 @@ namespace DataAccess.Configuration
                         .ForMember(dest => dest.Item, opt => opt.Ignore());
             #endregion
 
-
+            #region Player Prize
+            CreateMap<PlayerPrize, GetPrizeDto>().ReverseMap();
+            CreateMap<PlayerPrize, UpdatePlayerPrizeDto>().ReverseMap();
+            CreateMap<PlayerPrize, CreatePlayerPrizeDto>().ReverseMap();
+            CreateMap<PlayerPrize, PlayerPrizeDto>()
+                        .ForMember(dest => dest.PlayerName, opt => opt.MapFrom(src => src.Player.Nickname))
+                        .ForMember(dest => dest.PrizeName, opt => opt.MapFrom(src => src.Prize.Name));
+            #endregion
             #region Event Task
             CreateMap<EventTask, GetEventTaskDto>().ReverseMap();
 
@@ -88,6 +95,15 @@ namespace DataAccess.Configuration
                             .ForMember(dest => dest.AnswerName, opt => opt.MapFrom(src => src.Answer.AnswerName))
                             .ForMember(dest => dest.MajorName, opt => opt.MapFrom(src => src.Major.Name));
 
+            #endregion  
+            
+            #region Student
+            CreateMap<Student, GetStudentDto>().ReverseMap();
+            CreateMap<Student, UpdateStudentDto>().ReverseMap();
+            CreateMap<Student, CreateStudentDto>().ReverseMap();
+            CreateMap<Student, StudentDto>()
+                            .ForMember(dest => dest.Schoolname, opt => opt.MapFrom(src => src.School.Name));
+
             #endregion
 
             #region NPC
@@ -104,15 +120,7 @@ namespace DataAccess.Configuration
             CreateMap<Location, LocationDto>().ReverseMap();
             #endregion  
             
-            #region Rank
-            CreateMap<Rank, GetRankDto>().ReverseMap();
-            CreateMap<Rank, UpdateRankDto>().ReverseMap();
-            CreateMap<Rank, CreateRankDto>().ReverseMap();
-            CreateMap<Rank, RankDto>()
-                            .ForMember(dest => dest.EventName, opt => opt.MapFrom(src => src.Event.Name))
-                            .ForMember(dest => dest.PlayerName, opt => opt.MapFrom(src => src.Player.Nickname));
-            #endregion
-
+        
             #region Answer
             CreateMap<Answer, AnswerDto>().ReverseMap();
                      
@@ -122,12 +130,12 @@ namespace DataAccess.Configuration
 
             #endregion
 
-            #region Gift
-            CreateMap<Gift, GiftDto>()
-                .ForMember(dest => dest.RankName, opt => opt.MapFrom(src => src.Rank.Name));
-            CreateMap<Gift, UpdateGiftDto>().ReverseMap();
-            CreateMap<Gift, CreateGiftDto>().ReverseMap();
-            CreateMap<Gift, GetGiftDto>().ReverseMap();
+            #region Prize
+            CreateMap<Prize, PrizeDto>()
+                .ForMember(dest => dest.EventName, opt => opt.MapFrom(src => src.Event.Name));
+            CreateMap<Prize, UpdatePrizeDto>().ReverseMap();
+            CreateMap<Prize, CreatePrizeDto>().ReverseMap();
+            CreateMap<Prize, GetPrizeDto>().ReverseMap();
             #endregion
 
             #region Exchange History
@@ -159,27 +167,22 @@ namespace DataAccess.Configuration
 
             #region Player
             CreateMap<Player, PlayerDto>()
-                            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.Fullname));
+                            .ForMember(dest => dest.EventName, opt => opt.MapFrom(src => src.Event.Name))
+                            .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname));
             CreateMap<Player, UpdatePlayerDto>().ReverseMap();
             CreateMap<Player, CreatePlayerDto>().ReverseMap();
             CreateMap<Player, GetPlayerDto>().ReverseMap();
-            #endregion  
-            
+            #endregion
+
             #region Player History
             CreateMap<PlayHistory, PlayerHistoryDto>()
-                            .ForMember(dest => dest.PlayerName, opt => opt.MapFrom(src => src.Player.Nickname))
-                            .ForMember(dest => dest.TaskName, opt => opt.MapFrom(src => src.Task.Name)); 
+                            .ForMember(dest => dest.PlayerNickName, opt => opt.MapFrom(src => src.Player.Nickname));
             CreateMap<PlayHistory, UpdatePlayerHistoryDto>().ReverseMap();
             CreateMap<PlayHistory, CreatePlayerHistoryDto>().ReverseMap();
             CreateMap<PlayHistory, GetPlayerHistoryDto>().ReverseMap();
             #endregion
             
-            #region Role
-            CreateMap<Role, RoleDto>().ReverseMap();
-            CreateMap<Role, GetRoleDto>().ReverseMap();
-            CreateMap<Role, CreateRoleDto>().ReverseMap();
-            CreateMap<Role, UpdateRoleDto>().ReverseMap();
-            #endregion
+            
             
             #region School
             CreateMap<School, SchoolDto>().ReverseMap();
@@ -208,18 +211,7 @@ namespace DataAccess.Configuration
             
 
             
-            #region User
-            CreateMap<User, ApiUserDto>().ReverseMap();
-            CreateMap<User, AuthResponseDto>().ReverseMap();
-            CreateMap<User, LoginDto>().ReverseMap();
-            CreateMap<User, UpdateUserDto>().ReverseMap();
-            CreateMap<User, GetUserDto>().ReverseMap();
-            CreateMap<User, CreateUserDto>().ReverseMap();
-            CreateMap<User, UserDto>()
-                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role.Name))
-                .ForMember(dest => dest.Schoolname, opt => opt.MapFrom(src => src.School.Name));
-
-            #endregion
+          
 
 
         }

@@ -8,10 +8,10 @@ namespace DataAccess.Dtos.PlayerHistoryDto
 {
     public abstract class BasePlayerHistoryDto
     {
-        public Guid TaskId { get; set; }
+        public Guid EventtaskId { get; set; }
         public Guid PlayerId { get; set; }
-        public int CompletedTime { get; set; }
-        public int TaskPoint { get; set; }
+        public double CompletedTime { get; set; }
+        public double TaskPoint { get; set; }
         public string Status { get; set; }
     }
 }

@@ -10,10 +10,11 @@ namespace Service.Services.ExchangeHistoryService
 {
     public interface IExchangeHistoryService
     {
-        Task<ServiceResponse<IEnumerable<GetExchangeHistoryDto>>> GetExchangeHistory();
-        Task<ServiceResponse<ExchangeHistoryDto>> GetExchangeHistoryById(Guid eventId);
+        Task<ServiceResponse<IEnumerable<ExchangeHistoryDto>>> GetExchangeHistory();
+        Task<ServiceResponse<GetExchangeHistoryDto>> GetExchangeHistoryById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewExchangeHistory(CreateExchangeHistoryDto createEventTaskDto);
         Task<ServiceResponse<string>> UpdateExchangeHistory(Guid id, UpdateExchangeHistoryDto eventTaskDto);
-        Task<ServiceResponse<IEnumerable<GetExchangeHistoryDto>>> GetAllExchangeHistory();
+        Task<ServiceResponse<ExchangeHistoryDto>> GetExchangeByItemName(string itemName);
+
     }
 }

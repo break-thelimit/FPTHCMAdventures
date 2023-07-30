@@ -10,18 +10,13 @@ using DataAccess.Repositories.UserRepositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+
 using Service.Services.EventService;
 using Service.Services.EventTaskService;
 using Service.Services.MajorService;
@@ -29,36 +24,28 @@ using Service.Services.QuestionService;
 using Service.Services.TaskService;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using DataAccess.Repositories.LocationRepositories;
 using DataAccess.Repositories.NPCRepository;
 using Service.Services.LocationServoce;
 using Service.Services.NpcService;
-using DataAccess.Repositories.RankRepositories;
 using DataAccess.Repositories.SchoolEventRepositories;
 using DataAccess.Repositories.SchoolRepositories;
 using DataAccess.Repositories.AnswerRepositories;
 using DataAccess.Repositories.InventoryRepositories;
 using DataAccess.Repositories.ItemRepositories;
-using DataAccess.Repositories.GiftRepositories;
 using DataAccess.Repositories.PlayerRepositories;
 using DataAccess.Repositories.PlayerHistoryRepositories;
-using DataAccess.Repositories.RoleRepositories;
 using DataAccess.Repositories.ExchangeHistoryRepositories;
-using Service.Services.RankService;
 using Service.Services.SchoolEventService;
 using Service.Services.SchoolService;
 using Service.Services.AnswerService;
 using Service.Services.InventoryService;
 using Service.Services.ItemService;
-using Service.Services.GiftService;
 using Service.Services.PlayerService;
 using Service.Services.PlayerHistoryService;
-using Service.Services.RoleService;
 using Service.Services.ExchangeHistoryService;
 using Service.Services.ItemInventoryService;
 using DataAccess.Repositories.ItemInventoryRepositories;
@@ -66,11 +53,23 @@ using OfficeOpenXml;
 using ClosedXML.Excel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-using DataAccess.Repositories.UserRepository;
-using Service.Services.UserService;
 using DataAccess.Dtos.Users;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
+using DataAccess.MiddleWareException;
+using Serilog;
+using Serilog.Events;
+using Microsoft.AspNetCore.Rewrite;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Http;
+using HealthChecks.UI.Client;
+using Service.HealthCheck;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using DataAccess.Repositories.PrizeRepositories;
+using DataAccess.Repositories.StudentRepositories;
+using DataAccess.Repositories.PlayerPrizeRepositories;
+using Service.Services.StudentService;
+using Service.Services.PlayerPrizeService;
 
 namespace FPTHCMAdventuresAPI
 {
@@ -101,6 +100,8 @@ namespace FPTHCMAdventuresAPI
                           .AllowAnyOrigin()
                           .AllowAnyMethod());
             });
+
+            #region Repositories
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IEventRepositories, EventRepositories>();
             services.AddScoped<ITaskRepositories, TaskRepositories>();
@@ -109,21 +110,19 @@ namespace FPTHCMAdventuresAPI
             services.AddScoped<IQuestionRepository, QuestionRepository>();
             services.AddScoped<ILocationRepository, LocationRepository>();
             services.AddScoped<INpcRepository, NpcRepository>();
-            services.AddScoped<IRankRepository, RankRepository>();
             services.AddScoped<ISchoolEventRepository, SchoolEventRepository>();
             services.AddScoped<ISchoolRepository, SchoolRepository>();
             services.AddScoped<IAnswerRepository, AnswerRepository>();
             services.AddScoped<IItemInventoryRepositories, ItemInventoryRepositories>();
             services.AddScoped<IItemRepository, ItemRepository>();
             services.AddScoped<IInventoryRepository, InventoryRepository>();
-            services.AddScoped<IGiftRepository, GiftRepository>();
+            services.AddScoped<IPrizeRepository, PrizeRepository>();
             services.AddScoped<IPlayerRepository, PlayerRepository>();
             services.AddScoped<IPlayerHistoryRepository, PlayerHistoryRepository>();
-            services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IExchangeHistoryRepository, ExchangeHistoryRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IAuthManager, AuthManager>();
-
+            services.AddScoped<IStudentRepositories, StudentRepositories>();
+            services.AddScoped<IPlayerPrizeRepositories, PlayerPrizeRepositories>();
+            #endregion
             #region Excel
             services.AddScoped<ExcelPackage>();
             services.AddScoped<IXLWorkbook, XLWorkbook>();
@@ -153,8 +152,11 @@ namespace FPTHCMAdventuresAPI
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidIssuer = Configuration["JwtSettings:Issuer"],
+                    ValidAudience = Configuration["JwtSettings:Audience"],
                     ClockSkew = TimeSpan.Zero
             };
             }).AddCookie()
@@ -166,7 +168,7 @@ namespace FPTHCMAdventuresAPI
                 options.CallbackPath = "/signin-google";
 
             });
-
+        
             services.AddSwaggerGen(options => {
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "FPTHCM Adventure API", Version = "v1" });
                 options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
@@ -204,6 +206,7 @@ namespace FPTHCMAdventuresAPI
                 options.UseCaseSensitivePaths = true;
                 options.MaximumBodySize = 1024;
             });
+            #region Service
             //For DI Service
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<ITaskService, TaskService>();
@@ -212,52 +215,108 @@ namespace FPTHCMAdventuresAPI
             services.AddScoped<IQuestionService, QuestionService>();
             services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<INpcService, NpcService>();
-            services.AddScoped<IRankService, RankService>();
             services.AddScoped<ISchoolEventService, SchoolEventService>();
             services.AddScoped<ISchoolService, SchoolService>();
             services.AddScoped<IAnswerService, AnswerService>();
             services.AddScoped<IItemInventoryService, ItemInventoryService>();
             services.AddScoped<IItemService, ItemService>();
             services.AddScoped<IInventoryService, InventoryService>();
-            services.AddScoped<IGiftService, GiftService>();
             services.AddScoped<IPlayerService, PlayerService>();
             services.AddScoped<IPlayerHistoryService, PlayerHistoryService>();
-            services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IExchangeHistoryService, ExchangHistoryService>();
-            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IStudentService, StudentService>();
+            services.AddScoped<IPlayerPrizeService, PlayerPrizeService>();
+            #endregion
+
+            services.AddHealthChecks()
+              .AddCheck<CustomHealthChecks>("Custom Health Check", failureStatus: HealthStatus.Degraded, tags: new[] { "custom" })
+              .AddSqlServer(ConectionString , tags: new[] {"database"})
+              .AddDbContextCheck<FPTHCMAdventuresDBContext>(tags: new[] { "database" });
+            services.AddHealthChecksUI(opt =>
+            {
+                opt.SetEvaluationTimeInSeconds(15); //time in seconds between check
+            }).AddInMemoryStorage();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-          /*  if (env.IsDevelopment())
-            {
-               *//* app.UseDeveloperExceptionPage();
-                app.UseSwagger();
+            /*  if (env.IsDevelopment())
+              {
+                 *//* app.UseDeveloperExceptionPage();
+                  app.UseSwagger();
 
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "XavalorAdventuresAPI v1"));*//*
-            }*/
+                  app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "XavalorAdventuresAPI v1"));*//*
+              }*/
 
             app.UseSwagger();
             app.UseSwaggerUI(c => {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Documentation");
-            }); 
+            });
+            app.UseMiddleware<ExceptionMiddleware>();
             app.UseHttpsRedirection();
+            app.UseRouting();
 
             app.UseCors("AllowAll");
 
             app.UseResponseCaching();
 
-            app.UseRouting();
+            app.Use(async (context, next) =>
+            {
+                context.Response.GetTypedHeaders().CacheControl =
+                    new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
+                    {
+                        Public = true,
+                        MaxAge = TimeSpan.FromSeconds(10)
+                    };
+                context.Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.Vary] =
+                    new string[] { "Accept-Encoding" };
 
+                await next();
+            });
             app.UseAuthentication();
-
             app.UseAuthorization();
-
+           
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+
             });
+            app.UseRouting()
+          .UseEndpoints(config =>
+          {
+              config.MapHealthChecks("/health", new HealthCheckOptions
+              {
+                  ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+              });
+              config.MapHealthChecks("/healthcheck", new HealthCheckOptions
+              {
+                  Predicate = healthcheck => healthcheck.Tags.Contains("custom"),
+                  ResultStatusCodes =
+                {
+                    [HealthStatus.Healthy] = StatusCodes.Status200OK,
+                    [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable,
+                    [HealthStatus.Degraded] = StatusCodes.Status200OK,
+                },
+                  ResponseWriter = HealthCheckResponseWriter.WriteResponse
+              });
+              config.MapHealthChecks("/databasehealthcheck", new HealthCheckOptions
+              {
+                  Predicate = healthcheck => healthcheck.Tags.Contains("database"),
+                  ResultStatusCodes =
+                {
+                    [HealthStatus.Healthy] = StatusCodes.Status200OK,
+                    [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable,
+                    [HealthStatus.Degraded] = StatusCodes.Status200OK,
+                },
+                  ResponseWriter = HealthCheckResponseWriter.WriteResponse
+              });
+
+              config.MapHealthChecksUI();
+
+              config.MapDefaultControllerRoute();
+          });
         }
     }
 }

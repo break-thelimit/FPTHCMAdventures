@@ -2,6 +2,7 @@
 using BusinessObjects.Model;
 using DataAccess;
 using DataAccess.Configuration;
+using DataAccess.Dtos.QuestionDto;
 using DataAccess.Dtos.SchoolDto;
 using DataAccess.Dtos.SchoolEventDto;
 using DataAccess.Repositories.SchoolEventRepositories;
@@ -148,8 +149,34 @@ namespace Service.Services.SchoolService
         {
             return await _schoolRepository.Exists(id);
         }
+        public async Task<ServiceResponse<string>> DisableSchool(Guid id)
+        {
+            var checkEvent = await _schoolRepository.GetAsync<SchoolDto>(id);
 
-       
+            if (checkEvent == null)
+            {
+                return new ServiceResponse<string>
+                {
+                    Data = "null",
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            else
+            {
+                checkEvent.Status = "INACTIVE";
+                await _schoolRepository.UpdateAsync(id, checkEvent);
+                return new ServiceResponse<string>
+                {
+                    Data = checkEvent.Status,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+        }
+
 
     }
 }

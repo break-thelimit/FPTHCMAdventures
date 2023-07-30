@@ -2,16 +2,19 @@
 using DataAccess.Dtos.RoleDto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Service.Services.RoleService;
 using Service;
 using System.Threading.Tasks;
 using System;
 using Service.Services.SchoolService;
 using DataAccess.Dtos.SchoolDto;
 using DataAccess;
+using Microsoft.AspNetCore.Authorization;
+using DataAccess.Dtos.ItemDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class SchoolsController : ControllerBase
@@ -91,6 +94,21 @@ namespace FPTHCMAdventuresAPI.Controllers
 
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
+        }
+
+        [HttpDelete("disableschool")]
+        public async Task<ActionResult<ServiceResponse<ItemDto>>> DisableStatusSchool(Guid id)
+        {
+            try
+            {
+                var disableEvent = await _schoolService.DisableSchool(id);
+                return Ok(disableEvent);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+
         }
     }
 }

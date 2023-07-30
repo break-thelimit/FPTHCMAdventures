@@ -8,9 +8,13 @@ using System.Threading.Tasks;
 using System;
 using Service.Services.NpcService;
 using DataAccess.Dtos.NPCDto;
+using Microsoft.AspNetCore.Authorization;
+using DataAccess.Dtos.ItemDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
 
@@ -76,6 +80,21 @@ namespace FPTHCMAdventuresAPI.Controllers
 
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
+        }
+
+        [HttpDelete("disablenpc")]
+        public async Task<ActionResult<ServiceResponse<NpcDto>>> DisableStatusMajor(Guid id)
+        {
+            try
+            {
+                var disableEvent = await _npcService.DisableNpc(id);
+                return Ok(disableEvent);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+
         }
     }
 }

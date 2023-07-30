@@ -22,5 +22,7 @@ namespace Service.Services.EventService
         Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file);
         Task<ServiceResponse<PagedResult<EventDto>>> GetEventWithPage(QueryParameters queryParameters);
 
+        Task<ServiceResponse<string>> DisableEvent(Guid id);    
+
     }
 }

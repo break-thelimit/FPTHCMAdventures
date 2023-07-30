@@ -9,8 +9,8 @@ namespace BusinessObjects.Model
     {
         public Guid Id { get; set; }
         public Guid InventoryId { get; set; }
-        public Guid? ItemId { get; set; }
-        public int? Quantity { get; set; }
+        public Guid ItemId { get; set; }
+        public int Quantity { get; set; }
 
         public virtual Inventory Inventory { get; set; }
         public virtual Item Item { get; set; }

@@ -14,5 +14,7 @@ namespace Service.Services.ItemService
         Task<ServiceResponse<ItemDto>> GetItemById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewItem(CreateItemDto createItemDto);
         Task<ServiceResponse<string>> UpdateItem(Guid id, UpdateItemDto ItemDto);
+
+        Task<ServiceResponse<string>> DisableStausItem(Guid id);
     }
 }

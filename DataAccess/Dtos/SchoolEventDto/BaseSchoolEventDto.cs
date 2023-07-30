@@ -10,6 +10,8 @@ namespace DataAccess.Dtos.SchoolEventDto
     {
         public Guid EventId { get; set; }
         public Guid SchoolId { get; set; }
+        public string InvitationLetter { get; set; }
+        public string Status { get; set; }
 
     }
 }

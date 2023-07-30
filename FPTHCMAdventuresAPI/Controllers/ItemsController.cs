@@ -8,10 +8,12 @@ using System.Threading.Tasks;
 using System;
 using Service.Services.ItemService;
 using DataAccess.Dtos.ItemDto;
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class ItemsController : ControllerBase
@@ -77,6 +79,20 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
       
             }
+        }
+        [HttpDelete("disableitem")]
+        public async Task<ActionResult<ServiceResponse<ItemDto>>> DisableStatusItem(Guid id)
+        {
+            try
+            {
+                var disableEvent = await _itemService.DisableStausItem(id);
+                return Ok(disableEvent);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+
         }
     }
 }

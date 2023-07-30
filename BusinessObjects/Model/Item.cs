@@ -21,8 +21,6 @@ namespace BusinessObjects.Model
         public string Type { get; set; }
         public bool? LimitExchange { get; set; }
         public string Status { get; set; }
-        public int? Quantity { get; set; }
-        public string ImageUrl { get; set; }
 
         public virtual ICollection<ExchangeHistory> ExchangeHistories { get; set; }
         public virtual ICollection<ItemIventory> ItemIventories { get; set; }

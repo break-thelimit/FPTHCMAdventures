@@ -1,8 +1,5 @@
 ﻿using AutoMapper;
-using DataAccess.Dtos.PlayerHistoryDto;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Service.Services.PlayerHistoryService;
 using Service;
 using System.Threading.Tasks;
 using System;
@@ -12,6 +9,7 @@ using DataAccess.Dtos.PlayerDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class PlayersController : ControllerBase
@@ -41,7 +39,7 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
         }
 
-        [HttpGet("players/listPlayer-username", Name = "GetPlayerWithUserNames")]
+     /*   [HttpGet("players/listPlayer-username", Name = "GetPlayerWithUserNames")]
 
         public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> GetPlayerListWithUserName()
         {
@@ -54,7 +52,7 @@ namespace FPTHCMAdventuresAPI.Controllers
             {
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
-        }
+        }*/
         [HttpGet("{id}")]
         public async Task<ActionResult<PlayerDto>> GetPlayerById(Guid id)
         {
@@ -62,10 +60,10 @@ namespace FPTHCMAdventuresAPI.Controllers
             return Ok(eventDetail);
         }
 
-        [HttpGet("user/{id}")]
-        public async Task<ActionResult<PlayerDto>> GetPlayerByUserId(Guid id)
+        [HttpGet("user/{studentId}")]
+        public async Task<ActionResult<PlayerDto>> GetPlayerByStudentId(Guid studentId)
         {
-            var eventDetail = await _playerService.GetPlayerByUserId(id);
+            var eventDetail = await _playerService.GetPlayerByStudentId(studentId);
             return Ok(eventDetail);
         }
         [HttpGet("player/player-{nickname}")]
@@ -74,12 +72,12 @@ namespace FPTHCMAdventuresAPI.Controllers
             var eventDetail = await _playerService.CheckPlayerByNickName(nickname);
             return Ok(eventDetail);
         }
-        [HttpGet("player/{username}")]
+      /*  [HttpGet("player/{username}")]
         public async Task<ActionResult<PlayerDto>> GetPlayerByUserName(string username)
         {
             var eventDetail = await _playerService.CheckPlayerByUserName(username);
             return Ok(eventDetail);
-        }
+        }*/
 
         [HttpPost("player", Name = "CreateNewPlayer")]
 

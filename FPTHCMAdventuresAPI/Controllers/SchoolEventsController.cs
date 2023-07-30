@@ -2,15 +2,17 @@
 using DataAccess.Dtos.RoleDto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Service.Services.RoleService;
 using Service;
 using System.Threading.Tasks;
 using System;
 using Service.Services.SchoolEventService;
 using DataAccess.Dtos.SchoolEventDto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class SchoolEventsController : ControllerBase

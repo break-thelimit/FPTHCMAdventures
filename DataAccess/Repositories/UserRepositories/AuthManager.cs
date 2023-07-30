@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿/*using AutoMapper;
 using BusinessObjects.Model;
 using DataAccess.Dtos.Users;
 using DataAccess.GenericRepositories;
@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -18,6 +19,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Task = System.Threading.Tasks.Task;
 
 namespace DataAccess.Repositories.UserRepositories
 {
@@ -25,14 +27,14 @@ namespace DataAccess.Repositories.UserRepositories
     {
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
-        private User _user;
+        private Student _user;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         private const string _loginProvider = "FPTHCMAdventuresApi";
         private const string _refreshToken = "RefreshToken";
         private readonly FPTHCMAdventuresDBContext _dbContext;
         private readonly JWTSettings _jwtsettings;
-
+        private readonly List<RefreshToken> refreshTokens = new List<RefreshToken>();
         public AuthManager(FPTHCMAdventuresDBContext dbContext, IOptions<JWTSettings> jwtsettings, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor) 
         {
             this._mapper = mapper;
@@ -44,8 +46,8 @@ namespace DataAccess.Repositories.UserRepositories
         }
         public async Task<BaseResponse<AuthResponseDto>> Login(LoginDto loginDto)
         {
-            string pass = PasswordHash(loginDto.Password);
-            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Username == loginDto.Username);
+            *//*string pass = PasswordHash(loginDto.Password);
+            var user = await _dbContext.Students.SingleOrDefaultAsync(u => u.Email == loginDto.Username);
             var adminEmail = _configuration.GetSection("DefaultAccount").GetSection("Email").Value;
             var adminPassowrd = _configuration.GetSection("DefaultAccount").GetSection("Password").Value;
             AuthResponseDto userWithToken = null;
@@ -78,6 +80,7 @@ namespace DataAccess.Repositories.UserRepositories
                     userWithToken.Email = user.Email;
                     userWithToken.UserId = user.Id;
                     userWithToken.Username = user.Username;
+                    userWithToken.SchoolId = user.SchoolId;
                     if (userWithToken == null)
                     {
                         return new BaseResponse<AuthResponseDto>
@@ -89,6 +92,7 @@ namespace DataAccess.Repositories.UserRepositories
                     }
                     else
                     {
+
                         return new BaseResponse<AuthResponseDto>
                         {
                             Data = userWithToken,
@@ -106,13 +110,13 @@ namespace DataAccess.Repositories.UserRepositories
                         Success = false
                     };
                 }
-            }
+            }*//*
            
         }
 
         private RefreshToken GenerateRefreshToken()
         {
-            RefreshToken refreshToken = new RefreshToken();
+          *//*  RefreshToken refreshToken = new RefreshToken();
 
             var randomNumber = new byte[32];
             using (var rng = RandomNumberGenerator.Create())
@@ -121,13 +125,13 @@ namespace DataAccess.Repositories.UserRepositories
                 refreshToken.Token = Convert.ToBase64String(randomNumber);
             }
             refreshToken.ExpiryDate = DateTime.UtcNow.AddMonths(6);
-            return refreshToken;
+            return refreshToken;*//*
         }
 
         private bool ValidateRefreshToken(User user, string refreshToken)
         {
 
-            RefreshToken refreshTokenUser = _dbContext.RefreshTokens.Where(rt => rt.Token == refreshToken)
+            *//*RefreshToken refreshTokenUser = _dbContext.RefreshTokens.Where(rt => rt.Token == refreshToken)
                                                 .OrderByDescending(rt => rt.ExpiryDate)
                                                 .FirstOrDefault();
 
@@ -137,12 +141,12 @@ namespace DataAccess.Repositories.UserRepositories
                 return true;
             }
 
-            return false;
+            return false;*//*
         }
 
         private async Task<User> GetUserFromAccessToken(string accessToken)
         {
-            try
+           *//* try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes(_jwtsettings.SecretKey);
@@ -182,14 +186,16 @@ namespace DataAccess.Repositories.UserRepositories
                 return new User();
             }
 
-            return new User();
+            return new User();*//*
         }
         public string GenerateAccessTokenGoogle(string userId)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
+           *//* var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_jwtsettings.SecretKey);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
+                Issuer = _configuration["JwtSettings:Issuer"],
+                Audience = _configuration["JwtSettings:Audience"],
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, userId)
@@ -199,28 +205,32 @@ namespace DataAccess.Repositories.UserRepositories
                 SecurityAlgorithms.HmacSha256)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            return tokenHandler.WriteToken(token);*//*
         }
         public string GenerateAccessToken(Guid userId)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
+           *//* var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_jwtsettings.SecretKey);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
+                Issuer = _configuration["JwtSettings:Issuer"],
+                Audience = _configuration["JwtSettings:Audience"],
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, Convert.ToString(userId))
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_configuration["JwtSettings:DurationInMinutes"])),
+
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+              
                 SecurityAlgorithms.HmacSha256)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            return tokenHandler.WriteToken(token);*//*
         }
         public string PasswordHash(string password)
         {
-            using (var sha256 = SHA256.Create())
+          *//*  using (var sha256 = SHA256.Create())
             {
                 // Chuyển đổi mật khẩu sang mảng byte
                 byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
@@ -236,31 +246,31 @@ namespace DataAccess.Repositories.UserRepositories
                 }
 
                 return builder.ToString();
-            }
+            }*//*
         }
-        public Guid getRoleId()
+        public async Task<Guid> GetRoleIdAsync()
         {
-            var role = _dbContext.Roles.FirstOrDefault(x => x.Name =="USER");
-            if(role == null)
+            *//*var role = _dbContext.Roles.FirstOrDefault(x => x.Name == "USER");
+            if (role == null)
             {
-                role.Id = Guid.NewGuid();
+                role = new Role { Id = Guid.NewGuid(), Name = "USER" };
                 _dbContext.Roles.Add(role);
-                _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync();
                 return role.Id;
             }
             else
             {
                 return role.Id;
-            }
+            }*//*
         }
         public async Task<BaseResponse<AuthResponseDto>> RegisterUser(ApiUserDto apiUser)
         {
-            var user = _mapper.Map<User>(apiUser);
+           *//* var user = _mapper.Map<User>(apiUser);
             user.Id = Guid.NewGuid();
-            user.RoleId = Guid.Parse("3f9f9720-e050-4d27-b148-c4dc17fbf891");
+            user.RoleId = await GetRoleIdAsync();
             string hashedPassword = PasswordHash(apiUser.Password);
             user.Password = hashedPassword;
-            user.Status = "active";
+            user.Status = "ACTIVE";
             if (!long.TryParse(apiUser.PhoneNumber, out long phoneNumber))
             {
                 return new BaseResponse<AuthResponseDto>
@@ -318,12 +328,12 @@ namespace DataAccess.Repositories.UserRepositories
                     Success = false,
                     Message = "Error because userwithtoken is null",
                 };
-            }
+            }*//*
         }
 
         public async Task<BaseResponse<UserWithToken>> RefreshToken(RefreshRequest refreshRequest)
         {
-            User user = await GetUserFromAccessToken(refreshRequest.AccessToken);
+           *//* User user = await GetUserFromAccessToken(refreshRequest.AccessToken);
 
             if (user != null && ValidateRefreshToken(user, refreshRequest.RefreshToken))
             {
@@ -343,7 +353,7 @@ namespace DataAccess.Repositories.UserRepositories
                 Data = null,
                 Message = "Failed",
                 Success = false,
-            }; 
+            }; *//*
         }
 
         public async Task<BaseResponse<User>> GetUserByAccessToken(string accessToken)
@@ -357,7 +367,20 @@ namespace DataAccess.Repositories.UserRepositories
 
             return null;
         }
+
+        public async Task<BaseResponse<string>> DeleteTokenUser(Guid userId)
+        {
+            var refeshTokenList = await _dbContext.RefreshTokens.ToListAsync();
+            refeshTokenList.RemoveAll(x => x.UserId == userId);
+            return new BaseResponse<string>
+            {
+                Message = "Success",
+                Success = true,
+                Data = Task.CompletedTask.ToString()
+            };
+        }
     }
 
 }
 
+*/

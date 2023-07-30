@@ -18,5 +18,6 @@ namespace Service.Services.AnswerService
         Task<ServiceResponse<AnswerDto>> GetAnswerById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewAnswer(CreateAnswerDto createAnswerDto);
         Task<ServiceResponse<string>> UpdateAnswer(Guid id, UpdateAnswerDto eventDto);
+
     }
 }

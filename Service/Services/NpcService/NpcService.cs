@@ -49,7 +49,7 @@ namespace Service.Services.NpcService
             {
 
                 var eventDetail = await _npcRepository.GetAsync<NpcDto>(eventId);
-
+               
                 if (eventDetail == null)
                 {
 
@@ -165,6 +165,33 @@ namespace Service.Services.NpcService
             {
 
                 throw new Exception(ex.Message);
+            }
+        }
+        public async Task<ServiceResponse<string>> DisableNpc(Guid id)
+        {
+            var checkEvent = await _npcRepository.GetAsync<NpcDto>(id);
+
+            if (checkEvent == null)
+            {
+                return new ServiceResponse<string>
+                {
+                    Data = "null",
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            else
+            {
+                checkEvent.Status = "INACTIVE";
+                await _npcRepository.UpdateAsync(id, checkEvent);
+                return new ServiceResponse<string>
+                {
+                    Data = checkEvent.Status,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
             }
         }
     }

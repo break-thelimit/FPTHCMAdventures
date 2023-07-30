@@ -8,9 +8,13 @@ using System.Threading.Tasks;
 using System;
 using Service.Services.ExchangeHistoryService;
 using DataAccess.Dtos.ExchangeHistoryDto;
+using Microsoft.AspNetCore.Authorization;
+using DataAccess.Dtos.ItemInventoryDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class ExchangeHistorysController : ControllerBase
@@ -24,14 +28,19 @@ namespace FPTHCMAdventuresAPI.Controllers
             _exchangeHistoryService = exchangeHistoryService;
         }
 
-
+        [HttpGet("exchangehistory/byname/{itemName}")]
+        public async Task<ActionResult<ItemInventoryDto>> GetItemInventoryByItemName(string itemName)
+        {
+            var eventDetail = await _exchangeHistoryService.GetExchangeByItemName(itemName);
+            return Ok(eventDetail);
+        }
         [HttpGet(Name = "GetExchangHistory")]
 
         public async Task<ActionResult<ServiceResponse<ExchangeHistoryDto>>> GetExchangeHistoryList()
         {
             try
             {
-                var res = await _exchangeHistoryService.GetAllExchangeHistory();
+                var res = await _exchangeHistoryService.GetExchangeHistory();
                 return Ok(res);
             }
             catch (Exception ex)

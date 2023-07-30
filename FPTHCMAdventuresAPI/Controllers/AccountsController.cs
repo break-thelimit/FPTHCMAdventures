@@ -1,4 +1,4 @@
-﻿using DataAccess.Dtos.UserDto;
+﻿/*using DataAccess.Dtos.UserDto;
 using DataAccess.Dtos.Users;
 using DataAccess.GoogleAuthSetting;
 using DataAccess.Repositories.UserRepositories;
@@ -74,14 +74,14 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
             // Kiểm tra xem phoneClaim có tồn tại không (tùy thuộc vào cấu hình của bạn)
             var nameClaim = result.Principal.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name);
-            if(nameClaim == null)
+            if (nameClaim == null)
             {
                 apiUserDto.Fullname = nameClaim.Value;
 
             }
             apiUserDto.Email = emailClaim.Value;
             apiUserDto.Fullname = nameClaim.Value;
-            
+
             var errors = await _authManager.RegisterUser(apiUserDto);
 
 
@@ -142,6 +142,25 @@ namespace FPTHCMAdventuresAPI.Controllers
 
             return Ok(authResponse);
         }
+
+        [Authorize]
+        [HttpDelete]
+        [Route("logout")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> LogOut()
+        {
+            string rawuserId = HttpContext.User.FindFirstValue(ClaimTypes.Name);
+            if (!Guid.TryParse(rawuserId, out var userId))
+            {
+                return Unauthorized();
+            }
+            await _authManager.DeleteTokenUser(userId);
+
+            return NoContent();
+        }
     }
 }
 
+*/

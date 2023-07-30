@@ -18,5 +18,8 @@ namespace Service.Services.MajorService
         Task<string> getMajorName(Guid id); 
         Task<ServiceResponse<byte[]>> DownloadExcelTemplate();
         Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file);
+
+        Task<ServiceResponse<string>> DisableMajor(Guid id);
+
     }
 }

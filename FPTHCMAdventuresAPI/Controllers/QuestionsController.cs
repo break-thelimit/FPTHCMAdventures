@@ -9,9 +9,13 @@ using System.Threading.Tasks;
 using System;
 using Service.Services.QuestionService;
 using DataAccess.Dtos.QuestionDto;
+using Microsoft.AspNetCore.Authorization;
+using DataAccess.Dtos.ItemDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class QuestionsController : ControllerBase
@@ -49,7 +53,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpPost("question", Name = "CreateQuestion")]
 
-        public async Task<ActionResult<ServiceResponse<MajorDto>>> CreateNewQuestion(CreateQuestionDto eventTaskDto)
+        public async Task<ActionResult<ServiceResponse<GetQuestionDto>>> CreateNewQuestion(CreateQuestionDto eventTaskDto)
         {
             try
             {
@@ -64,7 +68,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<MajorDto>>> CreateNewEvent(Guid id, [FromBody] UpdateQuestionDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetQuestionDto>>> UpdateQuestion(Guid id, [FromBody] UpdateQuestionDto eventDto)
         {
             try
             {
@@ -113,6 +117,21 @@ namespace FPTHCMAdventuresAPI.Controllers
                 // Xử lý lỗi nếu có
                 return BadRequest(serviceResponse.Message);
             }
+        }
+
+        [HttpDelete("disablequestion")]
+        public async Task<ActionResult<ServiceResponse<QuestionDto>>> DisableStatusQuestion(Guid id)
+        {
+            try
+            {
+                var disableEvent = await _questionService.DisableQuestion(id);
+                return Ok(disableEvent);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+
         }
     }
 }

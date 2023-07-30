@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
 using DataAccess.Dtos.ExchangeHistoryDto;
+using DataAccess.Dtos.ItemInventoryDto;
 using DataAccess.GenericRepositories;
 using DataAccess.Repositories.EventTaskRepositories;
 using Microsoft.EntityFrameworkCore;
@@ -22,20 +23,18 @@ namespace DataAccess.Repositories.ExchangeHistoryRepositories
             _dbContext = dbContext;
             _mapper = mapper;
         }
-
-        public async Task<List<GetExchangeHistoryDto>> GetAllExchangeHistoryRepository()
+        public async Task<ExchangeHistoryDto> getExchangeByItemName(string itemName)
         {
-            var userlist1 = await _dbContext.ExchangeHistories.Include(x => x.Player).Include(r => r.Item).Select(x => new GetExchangeHistoryDto
-            {
-                Id = x.Id,
-                PlayerId=x.PlayerId,
-                PlayerNickname=x.Player.Nickname,
-                ItemId=x.ItemId,
-                ItemName=x.Item.Name,
-                ExchangeDate=x.ExchangeDate
-            }).ToListAsync();
-            return userlist1;
+            var getItemByName = await _dbContext.ExchangeHistories
+                       .Include(x => x.Item) // Chắc chắn rằng bạn đã Include bảng Item để có thể truy cập vào thông tin của nó
+                       .Where(x => x.Item.Name == itemName)
+                       .FirstOrDefaultAsync();
+
+            // Ánh xạ từ ItemIventories sang ItemInventoryDto bằng AutoMapper
+            ExchangeHistoryDto itemDto = _mapper.Map<ExchangeHistoryDto>(getItemByName);
+            return itemDto;
         }
+
 
     }
 }

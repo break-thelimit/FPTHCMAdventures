@@ -1,18 +1,19 @@
 ﻿using AutoMapper;
 using DataAccess.Dtos.AnswerDto;
 using DataAccess.Dtos.ExchangeHistoryDto;
-using DataAccess.Dtos.GiftDto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Service.Services.GiftService;
 using Service;
 using System.Threading.Tasks;
 using System;
 using Service.Services.InventoryService;
 using DataAccess.Dtos.InventoryDto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class InventorysController : ControllerBase
@@ -78,5 +79,7 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+
+       
     }
 }

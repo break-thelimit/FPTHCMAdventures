@@ -1,5 +1,4 @@
-﻿using DataAccess.Dtos.GiftDto;
-using DataAccess.Dtos.InventoryDto;
+﻿using DataAccess.Dtos.InventoryDto;
 using System;
 using System.Collections.Generic;
 using System.Linq;

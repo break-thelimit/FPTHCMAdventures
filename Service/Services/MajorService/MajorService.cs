@@ -279,5 +279,33 @@ namespace Service.Services.MajorService
             }
 
         }
+
+        public async Task<ServiceResponse<string>> DisableMajor(Guid id)
+        {
+            var checkEvent = await _majorRepository.GetAsync<MajorDto>(id);
+
+            if (checkEvent == null)
+            {
+                return new ServiceResponse<string>
+                {
+                    Data = "null",
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            else
+            {
+                checkEvent.Status = "INACTIVE";
+                await _majorRepository.UpdateAsync(id, checkEvent);
+                return new ServiceResponse<string>
+                {
+                    Data = checkEvent.Status,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+        }
     }
 }

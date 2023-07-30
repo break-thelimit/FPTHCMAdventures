@@ -2,6 +2,7 @@
 using BusinessObjects.Model;
 using DataAccess.Configuration;
 using DataAccess.Dtos.ItemDto;
+using DataAccess.Dtos.NPCDto;
 using DataAccess.Dtos.PlayerDto;
 using DataAccess.Dtos.PlayerHistoryDto;
 using DataAccess.Repositories.ItemRepositories;
@@ -34,7 +35,7 @@ namespace Service.Services.PlayerHistoryService
             var majorList = await _playerHistoryRepository.GetAllAsync<GetPlayerHistoryDto>();
             if (majorList != null)
             {
-               var playerHistory =  majorList.FirstOrDefault(x => x.PlayerId == createPlayerHistoryDto.PlayerId && x.TaskId == createPlayerHistoryDto.TaskId);
+               var playerHistory =  majorList.FirstOrDefault(x => x.PlayerId == createPlayerHistoryDto.PlayerId && x.EventtaskId == createPlayerHistoryDto.EventtaskId);
                 if(playerHistory != null)
                 {
                     return new ServiceResponse<Guid>
@@ -72,6 +73,34 @@ namespace Service.Services.PlayerHistoryService
             
         }
 
+        public async Task<ServiceResponse<string>> DisablePlayerHistory(Guid id)
+        {
+            var checkEvent = await _playerHistoryRepository.GetAsync<PlayerHistoryDto>(id);
+
+            if (checkEvent == null)
+            {
+                return new ServiceResponse<string>
+                {
+                    Data = "null",
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            else
+            {
+                /*checkEvent.Status = "INACTIVE";
+                await _playerHistoryRepository.UpdateAsync(id, checkEvent);*/
+                return new ServiceResponse<string>
+                {
+                    Data = checkEvent.Status,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+        }
+
         public async Task<ServiceResponse<IEnumerable<GetPlayerHistoryDto>>> GetPlayerHistory()
         {
             var playerhistoryList = await _playerHistoryRepository.GetAllAsync<GetPlayerHistoryDto>();
@@ -98,24 +127,24 @@ namespace Service.Services.PlayerHistoryService
             }
         }
 
-        public async Task<ServiceResponse<PlayerHistoryDto>> GetPlayerHistoryById(Guid eventId)
+        public async Task<ServiceResponse<GetPlayerHistoryDto>> GetPlayerHistoryById(Guid eventId)
         {
             try
             {
 
-                var eventDetail = await _playerHistoryRepository.GetAsync<PlayerHistoryDto>(eventId);
+                var eventDetail = await _playerHistoryRepository.GetAsync<GetPlayerHistoryDto>(eventId);
 
                 if (eventDetail == null)
                 {
 
-                    return new ServiceResponse<PlayerHistoryDto>
+                    return new ServiceResponse<GetPlayerHistoryDto>
                     {
                         Message = "No rows",
                         StatusCode = 200,
                         Success = true
                     };
                 }
-                return new ServiceResponse<PlayerHistoryDto>
+                return new ServiceResponse<GetPlayerHistoryDto>
                 {
                     Data = eventDetail,
                     Message = "Successfully",
@@ -130,7 +159,7 @@ namespace Service.Services.PlayerHistoryService
             }
         }
 
-        public async Task<ServiceResponse<PlayerHistoryDto>> GetPlayerHistoryByTaskId(Guid taskId)
+        public async Task<ServiceResponse<PlayerHistoryDto>> GetPlayerHistoryByEventTaskId(Guid eventTaskId)
         {
             try
             {
@@ -138,9 +167,10 @@ namespace Service.Services.PlayerHistoryService
                 {
                    
                 };
-                var taskDetail = await _playerHistoryRepository.GetByWithCondition(x => x.TaskId == taskId, includes, true);
+                var taskDetail = await _playerHistoryRepository.GetByWithCondition(x => x.EventtaskId == eventTaskId, includes, true);
                 var _mapper = config.CreateMapper();
                 var taskDetailDto = _mapper.Map<PlayerHistoryDto>(taskDetail);
+               
                 if (taskDetail == null)
                 {
 
@@ -166,7 +196,7 @@ namespace Service.Services.PlayerHistoryService
             }
         }
 
-        public async Task<ServiceResponse<PlayerHistoryDto>> GetPlayerHistoryByTaskIdAndPlayerId(Guid taskId, Guid PlayerId)
+        public async Task<ServiceResponse<PlayerHistoryDto>> GetPlayerHistoryByEventTaskIdAndPlayerId(Guid eventTaskId, Guid PlayerId)
         {
             try
             {
@@ -174,7 +204,7 @@ namespace Service.Services.PlayerHistoryService
                 {
 
                 };
-                var taskDetail = await _playerHistoryRepository.GetByWithCondition(x => x.TaskId == taskId && x.PlayerId == PlayerId, includes, true);
+                var taskDetail = await _playerHistoryRepository.GetByWithCondition(x => x.EventtaskId == eventTaskId && x.PlayerId == PlayerId, includes, true);
                 var _mapper = config.CreateMapper();
                 var taskDetailDto = _mapper.Map<PlayerHistoryDto>(taskDetail);
                 if (taskDetail == null)

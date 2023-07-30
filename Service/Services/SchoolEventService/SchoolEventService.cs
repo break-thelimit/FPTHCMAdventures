@@ -3,7 +3,6 @@ using BusinessObjects.Model;
 using DataAccess.Configuration;
 using DataAccess.Dtos.RoleDto;
 using DataAccess.Dtos.SchoolEventDto;
-using DataAccess.Repositories.RoleRepositories;
 using DataAccess.Repositories.SchoolEventRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;

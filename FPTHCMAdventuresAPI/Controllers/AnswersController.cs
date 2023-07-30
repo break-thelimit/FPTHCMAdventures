@@ -15,6 +15,7 @@ using DataAccess;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class AnswersController : ControllerBase
@@ -31,7 +32,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpGet(Name = "GetAnswerList")]
 
-        public async Task<ActionResult<ServiceResponse<GetAnswerDto>>> GetAnswerList()
+        public async Task<ActionResult<ServiceResponse<AnswerDto>>> GetAnswerList()
         {
             try
             {
@@ -80,7 +81,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpPost("answer", Name = "CreateNewAnswer")]
 
-        public async Task<ActionResult<ServiceResponse<AnswerDto>>> CreateNewAnswer(CreateAnswerDto answerDto)
+        public async Task<ActionResult<ServiceResponse<AnswerDto>>> CreateNewanswer(CreateAnswerDto answerDto)
         {
             try
             {
@@ -95,7 +96,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<AnswerDto>>> UpdateAnswer(Guid id, [FromBody] UpdateAnswerDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetAnswerDto>>> Updateanswer(Guid id, [FromBody] UpdateAnswerDto eventDto)
         {
             try
             {

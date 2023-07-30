@@ -8,9 +8,13 @@ using System.Threading.Tasks;
 using System;
 using Service.Services.PlayerHistoryService;
 using DataAccess.Dtos.PlayerHistoryDto;
+using Microsoft.AspNetCore.Authorization;
+using DataAccess.Dtos.TaskDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class PlayerHistorysController : ControllerBase
@@ -45,16 +49,16 @@ namespace FPTHCMAdventuresAPI.Controllers
             var eventDetail = await _playerHistoryService.GetPlayerHistoryById(id);
             return Ok(eventDetail);
         }
-        [HttpGet("task/{id}")]
-        public async Task<ActionResult<PlayerHistoryDto>> GetItemByTaskId(Guid id)
+        [HttpGet("task/{EventTaskId}")]
+        public async Task<ActionResult<PlayerHistoryDto>> GetPlayerHistoryByEventTaskId(Guid EventTaskId)
         {
-            var eventDetail = await _playerHistoryService.GetPlayerHistoryByTaskId(id);
+            var eventDetail = await _playerHistoryService.GetPlayerHistoryByEventTaskId(EventTaskId);
             return Ok(eventDetail);
         } 
         [HttpGet("task/{taskId}/{playerId}")]
-        public async Task<ActionResult<PlayerHistoryDto>> GetPlayerHistorywithtaskIdandPlayerId(Guid taskId, Guid playerId)
+        public async Task<ActionResult<PlayerHistoryDto>> GetPlayerHistoryWithEventTaskIdAndPlayerId(Guid eventtaskId, Guid playerId)
         {
-            var eventDetail = await _playerHistoryService.GetPlayerHistoryByTaskIdAndPlayerId(taskId, playerId);
+            var eventDetail = await _playerHistoryService.GetPlayerHistoryByEventTaskIdAndPlayerId(eventtaskId, playerId);
             return Ok(eventDetail);
         }
 
@@ -87,6 +91,20 @@ namespace FPTHCMAdventuresAPI.Controllers
 
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
+        }
+        [HttpDelete("disableplayerhistory")]
+        public async Task<ActionResult<ServiceResponse<PlayerHistoryDto>>> DisableStatusPlayerHistory(Guid id)
+        {
+            try
+            {
+                var disableEvent = await _playerHistoryService.DisablePlayerHistory(id);
+                return Ok(disableEvent);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+
         }
     }
 }

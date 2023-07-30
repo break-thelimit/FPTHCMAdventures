@@ -22,5 +22,7 @@ namespace Service.Services.LocationServoce
 
         Task<ServiceResponse<PagedResult<LocationDto>>> GetLocationWithPage(QueryParameters queryParameters);
 
+        Task<ServiceResponse<string>> DisableLocation(Guid id);
+
     }
 }

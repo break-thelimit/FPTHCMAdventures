@@ -37,12 +37,12 @@ namespace DataAccess.Repositories.EventRepositories
                 .Include(e => e.EventTasks).ThenInclude(et => et.Task.Location)
                 .Include(e => e.EventTasks).ThenInclude(et => et.Task.Major)
                 .Include(e => e.EventTasks).ThenInclude(et => et.Task.Npc)
-                .Where(e => e.StartTime <= vietnamTime && e.EndTime > vietnamTime && e.Status == "active")
+                .Where(e => e.StartTime <= vietnamTime && e.EndTime > vietnamTime && e.Status == "ACTIVE")
                 .Select(e => new GetTaskAndEventDto
                 {
                     EventName = e.Name,
                     TaskDtos = e.EventTasks
-                        .Where(et => et.Task.Status == "active") // Lọc theo trạng thái "active"
+                        .Where(et => et.Task.Status == "ACTIVE") // Lọc theo trạng thái "active"
                         .Select(et => _mapper.Map<TaskDto>(et.Task))
                         .ToList(),
                     StartTime = e.StartTime,

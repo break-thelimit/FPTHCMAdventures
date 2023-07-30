@@ -8,9 +8,12 @@ using System.Threading.Tasks;
 using System;
 using Service.Services.ItemInventoryService;
 using DataAccess.Dtos.ItemInventoryDto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class ItemInventorysController : ControllerBase

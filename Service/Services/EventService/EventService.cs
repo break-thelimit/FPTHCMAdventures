@@ -7,7 +7,6 @@ using DataAccess.Dtos.LocationDto;
 using DataAccess.Dtos.TaskDto;
 using DataAccess.Exceptions;
 using DataAccess.Repositories.EventRepositories;
-using DataAccess.Repositories.RankRepositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -19,13 +18,13 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.IO.RecyclableMemoryStreamManager;
 
 namespace Service.Services.EventService
 {
     public class EventService : IEventService
     {
         private readonly IEventRepositories _eventRepository;
-        private readonly IRankRepository _rankRepository;
         private readonly IMapper _mapper;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
@@ -418,5 +417,32 @@ namespace Service.Services.EventService
             }
         }
 
+        public async Task<ServiceResponse<string>> DisableEvent(Guid id)
+        {
+            var checkEvent = await _eventRepository.GetAsync<EventDto>(id);
+
+            if (checkEvent == null)
+            {
+                return new ServiceResponse<string>
+                {
+                    Data = "null",
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            else
+            {
+                checkEvent.Status = "INACTIVE";
+                await _eventRepository.UpdateAsync(id, checkEvent);
+                return new ServiceResponse<string>
+                {
+                    Data = checkEvent.Status,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+        }
     }
 }

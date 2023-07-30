@@ -11,21 +11,25 @@ namespace BusinessObjects.Model
         {
             ExchangeHistories = new HashSet<ExchangeHistory>();
             Inventories = new HashSet<Inventory>();
-            PlayHistories = new HashSet<PlayHistory>();
-            Ranks = new HashSet<Rank>();
+            PlayerHistories = new HashSet<PlayerHistory>();
+            PlayerPrizes = new HashSet<PlayerPrize>();
         }
 
         public Guid Id { get; set; }
-        public Guid UserId { get; set; }
+        public Guid StudentId { get; set; }
+        public Guid EventId { get; set; }
         public string Nickname { get; set; }
+        public string Passcode { get; set; }
         public DateTime CreatedAt { get; set; }
         public double TotalPoint { get; set; }
         public double TotalTime { get; set; }
+        public bool Isplayer { get; set; }
 
-        public virtual User User { get; set; }
+        public virtual Event Event { get; set; }
+        public virtual Student Student { get; set; }
         public virtual ICollection<ExchangeHistory> ExchangeHistories { get; set; }
         public virtual ICollection<Inventory> Inventories { get; set; }
-        public virtual ICollection<PlayHistory> PlayHistories { get; set; }
-        public virtual ICollection<Rank> Ranks { get; set; }
+        public virtual ICollection<PlayerHistory> PlayerHistories { get; set; }
+        public virtual ICollection<PlayerPrize> PlayerPrizes { get; set; }
     }
 }

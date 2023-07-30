@@ -34,7 +34,6 @@ namespace DataAccess.GenericRepositories
         Task<T> AddAsync(T entity);
         Task<TResult> AddAsync<TSource, TResult>(TSource source);
         Task DeleteAsync(Guid id);
-        Task UpdateAsync(T entity);
         Task UpdateAsync<TSource>(Guid id, TSource source) where TSource : IBaseDto;
         Task<bool> Exists(Guid id);
 

@@ -10,9 +10,12 @@ using Service.Services.EventTaskService;
 using System.Threading.Tasks;
 using System;
 using DataAccess.Dtos.EventTaskDto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class EventTasksController : ControllerBase
@@ -56,7 +59,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPost("eventtask", Name = "CreateNewEventTask")]
 
-        public async Task<ActionResult<ServiceResponse<EventDto>>> CreateNewEvent(CreateEventTaskDto eventTaskDto)
+        public async Task<ActionResult<ServiceResponse<GetEventTaskDto>>> CreateNewEventTask(CreateEventTaskDto eventTaskDto)
         {
             try
             {
@@ -71,7 +74,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<EventDto>>> UpdateEvent(Guid id, [FromBody] UpdateEventTaskDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetEventTaskDto>>> UpdateEvent(Guid id, [FromBody] UpdateEventTaskDto eventDto)
         {
             try
             {

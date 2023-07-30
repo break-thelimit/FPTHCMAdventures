@@ -16,9 +16,12 @@ using DataAccess.Dtos.EventDto;
 using DataAccess.Exceptions;
 using DataAccess;
 using DataAccess.Dtos.TaskDto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace XavalorAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class EventsController : ControllerBase
@@ -79,7 +82,7 @@ namespace XavalorAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<EventDto>>> CreateNewEvent(Guid id, [FromBody] UpdateEventDto eventDto)
+        public async Task<ActionResult<ServiceResponse<EventDto>>> UpdateNewEvent(Guid id, [FromBody] UpdateEventDto eventDto)
         {
             try
             {
@@ -137,7 +140,20 @@ namespace XavalorAdventuresAPI.Controllers
                 return BadRequest(serviceResponse.Message);
             }
         }
+        [HttpDelete("disableevent")]
+        public async Task<ActionResult<ServiceResponse<GetTaskAndEventDto>>> DisableStatusEvent(Guid id)
+        {
+            try
+            {
+                var disableEvent = await _eventService.DisableEvent(id);
+                return Ok(disableEvent);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
 
+        }
         [HttpGet("excel-template-event")]
         public async Task<IActionResult> DownloadExcelTemplate()
         {

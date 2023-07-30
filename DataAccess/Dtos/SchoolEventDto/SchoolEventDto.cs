@@ -12,5 +12,7 @@ namespace DataAccess.Dtos.SchoolEventDto
 
         public string EventName { get; set; }
         public string SchoolName { get; set; }
+        public string InvitationLetter { get; set; }
+        public string Status { get; set; }
     }
 }

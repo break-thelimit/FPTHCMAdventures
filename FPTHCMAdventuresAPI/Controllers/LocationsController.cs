@@ -12,9 +12,13 @@ using DataAccess.Dtos.LocationDto;
 using DataAccess.Dtos.EventDto;
 using DataAccess.Dtos.AnswerDto;
 using DataAccess;
+using Microsoft.AspNetCore.Authorization;
+using DataAccess.Dtos.ItemDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class LocationsController : ControllerBase
@@ -130,6 +134,20 @@ namespace FPTHCMAdventuresAPI.Controllers
                 // Xử lý lỗi nếu có
                 return BadRequest(serviceResponse.Message);
             }
+        }
+        [HttpDelete("disablelocation")]
+        public async Task<ActionResult<ServiceResponse<LocationDto>>> DisableStatusLocation(Guid id)
+        {
+            try
+            {
+                var disableEvent = await _locationService.DisableLocation(id);
+                return Ok(disableEvent);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+
         }
     }
 }

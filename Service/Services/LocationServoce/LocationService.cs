@@ -4,6 +4,7 @@ using DataAccess;
 using DataAccess.Configuration;
 using DataAccess.Dtos.AnswerDto;
 using DataAccess.Dtos.EventTaskDto;
+using DataAccess.Dtos.ItemDto;
 using DataAccess.Dtos.LocationDto;
 using DataAccess.Dtos.MajorDto;
 using DataAccess.Repositories.LocationRepositories;
@@ -279,6 +280,34 @@ namespace Service.Services.LocationServoce
                 StatusCode = 200,
                 Success = true
             };
+        }
+
+        public async Task<ServiceResponse<string>> DisableLocation(Guid id)
+        {
+            var checkEvent = await _locationRepository.GetAsync<LocationDto>(id);
+
+            if (checkEvent == null)
+            {
+                return new ServiceResponse<string>
+                {
+                    Data = "null",
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            else
+            {
+                checkEvent.Status = "INACTIVE";
+                await _locationRepository.UpdateAsync(id, checkEvent);
+                return new ServiceResponse<string>
+                {
+                    Data = checkEvent.Status,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
         }
     }
 }

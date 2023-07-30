@@ -9,9 +9,13 @@ using System.Threading.Tasks;
 using System;
 using Service.Services.MajorService;
 using DataAccess.Dtos.MajorDto;
+using Microsoft.AspNetCore.Authorization;
+using DataAccess.Dtos.ItemDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class MajorController : ControllerBase
@@ -113,6 +117,21 @@ namespace FPTHCMAdventuresAPI.Controllers
                 // Xử lý lỗi nếu có
                 return BadRequest(serviceResponse.Message);
             }
+        }
+
+        [HttpDelete("disablemajor")]
+        public async Task<ActionResult<ServiceResponse<MajorDto>>> DisableStatusMajor(Guid id)
+        {
+            try
+            {
+                var disableEvent = await _majorService.DisableMajor(id);
+                return Ok(disableEvent);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+
         }
     }
 }

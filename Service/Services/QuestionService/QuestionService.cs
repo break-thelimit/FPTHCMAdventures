@@ -2,6 +2,7 @@
 using BusinessObjects.Model;
 using DataAccess.Configuration;
 using DataAccess.Dtos.MajorDto;
+using DataAccess.Dtos.PlayerHistoryDto;
 using DataAccess.Dtos.QuestionDto;
 using DataAccess.Repositories.MajorRepositories;
 using DataAccess.Repositories.QuestionRepositories;
@@ -53,7 +54,7 @@ namespace Service.Services.QuestionService
         {
             var majorList = await _questionRepository.GetAllAsync<QuestionDto>();
 
-
+            
             if (majorList != null)
             {
                 return new ServiceResponse<IEnumerable<QuestionDto>>
@@ -82,7 +83,7 @@ namespace Service.Services.QuestionService
             {
 
                 var eventDetail = await _questionRepository.GetAsync<QuestionDto>(eventId);
-
+               
                 if (eventDetail == null)
                 {
 
@@ -301,6 +302,34 @@ namespace Service.Services.QuestionService
                 StatusCode = 200
             };
         }
+        public async Task<ServiceResponse<string>> DisableQuestion(Guid id)
+        {
+            var checkEvent = await _questionRepository.GetAsync<QuestionDto>(id);
+
+            if (checkEvent == null)
+            {
+                return new ServiceResponse<string>
+                {
+                    Data = "null",
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            else
+            {
+                checkEvent.Status = "INACTIVE";
+                await _questionRepository.UpdateAsync(id, checkEvent);
+                return new ServiceResponse<string>
+                {
+                    Data = checkEvent.Status,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+        }
+
 
     }
 }

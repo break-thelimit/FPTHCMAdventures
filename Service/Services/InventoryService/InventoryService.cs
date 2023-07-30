@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
 using DataAccess.Configuration;
-using DataAccess.Dtos.GiftDto;
 using DataAccess.Dtos.InventoryDto;
-using DataAccess.Repositories.GiftRepositories;
 using DataAccess.Repositories.InventoryRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -135,5 +133,6 @@ namespace Service.Services.InventoryService
         {
             return await _inventoryRepository.Exists(id);
         }
+
     }
 }

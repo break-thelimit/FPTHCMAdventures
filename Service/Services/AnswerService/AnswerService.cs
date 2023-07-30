@@ -5,6 +5,7 @@ using DataAccess.Configuration;
 using DataAccess.Dtos.AnswerDto;
 using DataAccess.Dtos.EventDto;
 using DataAccess.Dtos.LocationDto;
+using DataAccess.Dtos.MajorDto;
 using DataAccess.Dtos.QuestionDto;
 using DataAccess.Repositories.AnswerRepositories;
 using DataAccess.Repositories.EventRepositories;
@@ -52,6 +53,8 @@ namespace Service.Services.AnswerService
                 StatusCode = 201
             };
         }
+
+        
 
         public async Task<ServiceResponse<IEnumerable<GetAnswerDto>>> GetAnswer()
         {
@@ -153,21 +156,26 @@ namespace Service.Services.AnswerService
             }
         }
 
-        public async Task<ServiceResponse<string>> UpdateAnswer(Guid id, UpdateAnswerDto eventDto)
+        public async Task<ServiceResponse<string>> UpdateAnswer(Guid id, UpdateAnswerDto answerDto)
         {
-            
             try
             {
-                eventDto.Id = id;
-                await _answerRepository.UpdateAsync(id,eventDto);
+                answerDto.Id = id;
+                await _answerRepository.UpdateAsync(id, answerDto);
+                return new ServiceResponse<string>
+                {
+                    Message = "Success edit",
+                    Success = true,
+                    StatusCode = 202
+                };
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await CountryExists(id))
+                if (!await AnswerExists(id))
                 {
                     return new ServiceResponse<string>
                     {
-                        Message = "No rows",
+                        Message = "Invalid Record Id",
                         Success = false,
                         StatusCode = 500
                     };
@@ -177,16 +185,10 @@ namespace Service.Services.AnswerService
                     throw;
                 }
             }
-            return new ServiceResponse<string>
-            {
-                Message = "Update Success",
-                Success = true,
-                StatusCode = 200
-            };
-            
+
         }
 
-        private async Task<bool> CountryExists(Guid id)
+        private async Task<bool> AnswerExists(Guid id)
         {
             return await _answerRepository.Exists(id);
         }

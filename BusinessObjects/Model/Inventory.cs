@@ -14,6 +14,7 @@ namespace BusinessObjects.Model
 
         public Guid Id { get; set; }
         public Guid PlayerId { get; set; }
+        public string Status { get; set; }
 
         public virtual Player Player { get; set; }
         public virtual ICollection<ItemIventory> ItemIventories { get; set; }

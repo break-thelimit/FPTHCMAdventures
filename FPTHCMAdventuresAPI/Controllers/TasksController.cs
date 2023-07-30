@@ -14,9 +14,13 @@ using Service.Services.TaskService;
 using DataAccess.Dtos.EventDto;
 using Service;
 using DataAccess.Dtos.TaskDto;
+using Microsoft.AspNetCore.Authorization;
+using DataAccess.Dtos.ItemDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class TasksController : ControllerBase
@@ -47,13 +51,13 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<TaskDto>> GetTaskById(Guid id)
+        public async Task<ActionResult<GetTaskDto>> GetTaskById(Guid id)
         {
             var eventDetail = await _taskService.GetTaskById(id);
             return Ok(eventDetail);
         }
-        [HttpGet("/gettaskdonebymajor")]
-        public async Task<ActionResult<ServiceResponse<BusinessObjects.Model.Task>>> GetTaskDoneByMajor(Guid majorid)
+       /* [HttpGet("/gettaskdonebymajor")]
+        public async Task<ActionResult<ServiceResponse<TaskDto>>> GetTaskDoneByMajor(Guid majorid)
         {
             try
             {
@@ -65,11 +69,11 @@ namespace FPTHCMAdventuresAPI.Controllers
 
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
-        }
+        }*/
 
         [HttpPost("task", Name = "CreateNewTask")]
 
-        public async Task<ActionResult<ServiceResponse<TaskDto>>> CreateNewEvent(CreateTaskDto taskDto)
+        public async Task<ActionResult<ServiceResponse<GetTaskDto>>> CreateNewTask(CreateTaskDto taskDto)
         {
             try
             {
@@ -84,7 +88,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<GetTaskDto>>> CreateNewEvent(Guid id, [FromBody] UpdateTaskDto updateTaskDto)
+        public async Task<ActionResult<ServiceResponse<GetTaskDto>>> UpdateNewTask(Guid id, [FromBody] UpdateTaskDto updateTaskDto)
         {
             try
             {
@@ -96,6 +100,21 @@ namespace FPTHCMAdventuresAPI.Controllers
 
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
+        }
+
+        [HttpDelete("disabletask")]
+        public async Task<ActionResult<ServiceResponse<TaskDto>>> DisableStatusTask(Guid id)
+        {
+            try
+            {
+                var disableEvent = await _taskService.DisableTask(id);
+                return Ok(disableEvent);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+
         }
     }
 }

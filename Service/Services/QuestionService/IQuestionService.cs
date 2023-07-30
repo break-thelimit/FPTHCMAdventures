@@ -18,5 +18,7 @@ namespace Service.Services.QuestionService
 
         Task<ServiceResponse<byte[]>> DownloadExcelTemplate();
         Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file);
+
+        Task<ServiceResponse<string>> DisableQuestion(Guid id);
     }
 }

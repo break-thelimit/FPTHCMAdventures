@@ -11,7 +11,6 @@ namespace BusinessObjects.Model
         public Guid PlayerId { get; set; }
         public Guid ItemId { get; set; }
         public DateTime ExchangeDate { get; set; }
-        public int? Quantity { get; set; }
 
         public virtual Item Item { get; set; }
         public virtual Player Player { get; set; }

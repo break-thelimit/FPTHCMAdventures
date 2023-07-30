@@ -2,6 +2,7 @@
 using BusinessObjects.Model;
 using DataAccess.Configuration;
 using DataAccess.Dtos.EventDto;
+using DataAccess.Dtos.SchoolDto;
 using DataAccess.Dtos.TaskDto;
 using DataAccess.Repositories.EventRepositories;
 using DataAccess.Repositories.EventTaskRepositories;
@@ -52,7 +53,7 @@ namespace Service.Services.TaskService
         }
 
 
-        public async Task<ServiceResponse<IEnumerable<Task>>> GetTaskDoneByMajor(Guid majorId)
+       /* public async Task<ServiceResponse<IEnumerable<Task>>> GetTaskDoneByMajor(Guid majorId)
         {
             try
             {
@@ -85,7 +86,7 @@ namespace Service.Services.TaskService
 
                 throw new Exception(ex.Message);
             }
-        }
+        }*/
         public async Task<ServiceResponse<IEnumerable<TaskDto>>> GetTask()
         {
             List<Expression<Func<Task, object>>> includes = new List<Expression<Func<Task, object>>>
@@ -119,29 +120,29 @@ namespace Service.Services.TaskService
             }
         }
 
-        public async Task<ServiceResponse<TaskDto>> GetTaskById(Guid eventId)
+        public async Task<ServiceResponse<GetTaskDto>> GetTaskById(Guid eventId)
         {
             try
             {
                 List<Expression<Func<Task, object>>> includes = new List<Expression<Func<Task, object>>>
                 {
-                    x => x.PlayHistories,
                     x => x.EventTasks,
                 };
                 var taskDetail = await _taskRepository.GetByWithCondition(x => x.Id == eventId, includes, true);
                 var _mapper = config.CreateMapper();
-                var taskDetailDto = _mapper.Map<TaskDto>(taskDetail);
+                var taskDetailDto = _mapper.Map<GetTaskDto>(taskDetail);
+             
                 if (taskDetail == null)
                 {
 
-                    return new ServiceResponse<TaskDto>
+                    return new ServiceResponse<GetTaskDto>
                     {
                         Message = "No rows",
                         StatusCode = 200,
                         Success = true
                     };
                 }
-                return new ServiceResponse<TaskDto>
+                return new ServiceResponse<GetTaskDto>
                 {
                     Data = taskDetailDto,
                     Message = "Successfully",
@@ -191,6 +192,32 @@ namespace Service.Services.TaskService
             return await _taskRepository.Exists(id);
         }
 
-      
+        public async Task<ServiceResponse<string>> DisableTask(Guid id)
+        {
+            var checkEvent = await _taskRepository.GetAsync<TaskDto>(id);
+
+            if (checkEvent == null)
+            {
+                return new ServiceResponse<string>
+                {
+                    Data = "null",
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            else
+            {
+                checkEvent.Status = "INACTIVE";
+                await _taskRepository.UpdateAsync(id, checkEvent);
+                return new ServiceResponse<string>
+                {
+                    Data = checkEvent.Status,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+        }
     }
 }

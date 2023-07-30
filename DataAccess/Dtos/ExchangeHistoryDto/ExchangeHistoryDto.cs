@@ -12,5 +12,7 @@ namespace DataAccess.Dtos.ExchangeHistoryDto
         public string PlayerName { get; set; }
         public string ItemName { get; set; }
         public DateTime ExchangeDate { get; set; }
+        public int Quantity { get; set; }
+
     }
 }

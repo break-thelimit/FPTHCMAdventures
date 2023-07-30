@@ -8,11 +8,15 @@ namespace DataAccess.Dtos.PlayerDto
 {
     public abstract class BasePlayerDto
     {
-        public Guid UserId { get; set; }
+        public Guid StudentId { get; set; }
+        public Guid EventId { get; set; }
         public string Nickname { get; set; }
+        public string Passcode { get; set; }
+        public DateTime CreatedAt { get; set; }
         public double TotalPoint { get; set; }
         public double TotalTime { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public bool Isplayer { get; set; }
+
 
     }
 }

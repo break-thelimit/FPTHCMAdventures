@@ -43,6 +43,34 @@ namespace Service.Services.ItemService
             };
         }
 
+        public async Task<ServiceResponse<string>> DisableStausItem(Guid id)
+        {
+            var checkEvent = await _itemRepository.GetAsync<ItemDto>(id);
+
+            if (checkEvent == null)
+            {
+                return new ServiceResponse<string>
+                {
+                    Data = "null",
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            else
+            {
+                checkEvent.Status = "INACTIVE";
+                await _itemRepository.UpdateAsync(id, checkEvent);
+                return new ServiceResponse<string>
+                {
+                    Data = checkEvent.Status,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+        }
+
         public async Task<ServiceResponse<IEnumerable<GetItemDto>>> GetItem()
         {
             var majorList = await _itemRepository.GetAllAsync<GetItemDto>();
