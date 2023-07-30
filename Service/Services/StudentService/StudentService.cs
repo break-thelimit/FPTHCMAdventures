@@ -71,7 +71,7 @@ namespace Service.Services.StudentService
                 {
                     Data = majorList,
                     Success = false,
-                    Message = "Faile because List event null",
+                    Message = "Faile because List student null",
                     StatusCode = 200
                 };
             }
@@ -150,6 +150,32 @@ namespace Service.Services.StudentService
                 {
                     throw;
                 }
+            }
+        }
+
+        public async Task<ServiceResponse<IEnumerable<StudentDto>>> GetStudentBySchoolId(Guid id)
+        {
+            var studentList = await _studentRepository.GetStudentBySchoolId(id);
+
+            if (studentList != null)
+            {
+                return new ServiceResponse<IEnumerable<StudentDto>>
+                {
+                    Data = studentList,
+                    Success = true,
+                    Message = "Successfully",
+                    StatusCode = 200
+                };
+            }
+            else
+            {
+                return new ServiceResponse<IEnumerable<StudentDto>>
+                {
+                    Data = studentList,
+                    Success = false,
+                    Message = "Faile because List student null",
+                    StatusCode = 200
+                };
             }
         }
         private async Task<bool> StudentExists(Guid id)

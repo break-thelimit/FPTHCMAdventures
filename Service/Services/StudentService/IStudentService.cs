@@ -17,5 +17,6 @@ namespace Service.Services.StudentService
         Task<ServiceResponse<string>> UpdateStudent(Guid id, UpdateStudentDto studentDto);
         Task<ServiceResponse<PagedResult<StudentDto>>> GetStudentWithPage(QueryParameters queryParameters);
         Task<ServiceResponse<string>> DisableStudent(Guid id);
+        Task<ServiceResponse<IEnumerable<StudentDto>>> GetStudentBySchoolId(Guid id);
     }
 }
