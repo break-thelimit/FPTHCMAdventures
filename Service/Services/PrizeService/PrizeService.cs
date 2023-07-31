@@ -68,7 +68,7 @@ namespace Service.Services.PrizeService
 
         public async Task<ServiceResponse<string>> GetTotalPrize()
         {
-            var context = new FPTHCMAdventuresDBContext();
+            var context = new db_a9c31b_capstoneContext();
             try
             {
                 long total = context.Prizes.Count();

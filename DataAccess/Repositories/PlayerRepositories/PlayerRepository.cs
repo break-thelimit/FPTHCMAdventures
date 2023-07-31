@@ -14,10 +14,10 @@ namespace DataAccess.Repositories.PlayerRepositories
 {
     public class PlayerRepository : GenericRepository<Player> , IPlayerRepository
     {
-        private readonly FPTHCMAdventuresDBContext _dbContext;
+        private readonly db_a9c31b_capstoneContext _dbContext;
         private readonly IMapper _mapper;
 
-        public PlayerRepository(FPTHCMAdventuresDBContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        public PlayerRepository(db_a9c31b_capstoneContext dbContext, IMapper mapper) : base(dbContext, mapper)
         {
             _dbContext = dbContext;
             _mapper = mapper;

@@ -15,10 +15,10 @@ namespace DataAccess.Repositories.ExchangeHistoryRepositories
 {
     public class ExchangeHistoryRepository : GenericRepository<ExchangeHistory>, IExchangeHistoryRepository
     {
-        private readonly FPTHCMAdventuresDBContext _dbContext;
+        private readonly db_a9c31b_capstoneContext _dbContext;
         private readonly IMapper _mapper;
 
-        public ExchangeHistoryRepository(FPTHCMAdventuresDBContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        public ExchangeHistoryRepository(db_a9c31b_capstoneContext dbContext, IMapper mapper) : base(dbContext, mapper)
         {
             _dbContext = dbContext;
             _mapper = mapper;

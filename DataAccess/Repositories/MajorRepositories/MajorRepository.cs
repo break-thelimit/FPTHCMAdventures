@@ -12,10 +12,10 @@ namespace DataAccess.Repositories.MajorRepositories
 {
     public class MajorRepository : GenericRepository<Major>, IMajorRepository
     {
-        private readonly FPTHCMAdventuresDBContext _dbContext;
+        private readonly db_a9c31b_capstoneContext _dbContext;
         private readonly IMapper _mapper;
 
-        public MajorRepository(FPTHCMAdventuresDBContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        public MajorRepository(db_a9c31b_capstoneContext dbContext, IMapper mapper) : base(dbContext, mapper)
         {
             _dbContext = dbContext;
             _mapper = mapper;

@@ -6,6 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DataAccess.Dtos.StudentDto;
+using BusinessObjects.Model;
+using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace Service.Services.StudentService
 {
@@ -18,5 +21,9 @@ namespace Service.Services.StudentService
         Task<ServiceResponse<PagedResult<StudentDto>>> GetStudentWithPage(QueryParameters queryParameters);
         Task<ServiceResponse<string>> DisableStudent(Guid id);
         Task<ServiceResponse<IEnumerable<StudentDto>>> GetStudentBySchoolId(Guid id);
+        Task<ServiceResponse<byte[]>> DownloadExcelTemplate();
+
+        Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file);
+
     }
 }

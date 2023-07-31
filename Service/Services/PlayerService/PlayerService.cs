@@ -90,6 +90,7 @@ namespace Service.Services.PlayerService
 
         public async Task<ServiceResponse<Guid?>> CreateNewPlayer(CreatePlayerDto createPlayerDto)
         {
+            Guid guid = Guid.NewGuid();
             var playerNickName = await CheckPlayerByNickName(createPlayerDto.Nickname);
             if(playerNickName.Data == null)
             {
@@ -97,6 +98,8 @@ namespace Service.Services.PlayerService
                 var eventTaskcreate = mapper.Map<Player>(createPlayerDto);
                 eventTaskcreate.Id = Guid.NewGuid();
                 eventTaskcreate.CreatedAt = DateTime.Now;
+
+                eventTaskcreate.Passcode = guid.ToString("N").Substring(0, 8);
                 await _playerRepository.AddAsync(eventTaskcreate);
 
                 return new ServiceResponse<Guid?>
@@ -183,24 +186,24 @@ namespace Service.Services.PlayerService
             }
         }
 
-        public async Task<ServiceResponse<PlayerDto>> GetPlayerById(Guid eventId)
+        public async Task<ServiceResponse<GetPlayerDto>> GetPlayerById(Guid eventId)
         {
             try
             {
 
-                var eventDetail = await _playerRepository.GetAsync<PlayerDto>(eventId);
+                var eventDetail = await _playerRepository.GetAsync<GetPlayerDto>(eventId);
 
                 if (eventDetail == null)
                 {
 
-                    return new ServiceResponse<PlayerDto>
+                    return new ServiceResponse<GetPlayerDto>
                     {
                         Message = "No rows",
                         StatusCode = 200,
                         Success = true
                     };
                 }
-                return new ServiceResponse<PlayerDto>
+                return new ServiceResponse<GetPlayerDto>
                 {
                     Data = eventDetail,
                     Message = "Successfully",
@@ -215,7 +218,7 @@ namespace Service.Services.PlayerService
             }
         }
 
-        public async Task<ServiceResponse<PlayerDto>> GetPlayerByStudentId(Guid studentId)
+        public async Task<ServiceResponse<GetPlayerDto>> GetPlayerByStudentId(Guid studentId)
         {
             try
             {
@@ -226,18 +229,18 @@ namespace Service.Services.PlayerService
                 };
                 var taskDetail = await _playerRepository.GetByWithCondition(x => x.StudentId == studentId, includes, true);
                 var _mapper = config.CreateMapper();
-                var taskDetailDto = _mapper.Map<PlayerDto>(taskDetail);
+                var taskDetailDto = _mapper.Map<GetPlayerDto>(taskDetail);
                 if (taskDetail == null)
                 {
 
-                    return new ServiceResponse<PlayerDto>
+                    return new ServiceResponse<GetPlayerDto>
                     {
                         Message = "No rows",
                         StatusCode = 200,
                         Success = true
                     };
                 }
-                return new ServiceResponse<PlayerDto>
+                return new ServiceResponse<GetPlayerDto>
                 {
                     Data = taskDetailDto,
                     Message = "Successfully",
@@ -292,7 +295,7 @@ namespace Service.Services.PlayerService
         {
             try
             {
-                var context = new FPTHCMAdventuresDBContext();
+                var context = new db_a9c31b_capstoneContext();
                 List<Player> top5playerlist = context.Players.OrderByDescending(x => x.TotalPoint).ThenBy(x => x.TotalTime).Take(5).ToList();
                 return new ServiceResponse<IEnumerable<Player>>
                 {

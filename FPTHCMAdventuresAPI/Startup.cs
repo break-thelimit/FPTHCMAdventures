@@ -70,6 +70,7 @@ using DataAccess.Repositories.StudentRepositories;
 using DataAccess.Repositories.PlayerPrizeRepositories;
 using Service.Services.StudentService;
 using Service.Services.PlayerPrizeService;
+using Service.Services.PrizeService;
 
 namespace FPTHCMAdventuresAPI
 {
@@ -90,7 +91,7 @@ namespace FPTHCMAdventuresAPI
 
             services.AddControllers();
 
-            services.AddDbContext<FPTHCMAdventuresDBContext>(options => options.UseSqlServer(ConectionString));
+            services.AddDbContext<db_a9c31b_capstoneContext>(options => options.UseSqlServer(ConectionString));
             services.AddControllersWithViews().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddAutoMapper(typeof(MapperConfig));
 
@@ -227,12 +228,13 @@ namespace FPTHCMAdventuresAPI
             services.AddScoped<IExchangeHistoryService, ExchangHistoryService>();
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<IPlayerPrizeService, PlayerPrizeService>();
+            services.AddScoped<IPrizeService, PrizeService>();
             #endregion
 
             services.AddHealthChecks()
               .AddCheck<CustomHealthChecks>("Custom Health Check", failureStatus: HealthStatus.Degraded, tags: new[] { "custom" })
               .AddSqlServer(ConectionString , tags: new[] {"database"})
-              .AddDbContextCheck<FPTHCMAdventuresDBContext>(tags: new[] { "database" });
+              .AddDbContextCheck<db_a9c31b_capstoneContext>(tags: new[] { "database" });
             services.AddHealthChecksUI(opt =>
             {
                 opt.SetEvaluationTimeInSeconds(15); //time in seconds between check

@@ -1,5 +1,4 @@
-﻿using DataAccess.Dtos.RoleDto;
-using DataAccess.Dtos.SchoolDto;
+﻿using DataAccess.Dtos.SchoolDto;
 using DataAccess.Dtos.SchoolEventDto;
 using System;
 using System.Collections.Generic;

@@ -51,7 +51,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpPost("inventory", Name = "CreateNewInventory")]
 
-        public async Task<ActionResult<ServiceResponse<InventoryDto>>> CreateNewInventory(CreateInventoryDto answerDto)
+        public async Task<ActionResult<ServiceResponse<GetInventoryDto>>> CreateNewInventory(CreateInventoryDto answerDto)
         {
             try
             {
@@ -66,7 +66,7 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<InventoryDto>>> UpdateInventory(Guid id, [FromBody] UpdateInventoryDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetInventoryDto>>> UpdateInventory(Guid id, [FromBody] UpdateInventoryDto eventDto)
         {
             try
             {

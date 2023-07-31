@@ -1,4 +1,5 @@
 ﻿using DataAccess.Dtos.Users;
+using DataAccess.Dtos.Users.Admin;
 using DataAccess.GoogleAuthSetting;
 using DataAccess.Repositories.UserRepositories;
 using Microsoft.AspNetCore.Authentication;
@@ -114,6 +115,41 @@ namespace FPTHCMAdventuresAPI.Controllers
         public async Task<ActionResult<BaseResponse<AuthResponseDto>>> Login([FromBody] LoginDto loginDto)
         {
             var authResponse = await _authManager.Login(loginDto);
+
+            if (authResponse == null)
+            {
+                return Unauthorized();
+            }
+
+            return Ok(authResponse);
+
+        }   
+        [HttpPost]
+        [Route("loginadmin")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<BaseResponse<AuthResponseDto>>> LoginAdmin([FromBody] LoginAdminDto loginDto)
+        {
+            var authResponse = await _authManager.LoginAdmin(loginDto);
+
+            if (authResponse == null)
+            {
+                return Unauthorized();
+            }
+
+            return Ok(authResponse);
+
+        }   
+        
+        [HttpPost]
+        [Route("loginunity")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<BaseResponse<LoginResponseDto>>> LoginUnity([FromBody] LoginUnityDto loginDto)
+        {
+            var authResponse = await _authManager.LoginUnity(loginDto);
 
             if (authResponse == null)
             {

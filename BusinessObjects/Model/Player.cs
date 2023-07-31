@@ -20,7 +20,7 @@ namespace BusinessObjects.Model
         public Guid EventId { get; set; }
         public string Nickname { get; set; }
         public string Passcode { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
         public double TotalPoint { get; set; }
         public double TotalTime { get; set; }
         public bool Isplayer { get; set; }

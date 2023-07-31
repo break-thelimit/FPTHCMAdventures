@@ -15,10 +15,10 @@ namespace DataAccess.Repositories.TaskRepositories
 {
     public class TaskRepositories : GenericRepository<Task>, ITaskRepositories
     {
-        private readonly FPTHCMAdventuresDBContext _dbContext;
+        private readonly db_a9c31b_capstoneContext _dbContext;
         private readonly IMapper _mapper;
 
-        public TaskRepositories(FPTHCMAdventuresDBContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        public TaskRepositories(db_a9c31b_capstoneContext dbContext, IMapper mapper) : base(dbContext, mapper)
         {
             _dbContext = dbContext;
             _mapper = mapper;

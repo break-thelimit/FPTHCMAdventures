@@ -105,5 +105,42 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+
+        [HttpPost("upload-excel-student")]
+        public async Task<IActionResult> UploadExcel(IFormFile file)
+        {
+            var serviceResponse = await _studentService.ImportDataFromExcel(file);
+
+            if (serviceResponse.Success)
+            {
+                // Xử lý thành công
+                return Ok(serviceResponse.Message);
+            }
+            else
+            {
+                // Xử lý lỗi
+                return BadRequest(serviceResponse.Message);
+            }
+        }
+
+        [HttpGet("excel-template-student")]
+        public async Task<IActionResult> DownloadExcelTemplate()
+        {
+            var serviceResponse = await _studentService.DownloadExcelTemplate();
+
+            if (serviceResponse.Success)
+            {
+                // Trả về file Excel dưới dạng response
+                return new FileContentResult(serviceResponse.Data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                {
+                    FileDownloadName = "SampleData.xlsx"
+                };
+            }
+            else
+            {
+                // Xử lý lỗi nếu có
+                return BadRequest(serviceResponse.Message);
+            }
+        }
     }
 }

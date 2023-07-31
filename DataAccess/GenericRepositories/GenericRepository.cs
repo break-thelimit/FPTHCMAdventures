@@ -15,10 +15,10 @@ namespace DataAccess.GenericRepositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        private readonly FPTHCMAdventuresDBContext _dbContext;
+        private readonly db_a9c31b_capstoneContext _dbContext;
         private readonly IMapper _mapper;
 
-        public GenericRepository(FPTHCMAdventuresDBContext dbContext,IMapper mapper)
+        public GenericRepository(db_a9c31b_capstoneContext dbContext,IMapper mapper)
         {
             _dbContext = dbContext;
             _mapper = mapper;

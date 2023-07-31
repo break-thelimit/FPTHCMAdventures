@@ -54,14 +54,14 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
         }*/
         [HttpGet("{id}")]
-        public async Task<ActionResult<PlayerDto>> GetPlayerById(Guid id)
+        public async Task<ActionResult<GetPlayerDto>> GetPlayerById(Guid id)
         {
             var eventDetail = await _playerService.GetPlayerById(id);
             return Ok(eventDetail);
         }
 
         [HttpGet("user/{studentId}")]
-        public async Task<ActionResult<PlayerDto>> GetPlayerByStudentId(Guid studentId)
+        public async Task<ActionResult<GetPlayerDto>> GetPlayerByStudentId(Guid studentId)
         {
             var eventDetail = await _playerService.GetPlayerByStudentId(studentId);
             return Ok(eventDetail);

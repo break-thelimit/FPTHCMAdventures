@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
 using DataAccess.Dtos.Users;
+using DataAccess.Dtos.Users.Admin;
 using DataAccess.GenericRepositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -32,10 +33,10 @@ namespace DataAccess.Repositories.UserRepositories
 
         private const string _loginProvider = "FPTHCMAdventuresApi";
         private const string _refreshToken = "RefreshToken";
-        private readonly FPTHCMAdventuresDBContext _dbContext;
+        private readonly db_a9c31b_capstoneContext _dbContext;
         private readonly JWTSettings _jwtsettings;
         private readonly List<RefreshToken> refreshTokens = new List<RefreshToken>();
-        public AuthManager(FPTHCMAdventuresDBContext dbContext, IOptions<JWTSettings> jwtsettings, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor) 
+        public AuthManager(db_a9c31b_capstoneContext dbContext, IOptions<JWTSettings> jwtsettings, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor) 
         {
             this._mapper = mapper;
             this._configuration = configuration;
@@ -356,6 +357,91 @@ namespace DataAccess.Repositories.UserRepositories
                 Success = true,
                 Data = Task.CompletedTask.ToString()
             };
+        }
+
+        public async Task<BaseResponse<LoginResponseDto>> LoginUnity(LoginUnityDto loginUnityDto)
+        {
+            var student = await _dbContext.Students.SingleOrDefaultAsync(u => u.Email == loginUnityDto.Email);
+            var player = await _dbContext.Players.SingleOrDefaultAsync(x => x.Passcode == loginUnityDto.Passcode);
+            LoginResponseDto userWithToken = null;
+           
+            if (student != null && player != null)
+            {
+                RefreshToken refreshToken = GenerateRefreshToken();
+                student.RefreshTokens.Add(refreshToken);
+                await _dbContext.SaveChangesAsync();
+
+                userWithToken = new LoginResponseDto();
+                userWithToken.RefreshToken = refreshToken.Token;
+                userWithToken.Token = GenerateAccessToken(student.Id);
+                userWithToken.Nickname = player.Nickname;
+                userWithToken.TotalPoint = player.TotalPoint;
+                userWithToken.TotalTime = player.TotalTime;
+                userWithToken.Isplayer = player.Isplayer;
+                userWithToken.EventId = player.EventId;
+                userWithToken.StudentId = student.Id;
+                if (userWithToken == null)
+                {
+                    return new BaseResponse<LoginResponseDto>
+                    {
+                        Data = null,
+                        Message = "Failed, data is null",
+                        Success = false
+                    };
+                }
+                else
+                {
+
+                    return new BaseResponse<LoginResponseDto>
+                    {
+                        Data = userWithToken,
+                        Message = "Success",
+                        Success = true
+                    };
+                }
+            }
+            else
+            {
+                return new BaseResponse<LoginResponseDto>
+                {
+                    Data = null,
+                    Message = "Failed, data is null",
+                    Success = false
+                };
+            }
+            
+        }
+
+        public async Task<BaseResponse<AuthResponseDto>> LoginAdmin(LoginAdminDto loginDto)
+        {
+            var adminEmail = _configuration.GetSection("DefaultAccount").GetSection("Email").Value;
+            var adminPassowrd = _configuration.GetSection("DefaultAccount").GetSection("Password").Value;
+            AuthResponseDto userWithToken = null;
+
+            if (loginDto.Username.Equals(adminEmail) && loginDto.Password.Equals(adminPassowrd))
+            {
+                RefreshToken refreshToken = GenerateRefreshToken();
+                var id = Guid.NewGuid();
+                userWithToken = new AuthResponseDto();
+                userWithToken.RefreshToken = refreshToken.Token;
+                userWithToken.Token = GenerateAccessToken(id);
+
+                return new BaseResponse<AuthResponseDto>
+                {
+                    Data = userWithToken,
+                    Message = "Success",
+                    Success = true
+                };
+            }
+            else
+            {
+                return new BaseResponse<AuthResponseDto>
+                {
+                    Data = null,
+                    Message = "Failed, data is null",
+                    Success = false
+                };
+            }
         }
     }
 

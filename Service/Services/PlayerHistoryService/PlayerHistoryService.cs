@@ -48,7 +48,7 @@ namespace Service.Services.PlayerHistoryService
                 else
                 {
                     var mapper = config.CreateMapper();
-                    var eventTaskcreate = mapper.Map<PlayHistory>(createPlayerHistoryDto);
+                    var eventTaskcreate = mapper.Map<PlayerHistory>(createPlayerHistoryDto);
                     eventTaskcreate.Id = Guid.NewGuid();
                     await _playerHistoryRepository.AddAsync(eventTaskcreate);
 
@@ -163,7 +163,7 @@ namespace Service.Services.PlayerHistoryService
         {
             try
             {
-                List<Expression<Func<PlayHistory, object>>> includes = new List<Expression<Func<PlayHistory, object>>>
+                List<Expression<Func<PlayerHistory, object>>> includes = new List<Expression<Func<PlayerHistory, object>>>
                 {
                    
                 };
@@ -200,7 +200,7 @@ namespace Service.Services.PlayerHistoryService
         {
             try
             {
-                List<Expression<Func<PlayHistory, object>>> includes = new List<Expression<Func<PlayHistory, object>>>
+                List<Expression<Func<PlayerHistory, object>>> includes = new List<Expression<Func<PlayerHistory, object>>>
                 {
 
                 };

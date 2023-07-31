@@ -1,18 +1,20 @@
 ﻿using System;
+using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Configuration;
 
 #nullable disable
 
 namespace BusinessObjects.Model
 {
-    public partial class FPTHCMAdventuresDBContext : DbContext
+    public partial class db_a9c31b_capstoneContext : DbContext
     {
-        public FPTHCMAdventuresDBContext()
+        public db_a9c31b_capstoneContext()
         {
         }
 
-        public FPTHCMAdventuresDBContext(DbContextOptions<FPTHCMAdventuresDBContext> options)
+        public db_a9c31b_capstoneContext(DbContextOptions<db_a9c31b_capstoneContext> options)
             : base(options)
         {
         }
@@ -40,11 +42,10 @@ namespace BusinessObjects.Model
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=(local);Database=FPTHCMAdventuresDB;uid=sa;pwd=1234567890;");
-            }
+            var builder = new ConfigurationBuilder()
+                         .SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            IConfigurationRoot configuration = builder.Build();
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("CapstonProjectDbConnectionString"));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -165,11 +166,6 @@ namespace BusinessObjects.Model
                     .HasColumnName("id");
 
                 entity.Property(e => e.PlayerId).HasColumnName("player_id");
-
-                entity.Property(e => e.Status)
-                    .IsRequired()
-                    .HasMaxLength(100)
-                    .HasColumnName("status");
 
                 entity.HasOne(d => d.Player)
                     .WithMany(p => p.Inventories)
@@ -328,8 +324,7 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.Isplayer).HasColumnName("isplayer");
 
                 entity.Property(e => e.Nickname)
-                    .IsRequired()
-                    .HasMaxLength(100)
+                    .HasMaxLength(200)
                     .HasColumnName("nickname");
 
                 entity.Property(e => e.Passcode)

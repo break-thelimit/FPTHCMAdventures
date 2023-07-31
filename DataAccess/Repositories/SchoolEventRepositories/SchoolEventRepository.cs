@@ -11,10 +11,10 @@ namespace DataAccess.Repositories.SchoolEventRepositories
 {
     public class SchoolEventRepository : GenericRepository<SchoolEvent>,ISchoolEventRepository 
     {
-        private readonly FPTHCMAdventuresDBContext _dbContext;
+        private readonly db_a9c31b_capstoneContext _dbContext;
         private readonly IMapper _mapper;
 
-        public SchoolEventRepository(FPTHCMAdventuresDBContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        public SchoolEventRepository(db_a9c31b_capstoneContext dbContext, IMapper mapper) : base(dbContext, mapper)
         {
             _dbContext = dbContext;
             _mapper = mapper;

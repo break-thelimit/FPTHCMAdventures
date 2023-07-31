@@ -15,7 +15,6 @@ using DataAccess.Dtos.PlayerHistoryDto;
 using DataAccess.Dtos.PlayerPrizeDto;
 using DataAccess.Dtos.PrizeDto;
 using DataAccess.Dtos.QuestionDto;
-using DataAccess.Dtos.RoleDto;
 using DataAccess.Dtos.SchoolDto;
 using DataAccess.Dtos.SchoolEventDto;
 using DataAccess.Dtos.StudentDto;
@@ -175,11 +174,11 @@ namespace DataAccess.Configuration
             #endregion
 
             #region Player History
-            CreateMap<PlayHistory, PlayerHistoryDto>()
+            CreateMap<PlayerHistory, PlayerHistoryDto>()
                             .ForMember(dest => dest.PlayerNickName, opt => opt.MapFrom(src => src.Player.Nickname));
-            CreateMap<PlayHistory, UpdatePlayerHistoryDto>().ReverseMap();
-            CreateMap<PlayHistory, CreatePlayerHistoryDto>().ReverseMap();
-            CreateMap<PlayHistory, GetPlayerHistoryDto>().ReverseMap();
+            CreateMap<PlayerHistory, UpdatePlayerHistoryDto>().ReverseMap();
+            CreateMap<PlayerHistory, CreatePlayerHistoryDto>().ReverseMap();
+            CreateMap<PlayerHistory, GetPlayerHistoryDto>().ReverseMap();
             #endregion
             
             
@@ -208,10 +207,16 @@ namespace DataAccess.Configuration
             CreateMap<Item, CreateItemDto>().ReverseMap();
             CreateMap<Item, UpdateItemDto>().ReverseMap();
             #endregion
-            
 
-            
-          
+            #region StudentLogin
+            CreateMap<Student, ApiUserDto>().ReverseMap();
+            CreateMap<Student, AuthResponseDto>().ReverseMap();
+            CreateMap<Student, LoginDto>().ReverseMap();
+            #endregion
+
+
+
+
 
 
         }

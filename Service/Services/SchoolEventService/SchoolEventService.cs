@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
 using DataAccess.Configuration;
-using DataAccess.Dtos.RoleDto;
 using DataAccess.Dtos.SchoolEventDto;
 using DataAccess.Repositories.SchoolEventRepositories;
 using Microsoft.EntityFrameworkCore;
