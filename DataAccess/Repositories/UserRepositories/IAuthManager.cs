@@ -1,4 +1,4 @@
-﻿/*using BusinessObjects.Model;
+﻿using BusinessObjects.Model;
 using DataAccess.Dtos.Users;
 using DataAccess.GenericRepositories;
 using Microsoft.AspNetCore.Identity;
@@ -15,10 +15,9 @@ namespace DataAccess.Repositories.UserRepositories
         Task<BaseResponse<AuthResponseDto>> RegisterUser(ApiUserDto apiUser);        
         Task<BaseResponse<AuthResponseDto>> Login(LoginDto loginDto);
         Task<BaseResponse<UserWithToken>> RefreshToken(RefreshRequest refreshRequest);
-        Task<BaseResponse<User>> GetUserByAccessToken(string accessToken);
+        Task<BaseResponse<Student>> GetUserByAccessToken(string accessToken);
 
         Task<BaseResponse<string>> DeleteTokenUser(Guid userId);
         string GenerateAccessTokenGoogle(string userId);
     }
 }
-*/

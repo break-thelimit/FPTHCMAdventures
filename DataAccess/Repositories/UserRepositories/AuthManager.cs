@@ -1,4 +1,4 @@
-﻿/*using AutoMapper;
+﻿using AutoMapper;
 using BusinessObjects.Model;
 using DataAccess.Dtos.Users;
 using DataAccess.GenericRepositories;
@@ -46,12 +46,10 @@ namespace DataAccess.Repositories.UserRepositories
         }
         public async Task<BaseResponse<AuthResponseDto>> Login(LoginDto loginDto)
         {
-            *//*string pass = PasswordHash(loginDto.Password);
-            var user = await _dbContext.Students.SingleOrDefaultAsync(u => u.Email == loginDto.Username);
+            var student = await _dbContext.Students.SingleOrDefaultAsync(u => u.Email == loginDto.Email);
             var adminEmail = _configuration.GetSection("DefaultAccount").GetSection("Email").Value;
-            var adminPassowrd = _configuration.GetSection("DefaultAccount").GetSection("Password").Value;
             AuthResponseDto userWithToken = null;
-            if(loginDto.Username.Equals(adminEmail) && loginDto.Password.Equals(adminPassowrd))
+            if(loginDto.Email.Equals(adminEmail))
             {
                 RefreshToken refreshToken = GenerateRefreshToken();
                 var id = Guid.NewGuid();
@@ -68,19 +66,17 @@ namespace DataAccess.Repositories.UserRepositories
             }
             else
             {
-                if (user != null && pass == user.Password)
+                if (student != null )
                 {
                     RefreshToken refreshToken = GenerateRefreshToken();
-                    user.RefreshTokens.Add(refreshToken);
+                    student.RefreshTokens.Add(refreshToken);
                     await _dbContext.SaveChangesAsync();
 
                     userWithToken = new AuthResponseDto();
                     userWithToken.RefreshToken = refreshToken.Token;
-                    userWithToken.Token = GenerateAccessToken(user.Id);
-                    userWithToken.Email = user.Email;
-                    userWithToken.UserId = user.Id;
-                    userWithToken.Username = user.Username;
-                    userWithToken.SchoolId = user.SchoolId;
+                    userWithToken.Token = GenerateAccessToken(student.Id);
+                    userWithToken.Email = student.Email;
+                    userWithToken.SchoolId = student.SchoolId;
                     if (userWithToken == null)
                     {
                         return new BaseResponse<AuthResponseDto>
@@ -110,13 +106,13 @@ namespace DataAccess.Repositories.UserRepositories
                         Success = false
                     };
                 }
-            }*//*
+            }
            
         }
 
         private RefreshToken GenerateRefreshToken()
         {
-          *//*  RefreshToken refreshToken = new RefreshToken();
+            RefreshToken refreshToken = new RefreshToken();
 
             var randomNumber = new byte[32];
             using (var rng = RandomNumberGenerator.Create())
@@ -124,29 +120,29 @@ namespace DataAccess.Repositories.UserRepositories
                 rng.GetBytes(randomNumber);
                 refreshToken.Token = Convert.ToBase64String(randomNumber);
             }
-            refreshToken.ExpiryDate = DateTime.UtcNow.AddMonths(6);
-            return refreshToken;*//*
+            refreshToken.Expirydate = DateTime.UtcNow.AddMonths(6);
+            return refreshToken;
         }
 
-        private bool ValidateRefreshToken(User user, string refreshToken)
+        private bool ValidateRefreshToken(Student student, string refreshToken)
         {
 
-            *//*RefreshToken refreshTokenUser = _dbContext.RefreshTokens.Where(rt => rt.Token == refreshToken)
-                                                .OrderByDescending(rt => rt.ExpiryDate)
+            RefreshToken refreshTokenUser = _dbContext.RefreshTokens.Where(rt => rt.Token == refreshToken)
+                                                .OrderByDescending(rt => rt.Expirydate)
                                                 .FirstOrDefault();
 
-            if (refreshTokenUser != null && refreshTokenUser.UserId == user.Id
-                && refreshTokenUser.ExpiryDate > DateTime.UtcNow)
+            if (refreshTokenUser != null && refreshTokenUser.StudentId == student.Id
+                && refreshTokenUser.Expirydate > DateTime.UtcNow)
             {
                 return true;
             }
 
-            return false;*//*
+            return false;
         }
 
-        private async Task<User> GetUserFromAccessToken(string accessToken)
+        private async Task<Student> GetUserFromAccessToken(string accessToken)
         {
-           *//* try
+            try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes(_jwtsettings.SecretKey);
@@ -172,8 +168,7 @@ namespace DataAccess.Repositories.UserRepositories
 
                     if (Guid.TryParse(userId, out userIdGuid))
                     {
-                        return await _dbContext.Users.Include(u => u.Role)
-                                                    .FirstOrDefaultAsync(u => u.Id == userIdGuid);
+                        return await _dbContext.Students.FirstOrDefaultAsync(u => u.Id == userIdGuid);
                     }
                     else
                     {
@@ -183,14 +178,14 @@ namespace DataAccess.Repositories.UserRepositories
             }
             catch (Exception)
             {
-                return new User();
+                return new Student();
             }
 
-            return new User();*//*
+            return new Student();
         }
         public string GenerateAccessTokenGoogle(string userId)
         {
-           *//* var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_jwtsettings.SecretKey);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -205,11 +200,11 @@ namespace DataAccess.Repositories.UserRepositories
                 SecurityAlgorithms.HmacSha256)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);*//*
+            return tokenHandler.WriteToken(token);
         }
         public string GenerateAccessToken(Guid userId)
         {
-           *//* var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_jwtsettings.SecretKey);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -226,11 +221,11 @@ namespace DataAccess.Repositories.UserRepositories
                 SecurityAlgorithms.HmacSha256)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);*//*
+            return tokenHandler.WriteToken(token);
         }
         public string PasswordHash(string password)
         {
-          *//*  using (var sha256 = SHA256.Create())
+            using (var sha256 = SHA256.Create())
             {
                 // Chuyển đổi mật khẩu sang mảng byte
                 byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
@@ -246,30 +241,13 @@ namespace DataAccess.Repositories.UserRepositories
                 }
 
                 return builder.ToString();
-            }*//*
-        }
-        public async Task<Guid> GetRoleIdAsync()
-        {
-            *//*var role = _dbContext.Roles.FirstOrDefault(x => x.Name == "USER");
-            if (role == null)
-            {
-                role = new Role { Id = Guid.NewGuid(), Name = "USER" };
-                _dbContext.Roles.Add(role);
-                await _dbContext.SaveChangesAsync();
-                return role.Id;
             }
-            else
-            {
-                return role.Id;
-            }*//*
         }
+      
         public async Task<BaseResponse<AuthResponseDto>> RegisterUser(ApiUserDto apiUser)
         {
-           *//* var user = _mapper.Map<User>(apiUser);
+            var user = _mapper.Map<Student>(apiUser);
             user.Id = Guid.NewGuid();
-            user.RoleId = await GetRoleIdAsync();
-            string hashedPassword = PasswordHash(apiUser.Password);
-            user.Password = hashedPassword;
             user.Status = "ACTIVE";
             if (!long.TryParse(apiUser.PhoneNumber, out long phoneNumber))
             {
@@ -280,12 +258,12 @@ namespace DataAccess.Repositories.UserRepositories
                     Message = "Error because phone is failed",
                 };
             }
-            user.PhoneNumber = phoneNumber;
-            await _dbContext.Users.AddAsync(user);
+            user.Phonenumber = phoneNumber;
+            await _dbContext.Students.AddAsync(user);
             await _dbContext.SaveChangesAsync();
             
             //load role for registered user
-            user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == user.Id);
+            user = await _dbContext.Students.SingleOrDefaultAsync(u => u.Id == user.Id);
 
             AuthResponseDto userWithToken = null;
 
@@ -299,8 +277,8 @@ namespace DataAccess.Repositories.UserRepositories
                 userWithToken.RefreshToken = refreshToken.Token;
                 userWithToken.Token = GenerateAccessToken(user.Id);
                 userWithToken.Email = user.Email;
-                userWithToken.UserId = user.Id;
-                userWithToken.Username = user.Username;
+                userWithToken.StudentId = user.Id;
+                userWithToken.SchoolId = user.SchoolId;
                 if (userWithToken == null)
                 {
                     return new BaseResponse<AuthResponseDto>
@@ -328,12 +306,12 @@ namespace DataAccess.Repositories.UserRepositories
                     Success = false,
                     Message = "Error because userwithtoken is null",
                 };
-            }*//*
+            }
         }
 
         public async Task<BaseResponse<UserWithToken>> RefreshToken(RefreshRequest refreshRequest)
         {
-           *//* User user = await GetUserFromAccessToken(refreshRequest.AccessToken);
+            Student user = await GetUserFromAccessToken(refreshRequest.AccessToken);
 
             if (user != null && ValidateRefreshToken(user, refreshRequest.RefreshToken))
             {
@@ -353,16 +331,16 @@ namespace DataAccess.Repositories.UserRepositories
                 Data = null,
                 Message = "Failed",
                 Success = false,
-            }; *//*
+            }; 
         }
 
-        public async Task<BaseResponse<User>> GetUserByAccessToken(string accessToken)
+        public async Task<BaseResponse<Student>> GetUserByAccessToken(string accessToken)
         {
-            User user = await GetUserFromAccessToken(accessToken);
+            Student user = await GetUserFromAccessToken(accessToken);
 
             if (user != null)
             {
-                return new BaseResponse<User> { Data = user,Message = "Success", Success = true};
+                return new BaseResponse<Student> { Data = user,Message = "Success", Success = true};
             }
 
             return null;
@@ -371,7 +349,7 @@ namespace DataAccess.Repositories.UserRepositories
         public async Task<BaseResponse<string>> DeleteTokenUser(Guid userId)
         {
             var refeshTokenList = await _dbContext.RefreshTokens.ToListAsync();
-            refeshTokenList.RemoveAll(x => x.UserId == userId);
+            refeshTokenList.RemoveAll(x => x.StudentId == userId);
             return new BaseResponse<string>
             {
                 Message = "Success",
@@ -383,4 +361,3 @@ namespace DataAccess.Repositories.UserRepositories
 
 }
 
-*/

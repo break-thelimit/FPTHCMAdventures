@@ -122,6 +122,7 @@ namespace FPTHCMAdventuresAPI
             services.AddScoped<IExchangeHistoryRepository, ExchangeHistoryRepository>();
             services.AddScoped<IStudentRepositories, StudentRepositories>();
             services.AddScoped<IPlayerPrizeRepositories, PlayerPrizeRepositories>();
+            services.AddScoped<IAuthManager, AuthManager>();
             #endregion
             #region Excel
             services.AddScoped<ExcelPackage>();
