@@ -88,9 +88,9 @@ namespace Service.Services.PlayerService
           
         }*/
 
-        public async Task<ServiceResponse<Guid?>> CreateNewPlayer(CreatePlayerDto createPlayerDto)
+        public async Task<ServiceResponse<Guid>> CreateNewPlayer(CreatePlayerDto player)
         {
-            var playerNickName = await CheckPlayerByNickName(createPlayerDto.Nickname);
+            /*var playerNickName = await CheckPlayerByNickName(createPlayerDto.Nickname);
             if(playerNickName.Data == null)
             {
                 var mapper = config.CreateMapper();
@@ -116,8 +116,25 @@ namespace Service.Services.PlayerService
                     Success = false,
                     StatusCode = 404
                 };
-            }
-          
+            }*/
+            player.Nickname = "null";
+            player.CreatedAt = DateTime.Now;
+            player.TotalPoint = 0;
+            player.TotalTime = 0;
+            player.Passcode= Guid.NewGuid().ToString("N").Substring(0, 8);
+            player.Isplayer = false;
+            var mapper = config.CreateMapper();
+            var _player = mapper.Map<Player>(player);
+            _player.Id = Guid.NewGuid();
+            await _playerRepository.AddAsync(_player);
+
+            return new ServiceResponse<Guid>
+            {
+                Data = _player.Id,
+                Message = "Successfully",
+                Success = true,
+                StatusCode = 201
+            };
         }
         public async Task<ServiceResponse<GetPlayerDto>> CheckPlayerByNickName(string nickName)
         {

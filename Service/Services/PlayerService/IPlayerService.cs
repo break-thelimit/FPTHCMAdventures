@@ -12,7 +12,7 @@ namespace Service.Services.PlayerService
         Task<ServiceResponse<PlayerDto>> GetPlayerById(Guid eventId);
         Task<ServiceResponse<PlayerDto>> GetPlayerByStudentId(Guid studentId);        
         Task<ServiceResponse<GetPlayerDto>> CheckPlayerByNickName(string nickName);
-        Task<ServiceResponse<Guid?>> CreateNewPlayer(CreatePlayerDto createPlayerDto);
+        Task<ServiceResponse<Guid>> CreateNewPlayer(CreatePlayerDto createPlayerDto);
         Task<ServiceResponse<string>> UpdatePlayer(Guid id, UpdatePlayerDto PlayerDto);
         Task<ServiceResponse<IEnumerable<Player>>> GetTop5PlayerInRank();
 

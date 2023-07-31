@@ -81,11 +81,11 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpPost("player", Name = "CreateNewPlayer")]
 
-        public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> CreateNewPlayer(CreatePlayerDto answerDto)
+        public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> CreateNewPlayer(CreatePlayerDto createPlayerDto)
         {
             try
             {
-                var res = await _playerService.CreateNewPlayer(answerDto);
+                var res = await _playerService.CreateNewPlayer(createPlayerDto);
                 return Ok(res);
             }
             catch (Exception ex)
