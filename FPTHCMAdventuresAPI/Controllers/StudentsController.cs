@@ -38,6 +38,22 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+
+        [HttpGet("GetStudentBySchoolId/{id}")]
+
+        public async Task<ActionResult<ServiceResponse<StudentDto>>> GetStudentListBySchoolId(Guid id)
+        {
+            try
+            {
+                var res = await _studentService.GetStudentBySchoolId(id);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
         [HttpGet("student/pagination", Name = "GetStudentListWithPagination")]
 
         public async Task<ActionResult<ServiceResponse<StudentDto>>> GetStudentListWithPage([FromQuery] QueryParameters queryParameters)
