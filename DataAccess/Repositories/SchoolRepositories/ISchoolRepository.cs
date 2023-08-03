@@ -10,5 +10,6 @@ namespace DataAccess.Repositories.SchoolRepositories
 {
     public interface ISchoolRepository : IGenericRepository<School>
     {
+        Task<IEnumerable<School>> GetSchoolByName(string schoolname);
     }
 }

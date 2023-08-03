@@ -44,6 +44,21 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
         }
 
+        [HttpGet("GetSchoolByName")]
+
+        public async Task<ActionResult<ServiceResponse<BusinessObjects.Model.School>>> GetSchoolByName(string name)
+        {
+            try
+            {
+                var res = await _schoolService.GetSchoolByName(name);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
         [HttpGet("school/pagination", Name = "GetSchoolListWithPagination")]
 
         public async Task<ActionResult<ServiceResponse<SchoolDto>>> GetLocationListWithPage([FromQuery] QueryParameters queryParameters)

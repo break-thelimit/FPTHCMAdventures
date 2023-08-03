@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
 using DataAccess.GenericRepositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,12 @@ namespace DataAccess.Repositories.SchoolRepositories
         {
             _dbContext = dbContext;
             _mapper = mapper;
+        }
+
+       public async Task<IEnumerable<School>> GetSchoolByName(string schoolname)
+        {
+            var schoolList = await _dbContext.Schools.Where(x => x.Name.ToLower().Contains(schoolname.ToLower())).ToListAsync();
+            return schoolList;
         }
     }
 }

@@ -177,6 +177,31 @@ namespace Service.Services.SchoolService
             }
         }
 
+        public async Task<ServiceResponse<IEnumerable<School>>> GetSchoolByName(string name)
+        {
+            var schoolList = await _schoolRepository.GetSchoolByName(name.Trim());
 
-    }
+            if (schoolList != null)
+            {
+                return new ServiceResponse<IEnumerable<School>>
+                {
+                    Data = schoolList,
+                    Success = true,
+                    Message = "Successfully",
+                    StatusCode = 200
+                };
+            }
+            else
+            {
+                return new ServiceResponse<IEnumerable<School>>
+                {
+                    Data = schoolList,
+                    Success = false,
+                    Message = "Faile because List school null",
+                    StatusCode = 200
+                };
+            }
+
+        }
+        }
 }
