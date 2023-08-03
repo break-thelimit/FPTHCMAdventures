@@ -467,7 +467,7 @@ namespace BusinessObjects.Model
 
                 entity.Property(e => e.PhoneNumber).HasColumnName("phone_number");
 
-                entity.Property(e => e.SchoolName).HasColumnName("school_name");
+                entity.Property(e => e.Name).HasColumnName("name");
             });
 
             modelBuilder.Entity<SchoolEvent>(entity =>

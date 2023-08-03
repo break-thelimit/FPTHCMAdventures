@@ -15,5 +15,6 @@ namespace Service.Services.SchoolService
         Task<ServiceResponse<Guid>> CreateNewSchool(CreateSchoolDto createSchoolDto);
         Task<ServiceResponse<string>> UpdateSchool(Guid id, UpdateSchoolDto schoolDto);
         Task<ServiceResponse<PagedResult<SchoolDto>>> GetSchoolWithPage(QueryParameters queryParameters);
+        Task<ServiceResponse<List<GetSchoolDto>>> GetSchoolByEventId(Guid eventid);
     }
 }

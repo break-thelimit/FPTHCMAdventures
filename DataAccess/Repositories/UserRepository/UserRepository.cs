@@ -34,7 +34,7 @@ namespace DataAccess.Repositories.UserRepository
             {
                 Id=x.Id,
                 SchoolId= x.SchoolId,
-                SchoolName = x.School.SchoolName,
+                SchoolName = x.School.Name,
                 RoleId=x.RoleId,
                 RoleName=x.Role.RoleName,
                 Fullname= x.Fullname,

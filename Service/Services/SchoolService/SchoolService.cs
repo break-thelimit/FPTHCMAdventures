@@ -64,7 +64,7 @@ namespace Service.Services.SchoolService
                 {
                     Data = majorList,
                     Success = false,
-                    Message = "Faile because List event null",
+                    Message = "Faile because List school null",
                     StatusCode = 200
                 };
             }
@@ -147,6 +147,30 @@ namespace Service.Services.SchoolService
                 Success = true
             };
         }
+        public async Task<ServiceResponse<List<GetSchoolDto>>> GetSchoolByEventId(Guid eventid)
+        {
+            var schoolList = await _schoolRepository.GetSchoolByEventId(eventid);
 
+            if (schoolList != null)
+            {
+                return new ServiceResponse<List<GetSchoolDto>>
+                {
+                    Data = schoolList,
+                    Success = true,
+                    Message = "Successfully",
+                    StatusCode = 200
+                };
+            }
+            else
+            {
+                return new ServiceResponse<List<GetSchoolDto>>
+                {
+                    Data = schoolList,
+                    Success = false,
+                    Message = "Faile because List event null",
+                    StatusCode = 200
+                };
+            }
+        }
     }
 }
