@@ -59,6 +59,21 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
         }
 
+        [HttpGet("GetSchoolByEventId/{id}")]
+
+        public async Task<ActionResult<ServiceResponse<GetSchoolDto>>> GetSchoolByEventId(Guid id)
+        {
+            try
+            {
+                var res = await _schoolService.GetSchoolByEventId(id);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
         [HttpGet("school/pagination", Name = "GetSchoolListWithPagination")]
 
         public async Task<ActionResult<ServiceResponse<SchoolDto>>> GetLocationListWithPage([FromQuery] QueryParameters queryParameters)

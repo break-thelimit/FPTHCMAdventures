@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
+using DataAccess.Dtos.SchoolDto;
 using DataAccess.GenericRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -24,6 +25,19 @@ namespace DataAccess.Repositories.SchoolRepositories
        public async Task<IEnumerable<School>> GetSchoolByName(string schoolname)
         {
             var schoolList = await _dbContext.Schools.Where(x => x.Name.ToLower().Contains(schoolname.ToLower())).ToListAsync();
+            return schoolList;
+        }
+
+        public async Task<List<GetSchoolDto>> GetSchoolByEventId(Guid eventid)
+        {
+            var schoolList = await _dbContext.SchoolEvents.Include(se => se.School).Where(se => se.EventId.Equals(eventid)).Select(s => new GetSchoolDto
+            {
+                Id = s.School.Id,
+                Name = s.School.Name,
+                PhoneNumber = s.School.PhoneNumber,
+                Email = s.School.Email,
+                Address = s.School.Address
+            }).ToListAsync();
             return schoolList;
         }
     }

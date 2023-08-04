@@ -17,5 +17,6 @@ namespace Service.Services.SchoolService
         Task<ServiceResponse<PagedResult<SchoolDto>>> GetSchoolWithPage(QueryParameters queryParameters);
         Task<ServiceResponse<string>> DisableSchool(Guid id);
         Task<ServiceResponse<IEnumerable<BusinessObjects.Model.School>>> GetSchoolByName(string name);
+        Task<ServiceResponse<List<GetSchoolDto>>> GetSchoolByEventId(Guid eventid);
     }
 }

@@ -201,7 +201,32 @@ namespace Service.Services.SchoolService
                     StatusCode = 200
                 };
             }
+        }
 
+        public async Task<ServiceResponse<List<GetSchoolDto>>> GetSchoolByEventId(Guid eventid)
+        {
+            var schoolList = await _schoolRepository.GetSchoolByEventId(eventid);
+
+            if (schoolList != null)
+            {
+                return new ServiceResponse<List<GetSchoolDto>>
+                {
+                    Data = schoolList,
+                    Success = true,
+                    Message = "Successfully",
+                    StatusCode = 200
+                };
+            }
+            else
+            {
+                return new ServiceResponse<List<GetSchoolDto>>
+                {
+                    Data = schoolList,
+                    Success = false,
+                    Message = "Faile because List school null",
+                    StatusCode = 200
+                };
+            }
         }
-        }
+    }
 }
