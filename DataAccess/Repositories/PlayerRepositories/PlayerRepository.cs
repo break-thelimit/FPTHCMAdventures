@@ -23,6 +23,19 @@ namespace DataAccess.Repositories.PlayerRepositories
             _mapper = mapper;
         }
 
-        
+        public async Task<IEnumerable<GetPlayerDto>> GetRankedPlayer(Guid eventid, Guid schoolId)
+        {
+            var ranked= await _dbContext.Players.Include(s=>s.Student.School).Where(p=>p.EventId.Equals(eventid) && p.Student.SchoolId.Equals(schoolId)).
+                OrderByDescending(x => x.TotalPoint).ThenBy(x => x.TotalTime).Select(x=> new GetPlayerDto 
+                {
+                    Id=x.Id,
+                    Nickname=x.Nickname,
+                    CreatedAt=x.CreatedAt,
+                    TotalPoint=x.TotalPoint,
+                    TotalTime=x.TotalTime,
+                    Isplayer=x.Isplayer
+                }).ToListAsync();
+            return ranked;
+        }
     }
 }

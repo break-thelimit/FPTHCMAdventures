@@ -329,5 +329,37 @@ namespace Service.Services.PlayerService
                 };
             }
         }
+
+        public async Task<ServiceResponse<IEnumerable<GetPlayerDto>>> GetRankedPlayer(Guid eventId,Guid schoolId)
+        {
+            try
+            {
+
+                var eventDetail = await _playerRepository.GetRankedPlayer(eventId,schoolId);
+
+                if (eventDetail == null)
+                {
+
+                    return new ServiceResponse<IEnumerable<GetPlayerDto>>
+                    {
+                        Message = "No rows",
+                        StatusCode = 200,
+                        Success = true
+                    };
+                }
+                return new ServiceResponse<IEnumerable<GetPlayerDto>>
+                {
+                    Data = eventDetail,
+                    Message = "Successfully",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

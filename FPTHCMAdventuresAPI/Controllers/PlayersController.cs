@@ -39,20 +39,34 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
         }
 
-     /*   [HttpGet("players/listPlayer-username", Name = "GetPlayerWithUserNames")]
+        [HttpGet("GetRankedPlayer")]
 
-        public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> GetPlayerListWithUserName()
+        public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> GetRankedPlayer(Guid eventId,Guid schoolId)
         {
             try
             {
-                var res = await _playerService.GetPlayerWithUserName();
+                var res = await _playerService.GetRankedPlayer(eventId,schoolId);
                 return Ok(res);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
-        }*/
+        }
+        /*   [HttpGet("players/listPlayer-username", Name = "GetPlayerWithUserNames")]
+
+           public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> GetPlayerListWithUserName()
+           {
+               try
+               {
+                   var res = await _playerService.GetPlayerWithUserName();
+                   return Ok(res);
+               }
+               catch (Exception ex)
+               {
+                   return StatusCode(500, "Internal server error: " + ex.Message);
+               }
+           }*/
         [HttpGet("{id}")]
         public async Task<ActionResult<PlayerDto>> GetPlayerById(Guid id)
         {
