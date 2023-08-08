@@ -18,6 +18,7 @@ namespace Service.Services.TaskService
 /*        Task<ServiceResponse<IEnumerable<BusinessObjects.Model.Task>>> GetTaskDoneByMajor(Guid majorId);
 */
         Task<ServiceResponse<string>> DisableTask(Guid id);
+        Task<ServiceResponse<IEnumerable<TaskDto>>> GetTaskByEventTaskWithEventId(Guid eventId);
 
     }
 }

@@ -50,6 +50,22 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+
+        [HttpGet("GetTaskByEventTaskWithEventId/{eventId}")]
+
+        public async Task<ActionResult<ServiceResponse<GetTaskDto>>> GetTaskByEventTaskWithEventId(Guid eventId)
+        {
+            try
+            {
+                var res = await _taskService.GetTaskByEventTaskWithEventId(eventId);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
         [HttpGet("{id}")]
         public async Task<ActionResult<GetTaskDto>> GetTaskById(Guid id)
         {

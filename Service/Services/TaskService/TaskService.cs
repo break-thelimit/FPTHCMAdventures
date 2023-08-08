@@ -219,5 +219,32 @@ namespace Service.Services.TaskService
                 };
             }
         }
+
+        public async Task<ServiceResponse<IEnumerable<TaskDto>>> GetTaskByEventTaskWithEventId(Guid eventId)
+        {
+            var taskList = await _taskRepository.GetTaskByEventTaskWithEventId(eventId);
+
+
+            if (taskList.Any())
+            {
+                return new ServiceResponse<IEnumerable<TaskDto>>
+                {
+                    Data = taskList,
+                    Success = true,
+                    Message = "Successfully",
+                    StatusCode = 200
+                };
+            }
+            else
+            {
+                return new ServiceResponse<IEnumerable<TaskDto>>
+                {
+                    Data = taskList,
+                    Success = false,
+                    Message = "Failed because List task null",
+                    StatusCode = 200
+                };
+            }
+        }
     }
 }
