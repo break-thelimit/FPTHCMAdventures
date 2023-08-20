@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repositories.ItemInventoryRepositories
 {
-    public interface IItemInventoryRepositories : IGenericRepository<ItemIventory>
+    public interface IItemInventoryRepositories : IGenericRepository<ItemInventory>
     {
         Task<GetListItemInventoryByPlayer> GetListItemInventoryByPlayer(string PlayerNickName);
         Task<ItemInventoryDto> getItemByItemName(string itemName);

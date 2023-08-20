@@ -36,6 +36,29 @@ namespace Service.Services.StudentService
 
         public async Task<ServiceResponse<Guid>> CreateNewStudent(CreateStudentDto createStudentDto)
         {
+            if (await _studentRepository.ExistsAsync(s => s.Email == createStudentDto.Email))
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "Duplicated data: Student with the same email already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            if (await _studentRepository.ExistsAsync(s => s.Phonenumber.ToString() == createStudentDto.Phonenumber))
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "Duplicated data: Student with the same phone number already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            createStudentDto.Email = createStudentDto.Email.Trim();
+            createStudentDto.GraduateYear = createStudentDto.GraduateYear.Trim();
+            createStudentDto.Classname = createStudentDto.Classname.Trim();
+            createStudentDto.Fullname = createStudentDto.Fullname.Trim();
+            createStudentDto.Status = createStudentDto.Status.Trim();
             var mapper = config.CreateMapper();
             var eventTaskcreate = mapper.Map<Student>(createStudentDto);
             eventTaskcreate.Id = Guid.NewGuid();
@@ -50,20 +73,20 @@ namespace Service.Services.StudentService
             };
         }
 
-        public async Task<ServiceResponse<string>> DisableStudent(Guid id)
+        public async Task<ServiceResponse<bool>> DisableStudent(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<ServiceResponse<IEnumerable<GetStudentDto>>> GetStudent()
+        public async Task<ServiceResponse<IEnumerable<StudentDto>>> GetStudent()
         {
-            var majorList = await _studentRepository.GetAllAsync<GetStudentDto>();
+            var studentList = await _studentRepository.GetAllAsync<StudentDto>();
 
-            if (majorList != null)
+            if (studentList != null)
             {
-                return new ServiceResponse<IEnumerable<GetStudentDto>>
+                return new ServiceResponse<IEnumerable<StudentDto>>
                 {
-                    Data = majorList,
+                    Data = studentList,
                     Success = true,
                     Message = "Successfully",
                     StatusCode = 200
@@ -71,9 +94,9 @@ namespace Service.Services.StudentService
             }
             else
             {
-                return new ServiceResponse<IEnumerable<GetStudentDto>>
+                return new ServiceResponse<IEnumerable<StudentDto>>
                 {
-                    Data = majorList,
+                    Data = studentList,
                     Success = false,
                     Message = "Faile because List student null",
                     StatusCode = 200
@@ -125,15 +148,37 @@ namespace Service.Services.StudentService
             };
         }
 
-        public async Task<ServiceResponse<string>> UpdateStudent(Guid id, UpdateStudentDto studentDto)
+        public async Task<ServiceResponse<bool>> UpdateStudent(Guid id, UpdateStudentDto studentDto)
         {
+            if (await _studentRepository.ExistsAsync(s => s.Email == studentDto.Email && s.Id != id))
+            {
+                return new ServiceResponse<bool>
+                {
+                    Message = "Duplicated data: Student with the same email already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            if (await _studentRepository.ExistsAsync(s => s.Phonenumber.ToString() == studentDto.Phonenumber && s.Id != id))
+            {
+                return new ServiceResponse<bool>
+                {
+                    Message = "Duplicated data: Student with the same Phone Number already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
             try
             {
-
-                studentDto.Id = id;
+                studentDto.Email = studentDto.Email.Trim();
+                studentDto.GraduateYear = studentDto.GraduateYear.Trim();
+                studentDto.Classname = studentDto.Classname.Trim();
+                studentDto.Fullname = studentDto.Fullname.Trim();
+                studentDto.Status = studentDto.Status.Trim();
                 await _studentRepository.UpdateAsync(id, studentDto);
-                return new ServiceResponse<string>
+                return new ServiceResponse<bool>
                 {
+                    Data = true,
                     Message = "Success edit",
                     Success = true,
                     StatusCode = 202
@@ -143,8 +188,9 @@ namespace Service.Services.StudentService
             {
                 if (!await StudentExists(id))
                 {
-                    return new ServiceResponse<string>
+                    return new ServiceResponse<bool>
                     {
+                        Data = false,
                         Message = "Invalid Record Id",
                         Success = false,
                         StatusCode = 500
@@ -193,21 +239,25 @@ namespace Service.Services.StudentService
                 var worksheet = package.Workbook.Worksheets.Add("SampleDataStudent");
 
                 // Thiết lập header cho các cột
-                worksheet.Cells[1, 1].Value = "School Name";
-                worksheet.Cells[1, 2].Value = "Full Name";
-                worksheet.Cells[1, 3].Value = "Email";
-                worksheet.Cells[1, 4].Value = "Phone Number";
-                worksheet.Cells[1, 5].Value = "GraduateYear";
-                worksheet.Cells[1, 6].Value = "Class Name";
-                worksheet.Cells[1, 7].Value = "Status";
+                worksheet.Cells[1, 1].Value = "Full Name";
+                worksheet.Cells[1, 2].Value = "Email";
+                worksheet.Cells[1, 3].Value = "Phone Number";
+                worksheet.Cells[1, 4].Value = "GraduateYear";
+                worksheet.Cells[1, 5].Value = "Class Name";
+                worksheet.Cells[1, 6].Value = "Status";
 
                 // Lưu file Excel vào MemoryStream
                 var stream = new MemoryStream(package.GetAsByteArray());
                 return stream.ToArray();
             }
         }
-        public async Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file)
+        public async Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file, Guid SchoolId)
         {
+            var existingEmails = await _studentRepository.GetExistingEmails(); // Đây là phương thức bạn cần triển khai để lấy danh sách email đã tồn tại trong cơ sở dữ liệu
+            var existingPhoneNumbers = await _studentRepository.GetExistingPhoneNumbers(); // Tương tự, phương thức lấy danh sách số điện thoại đã tồn tại
+
+            var checkExistingEmails = new HashSet<string>(); // Sử dụng HashSet để kiểm tra trùng lặp email
+            var checkExistingPhoneNumbers = new HashSet<string>(); // Sử dụng HashSet để kiểm tra trùng lặp số điện thoại
             if (file == null || file.Length <= 0)
             {
                 return new ServiceResponse<string>
@@ -240,39 +290,45 @@ namespace Service.Services.StudentService
                         if (worksheet != null)
                         {
                             var rowCount = worksheet.Dimension.Rows;
-                            var dataList = new List<StudentDto>();
+                            var dataList = new List<GetStudentDto>();
                             var errorMessages = new List<string>();
 
-                            for (int row = 2; row <= rowCount - 1; row++)
+                            for (int row = 2; row <= rowCount; row++)
                             {
-                                var data = new StudentDto
+                                var data = new GetStudentDto
                                 {
-                                    Schoolname = worksheet.Cells[row, 1].Text,
-                                    Fullname = worksheet.Cells[row, 2].Text,
-                                    Email    = worksheet.Cells[row, 3].Text,
-                                    Phonenumber = long.Parse(worksheet.Cells[row, 4].Text),
-                                    GraduateYear = worksheet.Cells[row, 5].Text,
-                                    Classname = worksheet.Cells[row, 6].Text,
-                                    Status = worksheet.Cells[row, 7].Text
+                                    Id = Guid.NewGuid(),
+                                    SchoolId = SchoolId, 
+                                    Fullname = worksheet.Cells[row, 1].Text.Trim(),
+                                    Email    = worksheet.Cells[row, 2].Text.Trim(),
+                                    Phonenumber = worksheet.Cells[row, 3].Text.Trim(),
+                                    GraduateYear = worksheet.Cells[row, 4].Text.Trim(),
+                                    Classname = worksheet.Cells[row, 5].Text.Trim(),
+                                    Status = worksheet.Cells[row, 6].Text.Trim()
                                 };
-                                if (string.IsNullOrEmpty(data.Schoolname))
-                                {
-                                    errorMessages.Add($"Row {row}: Schoolname is required.");
-                                }
-
                                 if (string.IsNullOrEmpty(data.Fullname))
                                 {
                                     errorMessages.Add($"Row {row}: Fullname is required.");
                                 }
 
-                                if (string.IsNullOrEmpty(data.Email) || !IsValidEmail(data.Email))
+                                if (string.IsNullOrEmpty(data.Email) || !IsValidEmail(data.Email) || existingEmails.Contains(data.Email) || checkExistingEmails.Contains(data.Email))
                                 {
-                                    errorMessages.Add($"Row {row}: Invalid email format.");
+                                    errorMessages.Add($"Row {row}: Invalid or duplicate email.");
+                                }
+                                else
+                                {
+                                    checkExistingEmails.Add(data.Email); // Thêm email vào HashSet nếu không trùng
                                 }
 
-                                if (data.Phonenumber <= 0)
+
+                                if (string.IsNullOrEmpty(data.Phonenumber) || existingPhoneNumbers.Contains(data.Phonenumber) || checkExistingPhoneNumbers.Contains(data.Phonenumber))
                                 {
-                                    errorMessages.Add($"Row {row}: Invalid phone number.");
+                                    errorMessages.Add($"Row {row}: Invalid or duplicate phone number.");
+                                }
+                                else
+                                {
+                                    checkExistingPhoneNumbers.Add(data.Phonenumber); 
+
                                 }
                                 dataList.Add(data);
                             }
@@ -348,6 +404,75 @@ namespace Service.Services.StudentService
                 Success = true,
                 StatusCode = 200
             };
+        }
+
+        public async Task<ServiceResponse<IEnumerable<GetStudentBySchoolAndEvent>>> GetStudentBySchoolIdAndEventId(Guid SchoolId, Guid eventId)
+        {
+            try
+            {
+
+                var eventDetail = await _studentRepository.GetStudentBySchoolIdAndEventId(SchoolId,eventId);
+
+                if (eventDetail == null)
+                {
+
+                    return new ServiceResponse<IEnumerable<GetStudentBySchoolAndEvent>>
+                    {
+                        Message = "No rows",
+                        StatusCode = 200,
+                        Success = true
+                    };
+                }
+                return new ServiceResponse<IEnumerable<GetStudentBySchoolAndEvent>>
+                {
+                    Data = eventDetail,
+                    Message = "Successfully",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<byte[]> ExportDataToExcelStudent(Guid schoolId)
+        {
+            var dataList = await _studentRepository.GetStudentsBySchoolIdAsync(schoolId); // Replace with your repository method to get all locations
+
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Students");
+
+                // Add header row
+                worksheet.Cells[1, 1].Value = "FULL NAME";
+                worksheet.Cells[1, 2].Value = "EMAIL";
+                worksheet.Cells[1, 3].Value = "CLASS NAME";
+                worksheet.Cells[1, 4].Value = "GRADUATE YEAR";
+                worksheet.Cells[1, 5].Value = "SCHOOL NAME";
+                worksheet.Cells[1, 6].Value = "PHONE NUMBER";
+                worksheet.Cells[1, 7].Value = "PASSCODE";
+                int row = 2;
+
+                foreach (var student in dataList)
+                {
+                    worksheet.Cells[row, 1].Value = student.Fullname;
+                    worksheet.Cells[row, 2].Value = student.Email;
+                    worksheet.Cells[row, 3].Value = student.Classname;
+                    worksheet.Cells[row, 4].Value = student.GraduateYear;
+                    worksheet.Cells[row, 5].Value = student.Schoolname;
+                    worksheet.Cells[row, 6].Value = student.Phonenumber;
+                    worksheet.Cells[row, 7].Value = student.Passcode;
+
+                    row++;
+                }
+
+                // Convert the package to a byte array
+                byte[] excelData = package.GetAsByteArray();
+                return excelData;
+            }
         }
     }
 }

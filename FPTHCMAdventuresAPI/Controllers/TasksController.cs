@@ -23,6 +23,8 @@ namespace FPTHCMAdventuresAPI.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class TasksController : ControllerBase
     {
         private readonly ITaskService _taskService;
@@ -37,7 +39,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpGet(Name = "GetTaskList")]
 
-        public async Task<ActionResult<ServiceResponse<GetTaskDto>>> GetEventList()
+        public async Task<ActionResult<ServiceResponse<TaskDto>>> GetTaskList()
         {
             try
             {
@@ -50,6 +52,7 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+        
         [HttpGet("{id}")]
         public async Task<ActionResult<GetTaskDto>> GetTaskById(Guid id)
         {
@@ -77,7 +80,15 @@ namespace FPTHCMAdventuresAPI.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
                 var res = await _taskService.CreateNewTask(taskDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -92,7 +103,15 @@ namespace FPTHCMAdventuresAPI.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
                 var res = await _taskService.UpdateTask(id, updateTaskDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)

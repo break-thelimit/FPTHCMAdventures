@@ -18,6 +18,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AnswersController : ControllerBase
     {
         private readonly IAnswerService _answerService;
@@ -81,10 +82,14 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpPost("answer", Name = "CreateNewAnswer")]
 
-        public async Task<ActionResult<ServiceResponse<AnswerDto>>> CreateNewanswer(CreateAnswerDto answerDto)
+        public async Task<ActionResult<ServiceResponse<GetAnswerDto>>> CreateNewanswer(CreateAnswerDto answerDto)
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
                 var res = await _answerService.CreateNewAnswer(answerDto);
                 return Ok(res);
             }
@@ -100,6 +105,10 @@ namespace FPTHCMAdventuresAPI.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
                 var res = await _answerService.UpdateAnswer(id, eventDto);
                 return Ok(res);
             }
@@ -109,5 +118,43 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+
+        [HttpPost("upload-excel-answer")]
+        public async Task<IActionResult> UploadExcel(IFormFile file)
+        {
+            var serviceResponse = await _answerService.ImportDataFromExcel(file);
+
+            if (serviceResponse.Success)
+            {
+                // Xử lý thành công
+                return Ok(serviceResponse.Message);
+            }
+            else
+            {
+                // Xử lý lỗi
+                return BadRequest(serviceResponse.Message);
+            }
+        }
+
+        [HttpGet("excel-template-answer")]
+        public async Task<IActionResult> DownloadExcelTemplate()
+        {
+            var serviceResponse = await _answerService.DownloadExcelTemplate();
+
+            if (serviceResponse.Success)
+            {
+                // Trả về file Excel dưới dạng response
+                return new FileContentResult(serviceResponse.Data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                {
+                    FileDownloadName = "SampleDataMajor.xlsx"
+                };
+            }
+            else
+            {
+                // Xử lý lỗi nếu có
+                return BadRequest(serviceResponse.Message);
+            }
+        }
+
     }
 }

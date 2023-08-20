@@ -1,22 +1,62 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System;
 
-namespace DataAccess.Dtos.TaskDto
+public abstract class BaseTaskDto
 {
-    public abstract class BaseTaskDto
+    private Guid locationId;
+    private Guid majorId;
+    private Guid npcId;
+    private Guid? itemId;
+    private string name;
+    private string type;
+    private string status;
+
+    [Required]
+    public Guid LocationId
     {
-        public Guid LocationId { get; set; }
-        public Guid MajorId { get; set; }
-        public Guid NpcId { get; set; }
-        public Guid ItemId { get; set; }
-        public string Name { get; set; }
-        public double Point { get; set; }
-        public string Type { get; set; }
-        public string Status { get; set; }
+        get { return locationId; }
+        set { locationId = value; }
+    }
 
+    [Required]
+    public Guid MajorId
+    {
+        get { return majorId; }
+        set { majorId = value; }
+    }
 
+    [Required]
+    public Guid NpcId
+    {
+        get { return npcId; }
+        set { npcId = value; }
+    }
+
+    public Guid? ItemId
+    {
+        get { return itemId; }
+        set { itemId = value; }
+    }
+
+    [Required]
+    public string Name
+    {
+        get { return name; }
+        set { name = value; }
+    }
+
+    [Required]
+    public string Type
+    {
+        get { return type; }
+        set { type = value; }
+    }
+
+    [Required]
+    [RegularExpression("^(INACTIVE|ACTIVE)$", ErrorMessage = "Status must be 'INACTIVE' or 'ACTIVE'.")]
+    public string Status
+    {
+        get { return status; }
+        set { status = value; }
     }
 }

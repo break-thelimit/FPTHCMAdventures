@@ -16,6 +16,8 @@ namespace FPTHCMAdventuresAPI.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class ItemsController : ControllerBase
     {
         private readonly IItemService _itemService;
@@ -30,7 +32,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpGet(Name = "GetItem")]
 
-        public async Task<ActionResult<ServiceResponse<GetItemDto>>> GetItemList()
+        public async Task<ActionResult<ServiceResponse<ItemDto>>> GetItemList()
         {
             try
             {
@@ -51,11 +53,19 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpPost("item", Name = "CreateNewItem")]
 
-        public async Task<ActionResult<ServiceResponse<ItemDto>>> CreateNewItem(CreateItemDto answerDto)
+        public async Task<ActionResult<ServiceResponse<GetItemDto>>> CreateNewItem([FromForm] CreateItemDto createItemDto)
         {
             try
             {
-                var res = await _itemService.CreateNewItem(answerDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _itemService.CreateNewItem(createItemDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -66,11 +76,19 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<ItemDto>>> UpdateItem(Guid id, [FromBody] UpdateItemDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetItemDto>>> UpdateItem(Guid id, [FromForm] UpdateItemDto updateItemDto)
         {
             try
             {
-                var res = await _itemService.UpdateItem(id, eventDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _itemService.UpdateItem(id, updateItemDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)

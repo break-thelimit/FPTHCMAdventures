@@ -21,7 +21,10 @@ namespace BusinessObjects.Model
         public string GraduateYear { get; set; }
         public string Classname { get; set; }
         public string Status { get; set; }
+        public Guid? PlayerId { get; set; }
+        public DateTime CreatedAt { get; set; }
 
+        public virtual Player Player { get; set; }
         public virtual School School { get; set; }
         public virtual ICollection<Player> Players { get; set; }
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; }

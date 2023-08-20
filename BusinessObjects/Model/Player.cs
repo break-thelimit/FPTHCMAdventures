@@ -13,6 +13,7 @@ namespace BusinessObjects.Model
             Inventories = new HashSet<Inventory>();
             PlayerHistories = new HashSet<PlayerHistory>();
             PlayerPrizes = new HashSet<PlayerPrize>();
+            Students = new HashSet<Student>();
         }
 
         public Guid Id { get; set; }
@@ -31,5 +32,6 @@ namespace BusinessObjects.Model
         public virtual ICollection<Inventory> Inventories { get; set; }
         public virtual ICollection<PlayerHistory> PlayerHistories { get; set; }
         public virtual ICollection<PlayerPrize> PlayerPrizes { get; set; }
+        public virtual ICollection<Student> Students { get; set; }
     }
 }

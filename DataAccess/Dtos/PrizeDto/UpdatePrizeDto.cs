@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.PrizeDto
 {
-    public class UpdatePrizeDto : BasePrizeDto, IBaseDto
+    public class UpdatePrizeDto : BasePrizeDto
     {
-        public Guid Id { get; set; }
     }
 }

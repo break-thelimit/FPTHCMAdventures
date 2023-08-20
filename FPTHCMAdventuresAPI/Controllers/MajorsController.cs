@@ -18,6 +18,8 @@ namespace FPTHCMAdventuresAPI.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class MajorController : ControllerBase
     {
         private readonly IMajorService _majorService;
@@ -53,11 +55,19 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpPost("major", Name = "CreateMajor")]
 
-        public async Task<ActionResult<ServiceResponse<MajorDto>>> CreateNewEvent(CreateMajorDto eventTaskDto)
+        public async Task<ActionResult<ServiceResponse<GetMajorDto>>> CreateNewEvent( CreateMajorDto createMajorDto)
         {
             try
             {
-                var res = await _majorService.CreateNewMajor(eventTaskDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _majorService.CreateNewMajor(createMajorDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -68,11 +78,19 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<MajorDto>>> UpdateNewEvent(Guid id, [FromBody] UpdateMajorDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetMajorDto>>> UpdateNewEvent(Guid id, [FromBody] UpdateMajorDto updateMajorDto)
         {
             try
             {
-                var res = await _majorService.UpdateMajor(id, eventDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _majorService.UpdateMajor(id, updateMajorDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)

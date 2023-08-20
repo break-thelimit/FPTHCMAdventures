@@ -17,6 +17,9 @@ namespace BusinessObjects.Model
         public Guid EventId { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
+        public double Point { get; set; }
+        public int? Priority { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         public virtual Event Event { get; set; }
         public virtual Task Task { get; set; }

@@ -9,7 +9,7 @@ namespace DataAccess.Dtos.TaskDto
     public class GetTaskAndEventDto
     {
         public string EventName { get; set; }
-        public IEnumerable<TaskDto> TaskDtos { get; set; }
+        public IEnumerable<GetTaskRequestDto> TaskDtos { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
     }

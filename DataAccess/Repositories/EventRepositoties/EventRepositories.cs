@@ -30,27 +30,50 @@ namespace DataAccess.Repositories.EventRepositories
         {
             DateTime utcNow = DateTime.UtcNow;
             DateTime vietnamTime = ConvertToVietnamTime(utcNow);
-            var status = "active";
+            var status = "ACTIVE";
 
-            var getTaskAndEventDtos = await _dbContext.Events
+            var query = _dbContext.Events
                 .Include(e => e.EventTasks).ThenInclude(et => et.Task)
                 .Include(e => e.EventTasks).ThenInclude(et => et.Task.Location)
                 .Include(e => e.EventTasks).ThenInclude(et => et.Task.Major)
                 .Include(e => e.EventTasks).ThenInclude(et => et.Task.Npc)
-                .Where(e => e.StartTime <= vietnamTime && e.EndTime > vietnamTime && e.Status == "ACTIVE")
+                .Include(e => e.EventTasks).ThenInclude(et => et.Task.Item)
+                .Where(e => e.StartTime <= vietnamTime && e.EndTime > vietnamTime && e.Status == "ACTIVE");
+
+            var getTaskAndEventDtos = await query
                 .Select(e => new GetTaskAndEventDto
                 {
                     EventName = e.Name,
                     TaskDtos = e.EventTasks
                         .Where(et => et.Task.Status == "ACTIVE") // Lọc theo trạng thái "active"
-                        .Select(et => _mapper.Map<TaskDto>(et.Task))
+                        .Select(et => new GetTaskRequestDto
+                        {
+                            Id = et.Task.Id,
+                            EventtaskId = et.Id,
+                            Name = et.Task.Name,
+                            ItemName = et.Task.Item.Name,
+                            LocationName = et.Task.Location.LocationName,
+                            MajorName = et.Task.Major.Name,
+                            MajorId = et.Task.MajorId,
+                            NpcName = et.Task.Npc.Name,
+                            Point = et.Point,
+                            Status = et.Task.Status,
+                            Type = et.Task.Type,
+                            Starttime = et.StartTime, 
+                            Endtime = et.EndTime,     
+                        })
                         .ToList(),
                     StartTime = e.StartTime,
                     EndTime = e.EndTime
                 })
                 .ToListAsync();
 
-             return getTaskAndEventDtos;
+            if (getTaskAndEventDtos.Count == 0 || getTaskAndEventDtos.Any(dto => dto.EventName == null) || getTaskAndEventDtos.Any(dto => dto.TaskDtos.Count() == 0))
+            {
+                return new List<GetTaskAndEventDto>();
+            }
+
+            return getTaskAndEventDtos;
         }
 
         public DateTime ConvertToVietnamTime(DateTime dateTimeUtc)

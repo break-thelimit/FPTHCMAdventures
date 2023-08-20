@@ -8,6 +8,8 @@ namespace DataAccess.Dtos.PrizeDto
 {
     public class PrizeDto 
     {
+        public Guid Id { get; set; }
+
         public string EventName { get; set; }
         public string Name { get; set; }
         public string Decription { get; set; }

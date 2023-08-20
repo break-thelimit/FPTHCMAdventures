@@ -18,6 +18,7 @@ namespace BusinessObjects.Model
         public string Decription { get; set; }
         public string Status { get; set; }
         public int Quantity { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         public virtual Event Event { get; set; }
         public virtual ICollection<PlayerPrize> PlayerPrizes { get; set; }

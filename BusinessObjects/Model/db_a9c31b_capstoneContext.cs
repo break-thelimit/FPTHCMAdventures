@@ -25,7 +25,7 @@ namespace BusinessObjects.Model
         public virtual DbSet<ExchangeHistory> ExchangeHistories { get; set; }
         public virtual DbSet<Inventory> Inventories { get; set; }
         public virtual DbSet<Item> Items { get; set; }
-        public virtual DbSet<ItemIventory> ItemIventories { get; set; }
+        public virtual DbSet<ItemInventory> ItemInventories { get; set; }
         public virtual DbSet<Location> Locations { get; set; }
         public virtual DbSet<Major> Majors { get; set; }
         public virtual DbSet<Npc> Npcs { get; set; }
@@ -43,7 +43,7 @@ namespace BusinessObjects.Model
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var builder = new ConfigurationBuilder()
-                         .SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                           .SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             IConfigurationRoot configuration = builder.Build();
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("CapstonProjectDbConnectionString"));
         }
@@ -65,7 +65,19 @@ namespace BusinessObjects.Model
                     .HasMaxLength(1000)
                     .HasColumnName("answer_name");
 
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
+
                 entity.Property(e => e.IsRight).HasColumnName("is_right");
+
+                entity.Property(e => e.QuestionId).HasColumnName("question_id");
+
+                entity.HasOne(d => d.Question)
+                    .WithMany(p => p.Answers)
+                    .HasForeignKey(d => d.QuestionId)
+                    .HasConstraintName("FK_Answer_question_id");
             });
 
             modelBuilder.Entity<Event>(entity =>
@@ -76,18 +88,15 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
-                entity.Property(e => e.EndTime)
+                entity.Property(e => e.CreatedAt)
                     .HasColumnType("datetime")
-                    .HasColumnName("end_time");
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(100)
                     .HasColumnName("name");
-
-                entity.Property(e => e.StartTime)
-                    .HasColumnType("datetime")
-                    .HasColumnName("start_time");
 
                 entity.Property(e => e.Status)
                     .IsRequired()
@@ -103,11 +112,20 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
+
                 entity.Property(e => e.EndTime)
                     .HasColumnType("datetime")
                     .HasColumnName("end_time");
 
                 entity.Property(e => e.EventId).HasColumnName("event_id");
+
+                entity.Property(e => e.Point).HasColumnName("point");
+
+                entity.Property(e => e.Priority).HasColumnName("priority");
 
                 entity.Property(e => e.StartTime)
                     .HasColumnType("datetime")
@@ -135,6 +153,11 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.Id)
                     .ValueGeneratedNever()
                     .HasColumnName("id");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.ExchangeDate)
                     .HasColumnType("datetime")
@@ -165,6 +188,11 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
+
                 entity.Property(e => e.PlayerId).HasColumnName("player_id");
 
                 entity.HasOne(d => d.Player)
@@ -182,10 +210,19 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
+
                 entity.Property(e => e.Description)
                     .IsRequired()
                     .HasMaxLength(1000)
                     .HasColumnName("description");
+
+                entity.Property(e => e.ImageUrl)
+                    .HasMaxLength(200)
+                    .HasColumnName("image_url");
 
                 entity.Property(e => e.LimitExchange).HasColumnName("limit_exchange");
 
@@ -207,13 +244,18 @@ namespace BusinessObjects.Model
                     .HasColumnName("type");
             });
 
-            modelBuilder.Entity<ItemIventory>(entity =>
+            modelBuilder.Entity<ItemInventory>(entity =>
             {
-                entity.ToTable("ItemIventory");
+                entity.ToTable("ItemInventory");
 
                 entity.Property(e => e.Id)
                     .ValueGeneratedNever()
                     .HasColumnName("id");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.InventoryId).HasColumnName("inventory_id");
 
@@ -222,13 +264,13 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.Quantity).HasColumnName("quantity");
 
                 entity.HasOne(d => d.Inventory)
-                    .WithMany(p => p.ItemIventories)
+                    .WithMany(p => p.ItemInventories)
                     .HasForeignKey(d => d.InventoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ItemIventory.inventory_id");
 
                 entity.HasOne(d => d.Item)
-                    .WithMany(p => p.ItemIventories)
+                    .WithMany(p => p.ItemInventories)
                     .HasForeignKey(d => d.ItemId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ItemIventory.item_id");
@@ -241,6 +283,11 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.Id)
                     .ValueGeneratedNever()
                     .HasColumnName("id");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.LocationName)
                     .IsRequired()
@@ -267,6 +314,11 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
+
                 entity.Property(e => e.Description)
                     .IsRequired()
                     .HasMaxLength(1000)
@@ -290,6 +342,11 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.Id)
                     .ValueGeneratedNever()
                     .HasColumnName("id");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.Introduce)
                     .IsRequired()
@@ -361,6 +418,11 @@ namespace BusinessObjects.Model
 
                 entity.Property(e => e.CompletedTime).HasColumnName("completed_time");
 
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
+
                 entity.Property(e => e.EventtaskId).HasColumnName("eventtask_id");
 
                 entity.Property(e => e.PlayerId).HasColumnName("player_id");
@@ -393,6 +455,11 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
+
                 entity.Property(e => e.PlayerId).HasColumnName("player_id");
 
                 entity.Property(e => e.PrizeId).HasColumnName("prize_id");
@@ -417,6 +484,11 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.Id)
                     .ValueGeneratedNever()
                     .HasColumnName("id");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.Decription)
                     .IsRequired()
@@ -452,7 +524,10 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
-                entity.Property(e => e.AnswerId).HasColumnName("answer_id");
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.MajorId).HasColumnName("major_id");
 
@@ -465,12 +540,6 @@ namespace BusinessObjects.Model
                     .IsRequired()
                     .HasMaxLength(100)
                     .HasColumnName("status");
-
-                entity.HasOne(d => d.Answer)
-                    .WithMany(p => p.Questions)
-                    .HasForeignKey(d => d.AnswerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Question.answer_id");
 
                 entity.HasOne(d => d.Major)
                     .WithMany(p => p.Questions)
@@ -520,6 +589,11 @@ namespace BusinessObjects.Model
                     .HasMaxLength(255)
                     .HasColumnName("address");
 
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
+
                 entity.Property(e => e.Email)
                     .IsRequired()
                     .HasMaxLength(100)
@@ -546,17 +620,29 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.EndTime)
+                    .HasColumnType("datetime")
+                    .HasColumnName("end_time");
+
                 entity.Property(e => e.EventId).HasColumnName("event_id");
 
                 entity.Property(e => e.InvitationLetter)
-                    .IsRequired()
+                    .HasMaxLength(255)
                     .HasColumnName("invitation_letter");
 
                 entity.Property(e => e.SchoolId).HasColumnName("school_id");
 
+                entity.Property(e => e.StartTime)
+                    .HasColumnType("datetime")
+                    .HasColumnName("start_time");
+
                 entity.Property(e => e.Status)
-                    .IsRequired()
-                    .HasMaxLength(1)
+                    .HasMaxLength(100)
                     .IsUnicode(false)
                     .HasColumnName("status");
 
@@ -587,6 +673,11 @@ namespace BusinessObjects.Model
                     .IsUnicode(false)
                     .HasColumnName("classname");
 
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
+
                 entity.Property(e => e.Email)
                     .IsRequired()
                     .HasMaxLength(100)
@@ -604,12 +695,19 @@ namespace BusinessObjects.Model
 
                 entity.Property(e => e.Phonenumber).HasColumnName("phonenumber");
 
+                entity.Property(e => e.PlayerId).HasColumnName("player_id");
+
                 entity.Property(e => e.SchoolId).HasColumnName("school_id");
 
                 entity.Property(e => e.Status)
                     .IsRequired()
                     .HasMaxLength(100)
                     .HasColumnName("status");
+
+                entity.HasOne(d => d.Player)
+                    .WithMany(p => p.Students)
+                    .HasForeignKey(d => d.PlayerId)
+                    .HasConstraintName("FK__Student__player___3A4CA8FD");
 
                 entity.HasOne(d => d.School)
                     .WithMany(p => p.Students)
@@ -626,6 +724,11 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
+
                 entity.Property(e => e.ItemId).HasColumnName("item_id");
 
                 entity.Property(e => e.LocationId).HasColumnName("location_id");
@@ -638,8 +741,6 @@ namespace BusinessObjects.Model
                     .HasColumnName("name");
 
                 entity.Property(e => e.NpcId).HasColumnName("npc_id");
-
-                entity.Property(e => e.Point).HasColumnName("point");
 
                 entity.Property(e => e.Status)
                     .IsRequired()
@@ -655,7 +756,6 @@ namespace BusinessObjects.Model
                 entity.HasOne(d => d.Item)
                     .WithMany(p => p.Tasks)
                     .HasForeignKey(d => d.ItemId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Task.item_id");
 
                 entity.HasOne(d => d.Location)

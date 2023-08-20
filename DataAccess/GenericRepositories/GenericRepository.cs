@@ -202,7 +202,10 @@ namespace DataAccess.GenericRepositories
                 .ProjectTo<TResult>(_mapper.ConfigurationProvider)
                 .ToListAsync();
         }
-
+        public async Task<T> GetSingleAsync(Expression<Func<T, bool>> filter)
+        {
+            return await _dbContext.Set<T>().SingleOrDefaultAsync(filter);
+        }
         public async Task<T> GetAsync(Guid? id)
         {
             var result = await _dbContext.Set<T>().FindAsync(id);
@@ -231,13 +234,8 @@ namespace DataAccess.GenericRepositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync<TSource>(Guid id, TSource source) where TSource : IBaseDto
+        public async Task UpdateAsync<TSource>(Guid id, TSource source) where TSource : class
         {
-            if (id != source.Id)
-            {
-                throw new BadRequestException("Invalid Id used in request");
-            }
-
             var entity = await GetAsync(id);
 
             if (entity == null)
@@ -246,10 +244,30 @@ namespace DataAccess.GenericRepositories
             }
 
             _mapper.Map(source, entity);
-            _dbContext.Update(entity);
+            _dbContext.Entry(entity).State = EntityState.Modified;
+            try
+            {
+                // Lưu thay đổi vào cơ sở dữ liệu
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // Xử lý các trường hợp khi có lỗi cạnh tranh khi lưu thay đổi vào cơ sở dữ liệu
+                // Ví dụ: một người dùng khác cập nhật thực thể cùng lúc.
+                throw;
+            }
+        }
+        public async Task UpdateAsync(Guid id, T source)
+        {
+            T entity = await GetAsync(id);
+            if (entity == null)
+            {
+                throw new NotFoundException(typeof(T).Name, id);
+            }
+
+            _mapper.Map(source, entity);
             await _dbContext.SaveChangesAsync();
         }
-
         public async Task AddRangeAsync(List<T> entities)
         {
             await _dbContext.Set<T>().AddRangeAsync(entities);
@@ -259,6 +277,11 @@ namespace DataAccess.GenericRepositories
         {
             return await _dbContext.SaveChangesAsync();
         }
-      
+
+        public async Task<bool> ExistsAsync(Expression<Func<T, bool>> expression)
+        {
+            return await _dbContext.Set<T>().AnyAsync(expression);
+        }
+
     }
 }

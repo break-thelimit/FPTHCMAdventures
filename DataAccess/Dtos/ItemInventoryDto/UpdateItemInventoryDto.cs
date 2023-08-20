@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.ItemInventoryDto
 {
-    public class UpdateItemInventoryDto : BaseItemInventoryDto , IBaseDto
+    public class UpdateItemInventoryDto : BaseItemInventoryDto 
     {
-        public Guid Id { get; set; }
     }
 }

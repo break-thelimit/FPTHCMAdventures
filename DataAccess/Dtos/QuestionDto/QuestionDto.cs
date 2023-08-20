@@ -10,7 +10,6 @@ namespace DataAccess.Dtos.QuestionDto
     {
         public Guid Id { get; set; }
 
-        public string AnswerName { get; set; }
         public string MajorName { get; set; }
         public string Name { get; set; }
         public string Status { get; set; }

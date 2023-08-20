@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.PlayerPrizeDto
 {
-    public class UpdatePlayerPrizeDto : BasePlayerPrizeDto, IBaseDto
+    public class UpdatePlayerPrizeDto : BasePlayerPrizeDto
     {
-        public Guid Id { get; set; }
     }
 }
 

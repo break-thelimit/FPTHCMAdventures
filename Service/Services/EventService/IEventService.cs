@@ -16,13 +16,13 @@ namespace Service.Services.EventService
         Task<ServiceResponse<EventDto>> GetEventById(Guid eventId);
         Task<ServiceResponse<IEnumerable<GetEventDto>>> GetEventByDate(DateTime dateTimeStart);        
         Task<ServiceResponse<Guid>> CreateNewEvent(CreateEventDto createEventDto);
-        Task<ServiceResponse<string>> UpdateEvent(Guid id,UpdateEventDto eventDto);
+        Task<ServiceResponse<bool>> UpdateEvent(Guid id,UpdateEventDto eventDto);
         Task<ServiceResponse<IEnumerable<GetTaskAndEventDto>>> GetTaskAndEventListByTimeNow();
         Task<ServiceResponse<byte[]>> DownloadExcelTemplate();
         Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file);
         Task<ServiceResponse<PagedResult<EventDto>>> GetEventWithPage(QueryParameters queryParameters);
 
-        Task<ServiceResponse<string>> DisableEvent(Guid id);    
+        Task<ServiceResponse<bool>> DisableEvent(Guid id);    
 
     }
 }

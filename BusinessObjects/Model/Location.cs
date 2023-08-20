@@ -18,6 +18,7 @@ namespace BusinessObjects.Model
         public double Z { get; set; }
         public string LocationName { get; set; }
         public string Status { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         public virtual ICollection<Task> Tasks { get; set; }
     }

@@ -71,6 +71,8 @@ using DataAccess.Repositories.PlayerPrizeRepositories;
 using Service.Services.StudentService;
 using Service.Services.PlayerPrizeService;
 using Service.Services.PrizeService;
+using DataAccess.ImageSetting;
+using DataAccess.Repositories.ImageRepository;
 
 namespace FPTHCMAdventuresAPI
 {
@@ -94,6 +96,7 @@ namespace FPTHCMAdventuresAPI
             services.AddDbContext<db_a9c31b_capstoneContext>(options => options.UseSqlServer(ConectionString));
             services.AddControllersWithViews().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddAutoMapper(typeof(MapperConfig));
+            services.Configure<ImgurSettings>(Configuration.GetSection("ImgurSettings"));
 
             services.AddCors(options => {
                 options.AddPolicy("AllowAll",
@@ -124,6 +127,7 @@ namespace FPTHCMAdventuresAPI
             services.AddScoped<IStudentRepositories, StudentRepositories>();
             services.AddScoped<IPlayerPrizeRepositories, PlayerPrizeRepositories>();
             services.AddScoped<IAuthManager, AuthManager>();
+            services.AddScoped<IImageRepository, ImageRepository>();
             #endregion
             #region Excel
             services.AddScoped<ExcelPackage>();

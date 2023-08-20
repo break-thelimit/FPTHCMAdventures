@@ -91,21 +91,6 @@ namespace FPTHCMAdventuresAPI.Controllers
 
             return Ok(errors);
         }
-
-
-        // POST: api/Account/register
-        [HttpPost]
-        [Route("register")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<BaseResponse<AuthResponseDto>>> Register([FromBody] ApiUserDto apiUserDto)
-        {
-            var errors = await _authManager.RegisterUser(apiUserDto);
-
-            return Ok(errors);
-        }
-
         // POST: api/Account/login
         [HttpPost]
         [Route("login")]

@@ -14,8 +14,8 @@ namespace Service.Services.NpcService
         Task<ServiceResponse<NpcDto>> GetNpcById(Guid eventId);
         Task<ServiceResponse<NpcDto>> GetNpcByName(string npcName);
         Task<ServiceResponse<Guid>> CreateNewNpc(CreateNpcDto createMajorDto);
-        Task<ServiceResponse<string>> UpdateNpc(Guid id, UpdateNpcDto majorDto);
+        Task<ServiceResponse<bool>> UpdateNpc(Guid id, UpdateNpcDto majorDto);
 
-        Task<ServiceResponse<string>> DisableNpc(Guid id);
+        Task<ServiceResponse<bool>> DisableNpc(Guid id);
     }
 }

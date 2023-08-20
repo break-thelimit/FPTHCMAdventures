@@ -17,6 +17,8 @@ namespace FPTHCMAdventuresAPI.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class PlayerHistorysController : ControllerBase
     {
         private readonly IPlayerHistoryService _playerHistoryService;
@@ -31,7 +33,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpGet(Name = "GetPlayerHistory")]
 
-        public async Task<ActionResult<ServiceResponse<GetPlayerHistoryDto>>> GetPlayerHistoryList()
+        public async Task<ActionResult<ServiceResponse<PlayerHistoryDto>>> GetPlayerHistoryList()
         {
             try
             {
@@ -56,19 +58,27 @@ namespace FPTHCMAdventuresAPI.Controllers
             return Ok(eventDetail);
         } 
         [HttpGet("task/{taskId}/{playerId}")]
-        public async Task<ActionResult<PlayerHistoryDto>> GetPlayerHistoryWithEventTaskIdAndPlayerId(Guid eventtaskId, Guid playerId)
+        public async Task<ActionResult<PlayerHistoryDto>> GetPlayerHistoryWithEventTaskIdAndPlayerId(Guid taskId, Guid playerId)
         {
-            var eventDetail = await _playerHistoryService.GetPlayerHistoryByEventTaskIdAndPlayerId(eventtaskId, playerId);
+            var eventDetail = await _playerHistoryService.GetPlayerHistoryByEventTaskIdAndPlayerId(taskId, playerId);
             return Ok(eventDetail);
         }
 
         [HttpPost("playerhistory", Name = "CreateNewPlayerHistory")]
 
-        public async Task<ActionResult<ServiceResponse<GetPlayerHistoryDto>>> CreateNewPlayerHistory(CreatePlayerHistoryDto answerDto)
+        public async Task<ActionResult<ServiceResponse<GetPlayerHistoryDto>>> CreateNewPlayerHistory(CreatePlayerHistoryDto createPlayerHistoryDto)
         {
             try
             {
-                var res = await _playerHistoryService.CreateNewPlayerHistory(answerDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _playerHistoryService.CreateNewPlayerHistory(createPlayerHistoryDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -79,11 +89,19 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<GetPlayerHistoryDto>>> UpdatePlayerHistory(Guid id, [FromBody] UpdatePlayerHistoryDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetPlayerHistoryDto>>> UpdatePlayerHistory(Guid id, [FromBody] UpdatePlayerHistoryDto updatePlayerHistoryDto)
         {
             try
             {
-                var res = await _playerHistoryService.UpdatePlayerHistory(id, eventDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _playerHistoryService.UpdatePlayerHistory(id, updatePlayerHistoryDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)

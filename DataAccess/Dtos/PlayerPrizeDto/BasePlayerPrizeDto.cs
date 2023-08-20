@@ -1,14 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Dtos.PlayerPrizeDto
 {
     public class BasePlayerPrizeDto
     {
-        public Guid PrizeId { get; set; }
-        public Guid PlayerId { get; set; }
+        private Guid prizeId;
+        private Guid playerId;
+
+        [Required]
+        public Guid PrizeId
+        {
+            get { return prizeId; }
+            set { prizeId = value; }
+        }
+
+        [Required]
+        public Guid PlayerId
+        {
+            get { return playerId; }
+            set { playerId = value; }
+        }
     }
 }

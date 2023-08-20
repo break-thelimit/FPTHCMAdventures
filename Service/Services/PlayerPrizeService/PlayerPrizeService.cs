@@ -31,44 +31,28 @@ namespace Service.Services.PlayerPrizeService
 
         public async Task<ServiceResponse<Guid>> CreateNewPlayerPrize(CreatePlayerPrizeDto createPlayerPrizeDto)
         {
-            var majorList = await _playerPrizeRepository.GetAllAsync<GetPlayerPrizeDto>();
-            if (majorList != null)
-            {
-                var playerHistory = majorList.FirstOrDefault(x => x.PlayerId == createPlayerPrizeDto.PlayerId );
-                if (playerHistory != null)
-                {
-                    return new ServiceResponse<Guid>
-                    {
-                        Message = "Failed taskId have exists",
-                        Success = false,
-                        StatusCode = 500
-                    };
-                }
-                else
-                {
-                    var mapper = config.CreateMapper();
-                    var eventTaskcreate = mapper.Map<PlayerPrize>(createPlayerPrizeDto);
-                    eventTaskcreate.Id = Guid.NewGuid();
-                    await _playerPrizeRepository.AddAsync(eventTaskcreate);
-
-                    return new ServiceResponse<Guid>
-                    {
-                        Data = eventTaskcreate.Id,
-                        Message = "Successfully",
-                        Success = true,
-                        StatusCode = 201
-                    };
-                }
-            }
-            else
+            if (await _playerPrizeRepository.ExistsAsync(s => s.PlayerId == createPlayerPrizeDto.PlayerId))
             {
                 return new ServiceResponse<Guid>
                 {
-                    Message = "Null",
+                    Message = "Duplicated data: Prize with the same player already exists.",
                     Success = false,
-                    StatusCode = 500
+                    StatusCode = 400
                 };
             }
+           
+            var mapper = config.CreateMapper();
+            var eventTaskcreate = mapper.Map<PlayerPrize>(createPlayerPrizeDto);
+            eventTaskcreate.Id = Guid.NewGuid();
+            await _playerPrizeRepository.AddAsync(eventTaskcreate);
+
+            return new ServiceResponse<Guid>
+            {
+                Data = eventTaskcreate.Id,
+                Message = "Successfully",
+                Success = true,
+                StatusCode = 201
+            };
         }
 
         public async Task<ServiceResponse<IEnumerable<PlayerPrizeDto>>> GetPlayerPrize()
@@ -129,14 +113,15 @@ namespace Service.Services.PlayerPrizeService
             }
         }
 
-        public async Task<ServiceResponse<string>> UpdatePlayerPrize(Guid id, UpdatePlayerPrizeDto PlayerPrizeDto)
+        public async Task<ServiceResponse<bool>> UpdatePlayerPrize(Guid id, UpdatePlayerPrizeDto PlayerPrizeDto)
         {
             try
             {
-                PlayerPrizeDto.Id = id;
+
                 await _playerPrizeRepository.UpdateAsync(id, PlayerPrizeDto);
-                return new ServiceResponse<string>
-                {
+                return new ServiceResponse<bool>
+                {   
+                    Data = true,
                     Message = "Success edit",
                     Success = true,
                     StatusCode = 202
@@ -146,8 +131,9 @@ namespace Service.Services.PlayerPrizeService
             {
                 if (!await PlayerPrizeExists(id))
                 {
-                    return new ServiceResponse<string>
+                    return new ServiceResponse<bool>
                     {
+                        Data = false,
                         Message = "Invalid Record Id",
                         Success = false,
                         StatusCode = 500

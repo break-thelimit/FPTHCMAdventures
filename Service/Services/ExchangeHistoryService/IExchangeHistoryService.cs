@@ -13,7 +13,7 @@ namespace Service.Services.ExchangeHistoryService
         Task<ServiceResponse<IEnumerable<ExchangeHistoryDto>>> GetExchangeHistory();
         Task<ServiceResponse<GetExchangeHistoryDto>> GetExchangeHistoryById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewExchangeHistory(CreateExchangeHistoryDto createEventTaskDto);
-        Task<ServiceResponse<string>> UpdateExchangeHistory(Guid id, UpdateExchangeHistoryDto eventTaskDto);
+        Task<ServiceResponse<bool>> UpdateExchangeHistory(Guid id, UpdateExchangeHistoryDto eventTaskDto);
         Task<ServiceResponse<ExchangeHistoryDto>> GetExchangeByItemName(string itemName);
 
     }

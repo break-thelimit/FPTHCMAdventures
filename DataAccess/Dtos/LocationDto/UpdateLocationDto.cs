@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.LocationDto
 {
-    public class UpdateLocationDto : BaseLocationDto, IBaseDto
+    public class UpdateLocationDto : BaseLocationDto
     {
-        public Guid Id { get; set; }
     }
 }
 

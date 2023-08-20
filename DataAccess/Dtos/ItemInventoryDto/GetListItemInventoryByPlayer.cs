@@ -11,7 +11,7 @@ namespace DataAccess.Dtos.ItemInventoryDto
     {
         public Guid PlayerId { get; set; }
         public Guid InventoryId { get; set; }
-        public List<GetItemDto> ListItem { get; set; }
+        public List<GetListItemDto> ListItem { get; set; }
 
         public List<GetItemInventoryDto> ListItemInventory { get; set; }
     }

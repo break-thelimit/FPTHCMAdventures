@@ -131,16 +131,17 @@ namespace Service.Services.ExchangeHistoryService
             }
         }
 
-        public async Task<ServiceResponse<string>> UpdateExchangeHistory(Guid id, UpdateExchangeHistoryDto eventTaskDto)
+        public async Task<ServiceResponse<bool>> UpdateExchangeHistory(Guid id, UpdateExchangeHistoryDto exchangeHistoryDto)
         {
             try
             {
 
-                eventTaskDto.Id = id;
-                eventTaskDto.ExchangeDate = DateTime.UtcNow;
-                await _exchangeHistoryRepository.UpdateAsync(id, eventTaskDto);
-                return new ServiceResponse<string>
-                {
+                exchangeHistoryDto.ExchangeDate = DateTime.UtcNow;
+
+                await _exchangeHistoryRepository.UpdateAsync(id, exchangeHistoryDto);
+                return new ServiceResponse<bool>
+                {   
+                    Data = true,
                     Message = "Success edit",
                     Success = true,
                     StatusCode = 202
@@ -150,8 +151,9 @@ namespace Service.Services.ExchangeHistoryService
             {
                 if (!await EventTaskExists(id))
                 {
-                    return new ServiceResponse<string>
-                    {
+                    return new ServiceResponse<bool>
+                    {   
+                        Data = false,
                         Message = "Invalid Record Id",
                         Success = false,
                         StatusCode = 500

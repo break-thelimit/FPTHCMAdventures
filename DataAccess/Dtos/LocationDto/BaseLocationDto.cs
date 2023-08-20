@@ -1,17 +1,50 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Dtos.LocationDto
 {
     public abstract class BaseLocationDto
     {
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Z { get; set; }
-        public string LocationName { get; set; }
-        public string Status { get; set; }
+        private double x;
+        private double y;
+        private double z;
+        private string locationName;
+        private string status;
+
+        [Required]
+        public double X
+        {
+            get { return x; }
+            set { x = value; }
+        }
+
+        [Required]
+        public double Y
+        {
+            get { return y; }
+            set { y = value; }
+        }
+
+        [Required]
+        public double Z
+        {
+            get { return z; }
+            set { z = value; }
+        }
+
+        [Required]
+        public string LocationName
+        {
+            get { return locationName; }
+            set { locationName = value; }
+        }
+
+        [Required]
+        [RegularExpression("^(INACTIVE|ACTIVE)$", ErrorMessage = "Status must be 'INACTIVE' or 'ACTIVE'.")]
+        public string Status
+        {
+            get { return status; }
+            set { status = value; }
+        }
     }
 }

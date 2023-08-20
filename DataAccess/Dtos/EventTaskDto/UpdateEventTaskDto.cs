@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.EventTaskDto
 {
-    public class UpdateEventTaskDto : BaseEventTaskDto, IBaseDto
+    public class UpdateEventTaskDto : BaseEventTaskDto
     {
-        public Guid Id { get; set; }
     }
 }

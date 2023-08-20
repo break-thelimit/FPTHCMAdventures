@@ -14,9 +14,9 @@ namespace Service.Services.PrizeService
         Task<ServiceResponse<IEnumerable<PrizeDto>>> GetPrize();
         Task<ServiceResponse<PrizeDto>> GetPrizeById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewPrize(CreatePrizeDto createGiftDto);
-        Task<ServiceResponse<string>> UpdatePrize(Guid id, UpdatePrizeDto giftDto);
+        Task<ServiceResponse<bool>> UpdatePrize(Guid id, UpdatePrizeDto giftDto);
         Task<ServiceResponse<string>> GetTotalPrize();
-        Task<ServiceResponse<string>> DisablePrize(Guid id);
+        Task<ServiceResponse<bool>> DisablePrize(Guid id);
 
 
     }

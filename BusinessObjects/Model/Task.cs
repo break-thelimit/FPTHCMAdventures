@@ -16,11 +16,11 @@ namespace BusinessObjects.Model
         public Guid LocationId { get; set; }
         public Guid MajorId { get; set; }
         public Guid NpcId { get; set; }
-        public Guid ItemId { get; set; }
+        public Guid? ItemId { get; set; }
         public string Name { get; set; }
-        public double Point { get; set; }
         public string Type { get; set; }
         public string Status { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         public virtual Item Item { get; set; }
         public virtual Location Location { get; set; }

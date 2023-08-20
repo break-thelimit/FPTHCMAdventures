@@ -9,6 +9,7 @@ using System;
 using Service.Services.ItemInventoryService;
 using DataAccess.Dtos.ItemInventoryDto;
 using Microsoft.AspNetCore.Authorization;
+using DataAccess.Dtos.EventDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
@@ -16,6 +17,8 @@ namespace FPTHCMAdventuresAPI.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class ItemInventorysController : ControllerBase
     {
         private readonly IItemInventoryService _itemInventoryService;
@@ -62,11 +65,15 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPost("itemInventory", Name = "CreateNewItemInventory")]
 
-        public async Task<ActionResult<ServiceResponse<ItemInventoryDto>>> CreateNewItemInventory(CreateItemInventoryDto answerDto)
+        public async Task<ActionResult<ServiceResponse<GetItemInventoryDto>>> CreateNewItemInventory(CreateItemInventoryDto createItemInventoryDto)
         {
             try
             {
-                var res = await _itemInventoryService.CreateNewItemInventory(answerDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _itemInventoryService.CreateNewItemInventory(createItemInventoryDto);
                 return Ok(res);
             }
             catch (Exception ex)
@@ -77,11 +84,19 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<ItemInventoryDto>>> UpdateItemInventory(Guid id, [FromBody] UpdateItemInventoryDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetItemInventoryDto>>> UpdateItemInventory(Guid id, [FromBody] UpdateItemInventoryDto updateItemInventoryDto)
         {
             try
             {
-                var res = await _itemInventoryService.UpdateItemInventory(id, eventDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _itemInventoryService.UpdateItemInventory(id, updateItemInventoryDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)

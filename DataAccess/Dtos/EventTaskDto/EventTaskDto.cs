@@ -12,5 +12,11 @@ namespace DataAccess.Dtos.EventTaskDto
 
         public string TaskName { get; set; }
         public string EventName { get; set; }
+        public double Point { get; set; }
+        public int? Priority { get; set; }
+
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+
     }
 }

@@ -38,6 +38,27 @@ namespace Service.Services.TaskService
         }
         public async Task<ServiceResponse<Guid>> CreateNewTask(CreateTaskDto createEventDto)
         {
+            if (await _taskRepository.ExistsAsync(s => s.Name == createEventDto.Name))
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "Duplicated data: Task with the same name already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            if (await _taskRepository.ExistsAsync(s => s.LocationId == createEventDto.LocationId))
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "Duplicated data: Task with the same location already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            createEventDto.Name = createEventDto.Name.Trim();
+            createEventDto.Type = createEventDto.Type.Trim();
+            createEventDto.Status = createEventDto.Status.Trim();
             var mapper = config.CreateMapper();
             var taskcreate = mapper.Map<Task>(createEventDto);
             taskcreate.Id = Guid.NewGuid();
@@ -53,40 +74,7 @@ namespace Service.Services.TaskService
         }
 
 
-       /* public async Task<ServiceResponse<IEnumerable<Task>>> GetTaskDoneByMajor(Guid majorId)
-        {
-            try
-            {
-                var context = new FPTHCMAdventuresDBContext();
-                List<Task> taskList = context.Tasks.Include(t => t.PlayHistories).Where(t => (t.PlayHistories.Count > 0) && (t.MajorId == majorId)).ToList();
-
-                if (taskList != null)
-                {
-                    return new ServiceResponse<IEnumerable<Task>>
-                    {
-                        Data = taskList,
-                        Success = true,
-                        Message = "Successfully",
-                        StatusCode = 200
-                    };
-                }
-                else
-                {
-                    return new ServiceResponse<IEnumerable<Task>>
-                    {
-                        Data = taskList,
-                        Success = false,
-                        Message = "Failed because List task null",
-                        StatusCode = 200
-                    };
-                }
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception(ex.Message);
-            }
-        }*/
+    
         public async Task<ServiceResponse<IEnumerable<TaskDto>>> GetTask()
         {
             List<Expression<Func<Task, object>>> includes = new List<Expression<Func<Task, object>>>
@@ -157,14 +145,40 @@ namespace Service.Services.TaskService
             }
         }
 
-        public async Task<ServiceResponse<string>> UpdateTask(Guid id, UpdateTaskDto updateTaskDto)
+        public async Task<ServiceResponse<bool>> UpdateTask(Guid id, UpdateTaskDto updateTaskDto)
         {
+            var existingSchoolWithSameName = await _taskRepository.ExistsAsync(s => s.Name == updateTaskDto.Name && s.Id != id);
+            var existingSchoolWithSameEmail = await _taskRepository.ExistsAsync(s => s.LocationId == updateTaskDto.LocationId && s.Id != id);
+
+            if (existingSchoolWithSameName)
+            {
+                return new ServiceResponse<bool>
+                {
+                    Data = false,
+                    Message = "Duplicated data: Task with the same name already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            if (existingSchoolWithSameEmail)
+            {
+                return new ServiceResponse<bool>
+                {
+                    Data = false,
+                    Message = "Duplicated data: Task with the same location already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
             try
             {
-                updateTaskDto.Id = id;
+                updateTaskDto.Name = updateTaskDto.Name.Trim();
+                updateTaskDto.Type = updateTaskDto.Type.Trim();
+                updateTaskDto.Status = updateTaskDto.Status.Trim();
                 await _taskRepository.UpdateAsync(id, updateTaskDto);
-                return new ServiceResponse<string>
+                return new ServiceResponse<bool>
                 {
+                    Data = true,
                     Message = "Success edit",
                     Success = true,
                     StatusCode = 202
@@ -174,8 +188,9 @@ namespace Service.Services.TaskService
             {
                 if (!await CountryExists(id))
                 {
-                    return new ServiceResponse<string>
-                    {
+                    return new ServiceResponse<bool>
+                    {   
+                        Data = false,
                         Message = "No rows",
                         Success = false,
                         StatusCode = 500
@@ -192,15 +207,15 @@ namespace Service.Services.TaskService
             return await _taskRepository.Exists(id);
         }
 
-        public async Task<ServiceResponse<string>> DisableTask(Guid id)
+        public async Task<ServiceResponse<bool>> DisableTask(Guid id)
         {
             var checkEvent = await _taskRepository.GetAsync<TaskDto>(id);
 
             if (checkEvent == null)
             {
-                return new ServiceResponse<string>
+                return new ServiceResponse<bool>
                 {
-                    Data = "null",
+                    Data = false,
                     Message = "Success",
                     StatusCode = 200,
                     Success = true
@@ -210,14 +225,16 @@ namespace Service.Services.TaskService
             {
                 checkEvent.Status = "INACTIVE";
                 await _taskRepository.UpdateAsync(id, checkEvent);
-                return new ServiceResponse<string>
+                return new ServiceResponse<bool>
                 {
-                    Data = checkEvent.Status,
+                    Data = true,
                     Message = "Success",
                     StatusCode = 200,
                     Success = true
                 };
             }
         }
+
+     
     }
 }

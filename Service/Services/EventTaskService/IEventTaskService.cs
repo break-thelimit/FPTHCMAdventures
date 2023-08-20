@@ -1,6 +1,7 @@
 ﻿using DataAccess.Dtos.EventDto;
 using DataAccess.Dtos.EventTaskDto;
 using DataAccess.Dtos.PlayerDto;
+using DataAccess.Dtos.TaskDto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,9 @@ namespace Service.Services.EventTaskService
         Task<ServiceResponse<EventTaskDto>> GetEventTaskByTaskId(Guid taskId);
 
         Task<ServiceResponse<Guid>> CreateNewEventTask(CreateEventTaskDto createEventTaskDto);
-        Task<ServiceResponse<string>> UpdateTaskEvent(Guid id, UpdateEventTaskDto eventTaskDto);
+        Task<ServiceResponse<bool>> UpdateTaskEvent(Guid id, UpdateEventTaskDto eventTaskDto);
+
+        Task<ServiceResponse<IEnumerable<GetTaskByEventIdDto>>> GetTaskByEventTaskWithEventId(Guid eventId);
+
     }
 }

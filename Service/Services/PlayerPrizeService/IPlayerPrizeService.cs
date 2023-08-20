@@ -13,6 +13,6 @@ namespace Service.Services.PlayerPrizeService
         Task<ServiceResponse<IEnumerable<PlayerPrizeDto>>> GetPlayerPrize();
         Task<ServiceResponse<GetPlayerPrizeDto>> GetPlayerPrizeById(Guid prizeId);
         Task<ServiceResponse<Guid>> CreateNewPlayerPrize(CreatePlayerPrizeDto createPlayerPrizeDto);
-        Task<ServiceResponse<string>> UpdatePlayerPrize(Guid id, UpdatePlayerPrizeDto PlayerPrizeDto);
+        Task<ServiceResponse<bool>> UpdatePlayerPrize(Guid id, UpdatePlayerPrizeDto PlayerPrizeDto);
     }
 }

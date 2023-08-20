@@ -10,11 +10,14 @@ using System.Threading.Tasks;
 using System;
 using Service.Services.PlayerPrizeService;
 using DataAccess.Dtos.PlayerPrizeDto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class PlayerPrizesController : ControllerBase
     {
         private readonly IPlayerPrizeService _playerPrizeService;
@@ -49,11 +52,19 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpPost("playerprize", Name = "CreateNewPlayerPrize")]
 
-        public async Task<ActionResult<ServiceResponse<GetPlayerPrizeDto>>> CreateNewPlayerPrize(CreatePlayerPrizeDto playerPrizeDto)
+        public async Task<ActionResult<ServiceResponse<GetPlayerPrizeDto>>> CreateNewPlayerPrize( CreatePlayerPrizeDto createPlayerPrizeDto)
         {
             try
             {
-                var res = await _playerPrizeService.CreateNewPlayerPrize(playerPrizeDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _playerPrizeService.CreateNewPlayerPrize(createPlayerPrizeDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -64,11 +75,19 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<GetPlayerPrizeDto>>> UpdatePlayerPrize(Guid id, [FromBody] UpdatePlayerPrizeDto playerPrizeDto)
+        public async Task<ActionResult<ServiceResponse<GetPlayerPrizeDto>>> UpdatePlayerPrize(Guid id, [FromBody] UpdatePlayerPrizeDto updatePlayerPrizeDto)
         {
             try
             {
-                var res = await _playerPrizeService.UpdatePlayerPrize(id, playerPrizeDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _playerPrizeService.UpdatePlayerPrize(id, updatePlayerPrizeDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)

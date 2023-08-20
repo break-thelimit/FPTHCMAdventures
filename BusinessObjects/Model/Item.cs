@@ -10,7 +10,7 @@ namespace BusinessObjects.Model
         public Item()
         {
             ExchangeHistories = new HashSet<ExchangeHistory>();
-            ItemIventories = new HashSet<ItemIventory>();
+            ItemInventories = new HashSet<ItemInventory>();
             Tasks = new HashSet<Task>();
         }
 
@@ -21,9 +21,11 @@ namespace BusinessObjects.Model
         public string Type { get; set; }
         public bool? LimitExchange { get; set; }
         public string Status { get; set; }
+        public string ImageUrl { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         public virtual ICollection<ExchangeHistory> ExchangeHistories { get; set; }
-        public virtual ICollection<ItemIventory> ItemIventories { get; set; }
+        public virtual ICollection<ItemInventory> ItemInventories { get; set; }
         public virtual ICollection<Task> Tasks { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
 using DataAccess.Configuration;
+using DataAccess.Dtos.ExchangeHistoryDto;
 using DataAccess.Dtos.InventoryDto;
 using DataAccess.Dtos.ItemInventoryDto;
 using DataAccess.Repositories.InventoryRepositories;
@@ -31,7 +32,7 @@ namespace Service.Services.ItemInventoryService
         public async Task<ServiceResponse<Guid>> CreateNewItemInventory(CreateItemInventoryDto createItemInventoryDto)
         {
             var mapper = config.CreateMapper();
-            var eventTaskcreate = mapper.Map<ItemIventory>(createItemInventoryDto);
+            var eventTaskcreate = mapper.Map<ItemInventory>(createItemInventoryDto);
             eventTaskcreate.Id = Guid.NewGuid();
             await _itemInventoryRepository.AddAsync(eventTaskcreate);
 
@@ -158,14 +159,15 @@ namespace Service.Services.ItemInventoryService
             }
         }
 
-        public async Task<ServiceResponse<string>> UpdateItemInventory(Guid id, UpdateItemInventoryDto ItemInventoryDto)
+        public async Task<ServiceResponse<bool>> UpdateItemInventory(Guid id, UpdateItemInventoryDto ItemInventoryDto)
         {
             try
-            {   
-                ItemInventoryDto.Id = id;
+            {
+             
                 await _itemInventoryRepository.UpdateAsync(id, ItemInventoryDto);
-                return new ServiceResponse<string>
+                return new ServiceResponse<bool>
                 {
+                    Data = true,
                     Message = "Success edit",
                     Success = true,
                     StatusCode = 202
@@ -175,8 +177,9 @@ namespace Service.Services.ItemInventoryService
             {
                 if (!await EventTaskExists(id))
                 {
-                    return new ServiceResponse<string>
+                    return new ServiceResponse<bool>
                     {
+                        Data = false,
                         Message = "Invalid Record Id",
                         Success = false,
                         StatusCode = 500

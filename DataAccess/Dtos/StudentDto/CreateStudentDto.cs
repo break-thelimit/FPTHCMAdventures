@@ -8,5 +8,6 @@ namespace DataAccess.Dtos.StudentDto
 {
     public class CreateStudentDto : BaseStudentDto
     {
+
     }
 }

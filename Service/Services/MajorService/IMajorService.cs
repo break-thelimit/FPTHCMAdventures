@@ -14,12 +14,12 @@ namespace Service.Services.MajorService
         Task<ServiceResponse<IEnumerable<GetMajorDto>>> GetMajor();
         Task<ServiceResponse<MajorDto>> GetMajorById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewMajor(CreateMajorDto createMajorDto);
-        Task<ServiceResponse<string>> UpdateMajor(Guid id, UpdateMajorDto majorDto);
+        Task<ServiceResponse<bool>> UpdateMajor(Guid id, UpdateMajorDto majorDto);
         Task<string> getMajorName(Guid id); 
         Task<ServiceResponse<byte[]>> DownloadExcelTemplate();
         Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file);
 
-        Task<ServiceResponse<string>> DisableMajor(Guid id);
+        Task<ServiceResponse<bool>> DisableMajor(Guid id);
 
     }
 }

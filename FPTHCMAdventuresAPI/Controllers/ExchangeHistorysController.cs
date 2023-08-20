@@ -10,6 +10,7 @@ using Service.Services.ExchangeHistoryService;
 using DataAccess.Dtos.ExchangeHistoryDto;
 using Microsoft.AspNetCore.Authorization;
 using DataAccess.Dtos.ItemInventoryDto;
+using DataAccess.Dtos.EventTaskDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
@@ -17,6 +18,8 @@ namespace FPTHCMAdventuresAPI.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class ExchangeHistorysController : ControllerBase
     {
         private readonly IExchangeHistoryService _exchangeHistoryService;
@@ -57,11 +60,20 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpPost("exchangeHistory", Name = "CreateNewExchangeHistory")]
 
-        public async Task<ActionResult<ServiceResponse<GetExchangeHistoryDto>>> CreateNewExchangeHistory(CreateExchangeHistoryDto answerDto)
+        public async Task<ActionResult<ServiceResponse<GetExchangeHistoryDto>>> CreateNewExchangeHistory( CreateExchangeHistoryDto createExchangeHistoryDto)
         {
             try
             {
-                var res = await _exchangeHistoryService.CreateNewExchangeHistory(answerDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var res = await _exchangeHistoryService.CreateNewExchangeHistory(createExchangeHistoryDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -72,11 +84,19 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<GetExchangeHistoryDto>>> UpdateExchangeHistory(Guid id, [FromBody] UpdateExchangeHistoryDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetExchangeHistoryDto>>> UpdateExchangeHistory(Guid id, [FromBody] UpdateExchangeHistoryDto updateExchangeHistoryDto)
         {
             try
             {
-                var res = await _exchangeHistoryService.UpdateExchangeHistory(id, eventDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _exchangeHistoryService.UpdateExchangeHistory(id, updateExchangeHistoryDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)

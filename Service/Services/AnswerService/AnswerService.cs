@@ -11,9 +11,12 @@ using DataAccess.Repositories.AnswerRepositories;
 using DataAccess.Repositories.EventRepositories;
 using DataAccess.Repositories.NPCRepository;
 using DataAccess.Repositories.QuestionRepositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -43,6 +46,7 @@ namespace Service.Services.AnswerService
             var mapper = config.CreateMapper();
             var eventcreate = mapper.Map<Answer>(createEventDto);
             eventcreate.Id = Guid.NewGuid();
+            eventcreate.AnswerName = createEventDto.AnswerName.Trim();
             await _answerRepository.AddAsync(eventcreate);
 
             return new ServiceResponse<Guid>
@@ -56,14 +60,14 @@ namespace Service.Services.AnswerService
 
         
 
-        public async Task<ServiceResponse<IEnumerable<GetAnswerDto>>> GetAnswer()
+        public async Task<ServiceResponse<IEnumerable<AnswerDto>>> GetAnswer()
         {
-            var eventList = await _answerRepository.GetAllAsync<GetAnswerDto>();
+            var eventList = await _answerRepository.GetAllAsync<AnswerDto>();
            
 
             if (eventList != null)
             {
-                return new ServiceResponse<IEnumerable<GetAnswerDto>>
+                return new ServiceResponse<IEnumerable<AnswerDto>>
                 {
                     Data = eventList,
                     Success = true,
@@ -73,7 +77,7 @@ namespace Service.Services.AnswerService
             }
             else
             {
-                return new ServiceResponse<IEnumerable<GetAnswerDto>>
+                return new ServiceResponse<IEnumerable<AnswerDto>>
                 {
                     Data = null,
                     Success = true,
@@ -156,14 +160,16 @@ namespace Service.Services.AnswerService
             }
         }
 
-        public async Task<ServiceResponse<string>> UpdateAnswer(Guid id, UpdateAnswerDto answerDto)
+        public async Task<ServiceResponse<bool>> UpdateAnswer(Guid id, UpdateAnswerDto answerDto)
         {
             try
             {
-                answerDto.Id = id;
+                answerDto.AnswerName = answerDto.AnswerName.Trim();
+
                 await _answerRepository.UpdateAsync(id, answerDto);
-                return new ServiceResponse<string>
+                return new ServiceResponse<bool>
                 {
+                    Data = true,
                     Message = "Success edit",
                     Success = true,
                     StatusCode = 202
@@ -173,8 +179,9 @@ namespace Service.Services.AnswerService
             {
                 if (!await AnswerExists(id))
                 {
-                    return new ServiceResponse<string>
+                    return new ServiceResponse<bool>
                     {
+                        Data = false,
                         Message = "Invalid Record Id",
                         Success = false,
                         StatusCode = 500
@@ -191,6 +198,141 @@ namespace Service.Services.AnswerService
         private async Task<bool> AnswerExists(Guid id)
         {
             return await _answerRepository.Exists(id);
+        }
+
+        public async Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file)
+        {
+            if (file == null || file.Length <= 0)
+            {
+                return new ServiceResponse<string>
+                {
+                    Data = null,
+                    Message = "No file uploaded.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+
+            if (file.ContentType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            {
+                return new ServiceResponse<string>
+                {
+                    Data = null,
+                    Message = "Invalid file format. Only Excel files are allowed.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+
+            try
+            {
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream);
+                    using (var package = new ExcelPackage(stream))
+                    {
+                        var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+                        if (worksheet != null)
+                        {
+                            var rowCount = worksheet.Dimension.Rows;
+                            var dataList = new List<GetAnswerDto>();
+
+                            for (int row = 2; row <= rowCount; row++)
+                            {
+                                var rawIsRightValue = worksheet.Cells[row, 2].Value?.ToString();
+                                bool isRight;
+
+                                if (!string.IsNullOrEmpty(rawIsRightValue) && bool.TryParse(rawIsRightValue, out isRight))
+                                {
+                                    var data = new GetAnswerDto
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        AnswerName = worksheet.Cells[row, 1].Value?.ToString(),
+                                        IsRight = isRight
+                                    };
+
+                                    dataList.Add(data);
+                                }
+                                else
+                                {
+                                    return new ServiceResponse<string>
+                                    {
+                                        Data = null,
+                                        Message = "Failed to process uploaded file.",
+                                        Success = false,
+                                        StatusCode = 500
+                                    };
+                                }
+                            }
+
+                            var mapper = config.CreateMapper();
+                            var locations = _mapper.Map<List<Answer>>(dataList);
+                            await _answerRepository.AddRangeAsync(locations);
+                            await _answerRepository.SaveChangesAsync();
+                        }
+                    }
+                }
+
+                return new ServiceResponse<string>
+                {
+                    Data = "Upload successful.",
+                    Success = true,
+                    StatusCode = 200
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<string>
+                {
+                    Data = null,
+                    Message = "Failed to process uploaded file.",
+                    Success = false,
+                    StatusCode = 500
+                };
+            }
+        }
+        public byte[] GenerateExcelTemplate()
+        {
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("SampleDataAnswer");
+
+                // Thiết lập header cho các cột
+                worksheet.Cells[1, 1].Value = "Answer Name";
+                worksheet.Cells[1, 2].Value = "isRight";
+
+
+                // Lưu file Excel vào MemoryStream
+                var stream = new MemoryStream(package.GetAsByteArray());
+                return stream.ToArray();
+            }
+        }
+        public async Task<ServiceResponse<byte[]>> DownloadExcelTemplate()
+        {
+            byte[] fileContents;
+            try
+            {
+                fileContents = GenerateExcelTemplate();
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi nếu có
+                return new ServiceResponse<byte[]>
+                {
+                    Data = null,
+                    Message = "Failed to generate Excel template.",
+                    Success = false,
+                    StatusCode = 500
+                };
+            }
+
+            // Trả về file Excel dưới dạng byte array
+            return new ServiceResponse<byte[]>
+            {
+                Data = fileContents,
+                Success = true,
+                StatusCode = 200
+            };
         }
     }
 }

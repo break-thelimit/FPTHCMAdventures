@@ -1,6 +1,7 @@
 ﻿using DataAccess;
 using DataAccess.Dtos.AnswerDto;
 using DataAccess.Dtos.EventDto;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
@@ -12,12 +13,14 @@ namespace Service.Services.AnswerService
 {
     public interface IAnswerService
     {
-        Task<ServiceResponse<IEnumerable<GetAnswerDto>>> GetAnswer();
+        Task<ServiceResponse<IEnumerable<AnswerDto>>> GetAnswer();
         Task<ServiceResponse<IEnumerable<GetAnswerAndQuestionNameDto>>> GetListQuestionByMajorIdAsync(Guid majorId);       
         Task<ServiceResponse<PagedResult<AnswerDto>>> GetAnswerWithPage(QueryParameters queryParameters);
         Task<ServiceResponse<AnswerDto>> GetAnswerById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewAnswer(CreateAnswerDto createAnswerDto);
-        Task<ServiceResponse<string>> UpdateAnswer(Guid id, UpdateAnswerDto eventDto);
+        Task<ServiceResponse<bool>> UpdateAnswer(Guid id, UpdateAnswerDto eventDto);
+        Task<ServiceResponse<byte[]>> DownloadExcelTemplate();
+        Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file);
 
     }
 }

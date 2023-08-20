@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.StudentDto
 {
-    public class UpdateStudentDto : BaseStudentDto, IBaseDto
+    public class UpdateStudentDto : BaseStudentDto
     {
-        public Guid Id { get; set; }
     }
 }

@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.PlayerHistoryDto
 {
-    public class UpdatePlayerHistoryDto : BasePlayerHistoryDto , IBaseDto
+    public class UpdatePlayerHistoryDto : BasePlayerHistoryDto 
     {
-        public Guid Id { get; set; }
     }
 }

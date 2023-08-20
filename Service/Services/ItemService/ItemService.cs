@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
 using DataAccess.Configuration;
+using DataAccess.Dtos.ImageUploadDto;
 using DataAccess.Dtos.ItemDto;
 using DataAccess.Dtos.ItemInventoryDto;
+using DataAccess.Repositories.ImageRepository;
 using DataAccess.Repositories.ItemInventoryRepositories;
 using DataAccess.Repositories.ItemRepositories;
 using Microsoft.EntityFrameworkCore;
@@ -17,21 +19,52 @@ namespace Service.Services.ItemService
     public class ItemService : IItemService
     {
         private readonly IItemRepository _itemRepository;
+        private readonly IImageRepository _imageRepository;
         private readonly IMapper _mapper;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MapperConfig());
         });
-        public ItemService(IItemRepository itemRepository, IMapper mapper)
+        public ItemService(IItemRepository itemRepository, IMapper mapper, IImageRepository imageRepository)
         {
             _itemRepository = itemRepository;
             _mapper = mapper;
+            _imageRepository = imageRepository;
         }
         public async Task<ServiceResponse<Guid>> CreateNewItem(CreateItemDto createItemDto)
         {
+            if (await _itemRepository.ExistsAsync(s => s.Name == createItemDto.Name ))
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "Duplicated data: Item with the same name already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            if (await _itemRepository.ExistsAsync(s => s.ImageUrl == createItemDto.ImageUrl))
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "Duplicated data: Item with the same ImageUrl already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
             var mapper = config.CreateMapper();
             var eventTaskcreate = mapper.Map<Item>(createItemDto);
             eventTaskcreate.Id = Guid.NewGuid();
+            eventTaskcreate.Name = createItemDto.Name.Trim();
+            eventTaskcreate.Description = createItemDto.Description.Trim();
+            eventTaskcreate.Type = createItemDto.Type.Trim();
+            eventTaskcreate.Status = createItemDto.Status.Trim();
+           
+
+            // Tải lên hình ảnh và lưu URL
+            string uploadedImageUrl = await _imageRepository.UploadImageAndReturnUrlAsync(createItemDto.Image);
+
+            eventTaskcreate.ImageUrl = uploadedImageUrl; // Gán URL của hình ảnh cho thuộc tính ImageUrl
+
             await _itemRepository.AddAsync(eventTaskcreate);
 
             return new ServiceResponse<Guid>
@@ -60,7 +93,9 @@ namespace Service.Services.ItemService
             else
             {
                 checkEvent.Status = "INACTIVE";
-                await _itemRepository.UpdateAsync(id, checkEvent);
+                var itemData = _mapper.Map<Item>(checkEvent);
+
+                await _itemRepository.UpdateAsync(id, itemData);
                 return new ServiceResponse<string>
                 {
                     Data = checkEvent.Status,
@@ -71,13 +106,13 @@ namespace Service.Services.ItemService
             }
         }
 
-        public async Task<ServiceResponse<IEnumerable<GetItemDto>>> GetItem()
+        public async Task<ServiceResponse<IEnumerable<ItemDto>>> GetItem()
         {
-            var majorList = await _itemRepository.GetAllAsync<GetItemDto>();
+            var majorList = await _itemRepository.GetAllAsync<ItemDto>();
 
             if (majorList != null)
             {
-                return new ServiceResponse<IEnumerable<GetItemDto>>
+                return new ServiceResponse<IEnumerable<ItemDto>>
                 {
                     Data = majorList,
                     Success = true,
@@ -87,7 +122,7 @@ namespace Service.Services.ItemService
             }
             else
             {
-                return new ServiceResponse<IEnumerable<GetItemDto>>
+                return new ServiceResponse<IEnumerable<ItemDto>>
                 {
                     Data = majorList,
                     Success = false,
@@ -129,14 +164,36 @@ namespace Service.Services.ItemService
             }
         }
 
-        public async Task<ServiceResponse<string>> UpdateItem(Guid id, UpdateItemDto ItemDto)
+        public async Task<ServiceResponse<bool>> UpdateItem(Guid id, UpdateItemDto updateItemDto)
         {
-            try
-            {   
-                ItemDto.Id = id;
-                await _itemRepository.UpdateAsync(id, ItemDto);
-                return new ServiceResponse<string>
+            if (await _itemRepository.ExistsAsync(s => s.Name == updateItemDto.Name && s.Id != id))
+            {
+                return new ServiceResponse<bool>
                 {
+                    Message = "Duplicated data: Item with the same name already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            if (await _itemRepository.ExistsAsync(s => s.ImageUrl == updateItemDto.ImageUrl && s.Id != id))
+            {
+                return new ServiceResponse<bool>
+                {
+                    Message = "Duplicated data: Item with the same ImageUrl already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            try
+            {
+                updateItemDto.Name = updateItemDto.Name.Trim();
+                updateItemDto.Description = updateItemDto.Description.Trim();
+                updateItemDto.Type = updateItemDto.Type.Trim();
+                updateItemDto.Status = updateItemDto.Status.Trim();
+                await _itemRepository.UpdateAsync(id, updateItemDto);
+                return new ServiceResponse<bool>
+                {
+                    Data = true,
                     Message = "Success edit",
                     Success = true,
                     StatusCode = 202
@@ -146,8 +203,9 @@ namespace Service.Services.ItemService
             {
                 if (!await EventTaskExists(id))
                 {
-                    return new ServiceResponse<string>
+                    return new ServiceResponse<bool>
                     {
+                        Data = false,
                         Message = "Invalid Record Id",
                         Success = false,
                         StatusCode = 500

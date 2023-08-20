@@ -24,16 +24,28 @@ namespace Service.Services.PrizeService
             _prizeRepository = prizeRepository;
             _mapper = mapper;
         }
-        public async Task<ServiceResponse<Guid>> CreateNewPrize(CreatePrizeDto createGiftDto)
+        public async Task<ServiceResponse<Guid>> CreateNewPrize(CreatePrizeDto createPrizeDto)
         {
+            if (await _prizeRepository.ExistsAsync(s => s.Name == createPrizeDto.Name))
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "Duplicated data: Prize with the same name already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            createPrizeDto.Description = createPrizeDto.Description.Trim();
+            createPrizeDto.Name = createPrizeDto.Name.Trim();
             var mapper = config.CreateMapper();
-            var eventTaskcreate = mapper.Map<Prize>(createGiftDto);
-            eventTaskcreate.Id = Guid.NewGuid();
-            await _prizeRepository.AddAsync(eventTaskcreate);
+            var createPrize = mapper.Map<Prize>(createPrizeDto);
+            createPrize.Id = Guid.NewGuid();
+           
+            await _prizeRepository.AddAsync(createPrize);
 
             return new ServiceResponse<Guid>
             {
-                Data = eventTaskcreate.Id,
+                Data = createPrize.Id,
                 Message = "Successfully",
                 Success = true,
                 StatusCode = 201
@@ -124,15 +136,25 @@ namespace Service.Services.PrizeService
             }
         }
 
-        public async Task<ServiceResponse<string>> UpdatePrize(Guid id, UpdatePrizeDto giftDto)
+        public async Task<ServiceResponse<bool>> UpdatePrize(Guid id, UpdatePrizeDto updatePrizeDto)
         {
+            if (await _prizeRepository.ExistsAsync(s => s.Name == updatePrizeDto.Name && s.Id != id))
+            {
+                return new ServiceResponse<bool>
+                {
+                    Message = "Duplicated data: Prize with the same name already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
             try
             {
-                giftDto.Id = id;
-               
-                await _prizeRepository.UpdateAsync(id, giftDto);
-                return new ServiceResponse<string>
+                updatePrizeDto.Description = updatePrizeDto.Description.Trim();
+                updatePrizeDto.Name = updatePrizeDto.Name.Trim();
+                await _prizeRepository.UpdateAsync(id, updatePrizeDto);
+                return new ServiceResponse<bool>
                 {
+                    Data = true,
                     Message = "Success edit",
                     Success = true,
                     StatusCode = 202
@@ -142,8 +164,9 @@ namespace Service.Services.PrizeService
             {
                 if (!await PrizeExists(id))
                 {
-                    return new ServiceResponse<string>
+                    return new ServiceResponse<bool>
                     {
+                        Data = false,
                         Message = "Invalid Record Id",
                         Success = false,
                         StatusCode = 500
@@ -163,27 +186,27 @@ namespace Service.Services.PrizeService
             return await _prizeRepository.Exists(id);
         }
 
-        public async Task<ServiceResponse<string>> DisablePrize(Guid id)
+        public async Task<ServiceResponse<bool>> DisablePrize(Guid id)
         {
             var checkEvent = await _prizeRepository.GetAsync<PrizeDto>(id);
 
             if (checkEvent == null)
             {
-                return new ServiceResponse<string>
+                return new ServiceResponse<bool>
                 {
-                    Data = "null",
-                    Message = "Success",
-                    StatusCode = 200,
+                    Data = false,
+                    Message = "Failed",
+                    StatusCode = 400,
                     Success = true
                 };
             }
             else
             {
                 checkEvent.Status = "INACTIVE";
-/*                await _prizeRepository.UpdateAsync(id, checkEvent);
-*/                return new ServiceResponse<string>
+               await _prizeRepository.UpdateAsync(id, checkEvent);
+               return new ServiceResponse<bool>
                 {
-                    Data = checkEvent.Status,
+                    Data = true,
                     Message = "Success",
                     StatusCode = 200,
                     Success = true

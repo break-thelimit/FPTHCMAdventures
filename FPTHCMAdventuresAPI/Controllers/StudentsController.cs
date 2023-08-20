@@ -9,9 +9,11 @@ using System.Threading.Tasks;
 using System;
 using DataAccess.Dtos.StudentDto;
 using DataAccess;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class StudentsController : ControllerBase
@@ -39,13 +41,13 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
         }
 
-        [HttpGet("GetStudentBySchoolId/{id}")]
+        [HttpGet("GetStudentBySchoolId/{schoolId}")]
 
-        public async Task<ActionResult<ServiceResponse<StudentDto>>> GetStudentListBySchoolId(Guid id)
+        public async Task<ActionResult<ServiceResponse<StudentDto>>> GetStudentListBySchoolId(Guid schoolId)
         {
             try
             {
-                var res = await _studentService.GetStudentBySchoolId(id);
+                var res = await _studentService.GetStudentBySchoolId(schoolId);
                 return Ok(res);
             }
             catch (Exception ex)
@@ -74,14 +76,29 @@ namespace FPTHCMAdventuresAPI.Controllers
             var eventDetail = await _studentService.GetStudentById(id);
             return Ok(eventDetail);
         }
+        [HttpGet]
+        [Route("{schoolId}/{eventId}")]
+        public async Task<ActionResult<StudentDto>> GetStudentBySchoolIdAndEventId(Guid schoolId, Guid eventId)
+        {
+            var eventDetail = await _studentService.GetStudentBySchoolIdAndEventId(schoolId,eventId);
+            return Ok(eventDetail);
+        }
 
         [HttpPost("student", Name = "CreateNewStudent")]
 
-        public async Task<ActionResult<ServiceResponse<StudentDto>>> CreateNewStudent(CreateStudentDto studentDto)
+        public async Task<ActionResult<ServiceResponse<GetStudentDto>>> CreateNewStudent( CreateStudentDto studentDto)
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
                 var res = await _studentService.CreateNewStudent(studentDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -90,13 +107,23 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<SchoolDto>>> UpdateStudent(Guid id, [FromBody] UpdateStudentDto studentDto)
+        public async Task<ActionResult<ServiceResponse<GetStudentDto>>> UpdateStudent(Guid id, [FromBody] UpdateStudentDto studentDto)
+
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
                 var res = await _studentService.UpdateStudent(id, studentDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -106,10 +133,10 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
         }
 
-        [HttpPost("upload-excel-student")]
-        public async Task<IActionResult> UploadExcel(IFormFile file)
+        [HttpPost("student-getbyschool")]
+        public async Task<IActionResult> UploadExcel(IFormFile file,Guid schoolid)
         {
-            var serviceResponse = await _studentService.ImportDataFromExcel(file);
+            var serviceResponse = await _studentService.ImportDataFromExcel(file, schoolid);
 
             if (serviceResponse.Success)
             {
@@ -133,7 +160,7 @@ namespace FPTHCMAdventuresAPI.Controllers
                 // Trả về file Excel dưới dạng response
                 return new FileContentResult(serviceResponse.Data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
                 {
-                    FileDownloadName = "SampleData.xlsx"
+                    FileDownloadName = "SampleDataStudent.xlsx"
                 };
             }
             else
@@ -141,6 +168,13 @@ namespace FPTHCMAdventuresAPI.Controllers
                 // Xử lý lỗi nếu có
                 return BadRequest(serviceResponse.Message);
             }
+        }
+
+        [HttpGet("export/{schoolId}")]
+        public async Task<IActionResult> ExportLocationsToExcel(Guid schoolId)
+        {
+            var excelData = await _studentService.ExportDataToExcelStudent(schoolId);
+            return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Students.xlsx");
         }
     }
 }

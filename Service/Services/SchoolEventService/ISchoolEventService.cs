@@ -10,9 +10,12 @@ namespace Service.Services.SchoolEventService
 {
     public interface ISchoolEventService
     {
-        Task<ServiceResponse<IEnumerable<GetSchoolEventDto>>> GetSchoolEvent();
+        Task<ServiceResponse<IEnumerable<SchoolEventDto>>> GetSchoolEvent();
         Task<ServiceResponse<SchoolEventDto>> GetSchoolEventById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewSchoolEvent(CreateSchoolEventDto createSchoolEventDto);
-        Task<ServiceResponse<string>> UpdateSchoolEvent(Guid id, UpdateSchoolEventDto schoolEventDto);
+        Task<ServiceResponse<bool>> UpdateSchoolEvent(Guid id, UpdateSchoolEventDto schoolEventDto);
+
+        Task<ServiceResponse<List<GetSchoolDto>>> GetSchoolByEventId(Guid eventid);
+
     }
 }

@@ -17,6 +17,8 @@ namespace FPTHCMAdventuresAPI.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class PrizesController : ControllerBase
     {
         private readonly IPrizeService _prizeService;
@@ -67,11 +69,19 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpPost("Gift", Name = "CreateNewGift")]
 
-        public async Task<ActionResult<ServiceResponse<PrizeDto>>> CreateNewGift(CreatePrizeDto answerDto)
+        public async Task<ActionResult<ServiceResponse<GetPrizeDto>>> CreateNewGift( CreatePrizeDto createPrizeDto)
         {
             try
             {
-                var res = await _prizeService.CreateNewPrize(answerDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _prizeService.CreateNewPrize(createPrizeDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -82,11 +92,19 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<PrizeDto>>> UpdateGift(Guid id, [FromBody] UpdatePrizeDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetPrizeDto>>> UpdateGift(Guid id, [FromBody] UpdatePrizeDto updatePrizeDto)
         {
             try
             {
-                var res = await _prizeService.UpdatePrize(id, eventDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _prizeService.UpdatePrize(id, updatePrizeDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
