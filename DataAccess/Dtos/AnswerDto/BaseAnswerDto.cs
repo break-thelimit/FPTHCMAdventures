@@ -1,14 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Dtos.AnswerDto
 {
     public abstract class BaseAnswerDto
     {
-        public string AnswerName { get; set; }
-        public bool IsRight { get; set; }
+        private string answerName;
+        private bool isRight;
+        private Guid? questionId;
+
+        [Required]
+        public string AnswerName
+        {
+            get { return answerName; }
+            set { answerName = value; }
+        }
+
+        [Required]
+        public bool IsRight
+        {
+            get { return isRight; }
+            set { isRight = value; }
+        }
+
+        [Required]
+        public Guid? QuestionId
+        {
+            get { return questionId; }
+            set { questionId = value; }
+        }
     }
 }

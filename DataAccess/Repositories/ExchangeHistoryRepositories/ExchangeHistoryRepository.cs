@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
 using DataAccess.Dtos.ExchangeHistoryDto;
+using DataAccess.Dtos.ItemInventoryDto;
 using DataAccess.GenericRepositories;
 using DataAccess.Repositories.EventTaskRepositories;
 using Microsoft.EntityFrameworkCore;
@@ -14,28 +15,26 @@ namespace DataAccess.Repositories.ExchangeHistoryRepositories
 {
     public class ExchangeHistoryRepository : GenericRepository<ExchangeHistory>, IExchangeHistoryRepository
     {
-        private readonly FPTHCMAdventuresDBContext _dbContext;
+        private readonly db_a9c31b_capstoneContext _dbContext;
         private readonly IMapper _mapper;
 
-        public ExchangeHistoryRepository(FPTHCMAdventuresDBContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        public ExchangeHistoryRepository(db_a9c31b_capstoneContext dbContext, IMapper mapper) : base(dbContext, mapper)
         {
             _dbContext = dbContext;
             _mapper = mapper;
         }
-
-        public async Task<List<GetExchangeHistoryDto>> GetAllExchangeHistoryRepository()
+        public async Task<ExchangeHistoryDto> getExchangeByItemName(string itemName)
         {
-            var userlist1 = await _dbContext.ExchangeHistories.Include(x => x.Player).Include(r => r.Item).Select(x => new GetExchangeHistoryDto
-            {
-                Id = x.Id,
-                PlayerId=x.PlayerId,
-                PlayerNickname=x.Player.Nickname,
-                ItemId=x.ItemId,
-                ItemName=x.Item.Name,
-                ExchangeDate=x.ExchangeDate
-            }).ToListAsync();
-            return userlist1;
+            var getItemByName = await _dbContext.ExchangeHistories
+                       .Include(x => x.Item) // Chắc chắn rằng bạn đã Include bảng Item để có thể truy cập vào thông tin của nó
+                       .Where(x => x.Item.Name == itemName)
+                       .FirstOrDefaultAsync();
+
+            // Ánh xạ từ ItemIventories sang ItemInventoryDto bằng AutoMapper
+            ExchangeHistoryDto itemDto = _mapper.Map<ExchangeHistoryDto>(getItemByName);
+            return itemDto;
         }
+
 
     }
 }

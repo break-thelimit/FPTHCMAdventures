@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
 using DataAccess.Configuration;
-using DataAccess.Dtos.GiftDto;
 using DataAccess.Dtos.InventoryDto;
-using DataAccess.Repositories.GiftRepositories;
 using DataAccess.Repositories.InventoryRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -27,10 +25,19 @@ namespace Service.Services.InventoryService
             _inventoryRepository = inventoryRepository;
             _mapper = mapper;
         }
-        public async Task<ServiceResponse<Guid>> CreateNewInventory(CreateInventoryDto createGiftDto)
+        public async Task<ServiceResponse<Guid>> CreateNewInventory(CreateInventoryDto createInventoryDto)
         {
+            if (await _inventoryRepository.ExistsAsync(inv => inv.PlayerId == createInventoryDto.PlayerId))
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "An Inventory with the same playerId already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
             var mapper = config.CreateMapper();
-            var eventTaskcreate = mapper.Map<Inventory>(createGiftDto);
+            var eventTaskcreate = mapper.Map<Inventory>(createInventoryDto);
             eventTaskcreate.Id = Guid.NewGuid();
             await _inventoryRepository.AddAsync(eventTaskcreate);
 
@@ -101,14 +108,24 @@ namespace Service.Services.InventoryService
             }
         }
 
-        public async Task<ServiceResponse<string>> UpdateInventory(Guid id, UpdateInventoryDto giftDto)
+        public async Task<ServiceResponse<bool>> UpdateInventory(Guid id, UpdateInventoryDto updateInventoryDto)
         {
-            try
-            {   
-                giftDto.Id = id;
-                await _inventoryRepository.UpdateAsync(id, giftDto);
-                return new ServiceResponse<string>
+            if (await _inventoryRepository.ExistsAsync(inv => inv.PlayerId == updateInventoryDto.PlayerId))
+            {
+                return new ServiceResponse<bool>
                 {
+                    Message = "An Inventory with the same playerId already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            try
+            {
+
+                await _inventoryRepository.UpdateAsync(id, updateInventoryDto);
+                return new ServiceResponse<bool>
+                {
+                    Data = true,
                     Message = "Success edit",
                     Success = true,
                     StatusCode = 202
@@ -118,8 +135,9 @@ namespace Service.Services.InventoryService
             {
                 if (!await EventTaskExists(id))
                 {
-                    return new ServiceResponse<string>
+                    return new ServiceResponse<bool>
                     {
+                        Data = false,
                         Message = "Invalid Record Id",
                         Success = false,
                         StatusCode = 500
@@ -135,5 +153,6 @@ namespace Service.Services.InventoryService
         {
             return await _inventoryRepository.Exists(id);
         }
+
     }
 }

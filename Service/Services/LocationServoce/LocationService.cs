@@ -4,6 +4,8 @@ using DataAccess;
 using DataAccess.Configuration;
 using DataAccess.Dtos.AnswerDto;
 using DataAccess.Dtos.EventTaskDto;
+using DataAccess.Dtos.ItemDto;
+using DataAccess.Dtos.ItemInventoryDto;
 using DataAccess.Dtos.LocationDto;
 using DataAccess.Dtos.MajorDto;
 using DataAccess.Repositories.LocationRepositories;
@@ -35,16 +37,27 @@ namespace Service.Services.LocationServoce
             _locationRepository = locationRepository;
             _mapper = mapper;
         }
-        public async Task<ServiceResponse<Guid>> CreateNewLocation(CreateLocationDto createEventTaskDto)
+        public async Task<ServiceResponse<Guid>> CreateNewLocation(CreateLocationDto createLocationDto)
         {
+            if (await _locationRepository.ExistsAsync(s => s.LocationName == createLocationDto.LocationName))
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "Duplicated data: Location with the same name already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            
             var mapper = config.CreateMapper();
-            var eventTaskcreate = mapper.Map<Location>(createEventTaskDto);
-            eventTaskcreate.Id = Guid.NewGuid();
-            await _locationRepository.AddAsync(eventTaskcreate);
+            var createLocation = mapper.Map<Location>(createLocationDto);
+            createLocation.Id = Guid.NewGuid();
+            createLocation.LocationName = createLocationDto.LocationName.Trim();
+            await _locationRepository.AddAsync(createLocation);
 
             return new ServiceResponse<Guid>
             {
-                Data = eventTaskcreate.Id,
+                Data = createLocation.Id,
                 Message = "Successfully",
                 Success = true,
                 StatusCode = 201
@@ -109,14 +122,24 @@ namespace Service.Services.LocationServoce
             }
         }
 
-        public async Task<ServiceResponse<string>> UpdateLocation(Guid id, UpdateLocationDto eventTaskDto)
+        public async Task<ServiceResponse<bool>> UpdateLocation(Guid id, UpdateLocationDto updateLocationDto)
         {
+            if (await _locationRepository.ExistsAsync(s => s.LocationName == updateLocationDto.LocationName && s.Id != id))
+            {
+                return new ServiceResponse<bool>
+                {
+                    Message = "Duplicated data: Location with the same name already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
             try
             {
-                eventTaskDto.Id = id;
-                await _locationRepository.UpdateAsync(id, eventTaskDto);
-                return new ServiceResponse<string>
+                updateLocationDto.LocationName = updateLocationDto.LocationName.Trim();
+                await _locationRepository.UpdateAsync(id, updateLocationDto);
+                return new ServiceResponse<bool>
                 {
+                    Data = true,
                     Message = "Success edit",
                     Success = true,
                     StatusCode = 202
@@ -126,8 +149,9 @@ namespace Service.Services.LocationServoce
             {
                 if (!await EventTaskExists(id))
                 {
-                    return new ServiceResponse<string>
+                    return new ServiceResponse<bool>
                     {
+                        Data = false,
                         Message = "Invalid Record Id",
                         Success = false,
                         StatusCode = 500
@@ -188,8 +212,8 @@ namespace Service.Services.LocationServoce
                                     X = Convert.ToDouble(worksheet.Cells[row, 1].Value),
                                     Y = Convert.ToDouble(worksheet.Cells[row, 2].Value),
                                     Z = Convert.ToDouble(worksheet.Cells[row, 3].Value),
-                                    LocationName = worksheet.Cells[row, 4].Value.ToString(),
-                                    Status = worksheet.Cells[row, 5].Value.ToString()
+                                    LocationName = worksheet.Cells[row, 4].Value.ToString().Trim(),
+                                    Status = worksheet.Cells[row, 5].Value.ToString().Trim()
                                 };
 
                                 dataList.Add(data);
@@ -223,11 +247,42 @@ namespace Service.Services.LocationServoce
                 };
             }
         }
+        public async Task<byte[]> ExportDataToExcel()
+        {
+            var dataList = await _locationRepository.GetAllAsync<GetLocationDto>(); // Replace with your repository method to get all locations
+
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Locations");
+
+                // Add header row
+                worksheet.Cells[1, 1].Value = "X";
+                worksheet.Cells[1, 2].Value = "Y";
+                worksheet.Cells[1, 3].Value = "Z";
+                worksheet.Cells[1, 4].Value = "LocationName";
+                worksheet.Cells[1, 5].Value = "Status";
+
+                // Populate data rows
+                for (int row = 0; row < dataList.Count; row++)
+                {
+                    var location = dataList[row];
+                    worksheet.Cells[row + 2, 1].Value = location.X;
+                    worksheet.Cells[row + 2, 2].Value = location.Y;
+                    worksheet.Cells[row + 2, 3].Value = location.Z;
+                    worksheet.Cells[row + 2, 4].Value = location.LocationName;
+                    worksheet.Cells[row + 2, 5].Value = location.Status;
+                }
+
+                // Convert the package to a byte array
+                byte[] excelData = package.GetAsByteArray();
+                return excelData;
+            }
+        }
         public byte[] GenerateExcelTemplate()
         {
             using (var package = new ExcelPackage())
             {
-                var worksheet = package.Workbook.Worksheets.Add("SampleData");
+                var worksheet = package.Workbook.Worksheets.Add("SampleDataLocation");
 
                 // Thiết lập header cho các cột
                 worksheet.Cells[1, 1].Value = "X";
@@ -279,6 +334,36 @@ namespace Service.Services.LocationServoce
                 StatusCode = 200,
                 Success = true
             };
+        }
+
+        public async Task<ServiceResponse<bool>> DisableLocation(Guid id)
+        {
+            var checkEvent = await _locationRepository.GetAsync<LocationDto>(id);
+
+            if (checkEvent == null)
+            {
+                return new ServiceResponse<bool>
+                {
+                    Data = false,
+                    Message = "Failed",
+                    StatusCode = 400,
+                    Success = true
+                };
+            }
+            else
+            {
+                checkEvent.Status = "INACTIVE";
+                var locationData = _mapper.Map<Location>(checkEvent);
+
+                await _locationRepository.UpdateAsync(id, locationData);
+                return new ServiceResponse<bool>
+                {
+                    Data = true,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
         }
     }
 }

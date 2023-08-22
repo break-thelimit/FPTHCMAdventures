@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
 using DataAccess.Configuration;
+using DataAccess.Dtos.EventDto;
 using DataAccess.Dtos.MajorDto;
 using DataAccess.Dtos.NPCDto;
 using DataAccess.Repositories.MajorRepositories;
@@ -28,15 +29,28 @@ namespace Service.Services.NpcService
             _npcRepository = npcRepository;
             _mapper = mapper;
         }
-        public async Task<ServiceResponse<Guid>> CreateNewNpc(CreateNpcDto createMajorDto)
+        public async Task<ServiceResponse<Guid>> CreateNewNpc(CreateNpcDto createNpcDto)
         {
-            var eventTaskcreate = _mapper.Map<Npc>(createMajorDto);
-            eventTaskcreate.Id = Guid.NewGuid();
-            await _npcRepository.AddAsync(eventTaskcreate);
+            if (await _npcRepository.ExistsAsync(s => s.Name == createNpcDto.Name))
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "Duplicated data: NPC with the same name already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            createNpcDto.Introduce = createNpcDto.Introduce.Trim();
+            createNpcDto.Name = createNpcDto.Name.Trim();
+            createNpcDto.Status = createNpcDto.Status.Trim();
+            var createNpc = _mapper.Map<Npc>(createNpcDto);
+            createNpc.Id = Guid.NewGuid();
+
+            await _npcRepository.AddAsync(createNpc);
 
             return new ServiceResponse<Guid>
             {
-                Data = eventTaskcreate.Id,
+                Data = createNpc.Id,
                 Message = "Successfully",
                 Success = true,
                 StatusCode = 201
@@ -49,7 +63,7 @@ namespace Service.Services.NpcService
             {
 
                 var eventDetail = await _npcRepository.GetAsync<NpcDto>(eventId);
-
+               
                 if (eventDetail == null)
                 {
 
@@ -101,14 +115,26 @@ namespace Service.Services.NpcService
             }
         }
 
-        public async Task<ServiceResponse<string>> UpdateNpc(Guid id, UpdateNpcDto majorDto)
+        public async Task<ServiceResponse<bool>> UpdateNpc(Guid id, UpdateNpcDto updateNpcDto)
         {
-            try
-            {   
-                majorDto.Id = id;
-                await _npcRepository.UpdateAsync(id, majorDto);
-                return new ServiceResponse<string>
+            if (await _npcRepository.ExistsAsync(s => s.Name == updateNpcDto.Name))
+            {
+                return new ServiceResponse<bool>
                 {
+                    Message = "Duplicated data: NPC with the same name already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            try
+            {
+                updateNpcDto.Introduce = updateNpcDto.Introduce.Trim();
+                updateNpcDto.Name = updateNpcDto.Name.Trim();
+                updateNpcDto.Status = updateNpcDto.Status.Trim();
+                await _npcRepository.UpdateAsync(id, updateNpcDto);
+                return new ServiceResponse<bool>
+                {
+                    Data = true,
                     Message = "Success edit",
                     Success = true,
                     StatusCode = 202
@@ -118,8 +144,9 @@ namespace Service.Services.NpcService
             {
                 if (!await EventTaskExists(id))
                 {
-                    return new ServiceResponse<string>
+                    return new ServiceResponse<bool>
                     {
+                        Data = false,
                         Message = "Invalid Record Id",
                         Success = false,
                         StatusCode = 500
@@ -165,6 +192,35 @@ namespace Service.Services.NpcService
             {
 
                 throw new Exception(ex.Message);
+            }
+        }
+        public async Task<ServiceResponse<bool>> DisableNpc(Guid id)
+        {
+            var checkEvent = await _npcRepository.GetAsync<NpcDto>(id);
+
+            if (checkEvent == null)
+            {
+                return new ServiceResponse<bool>
+                {
+                    Data = false,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            else
+            {
+                checkEvent.Status = "INACTIVE";
+                var npcData = _mapper.Map<Npc>(checkEvent);
+
+                await _npcRepository.UpdateAsync(id, npcData);
+                return new ServiceResponse<bool>
+                {
+                    Data = true,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
             }
         }
     }

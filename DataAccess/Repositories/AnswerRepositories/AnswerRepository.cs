@@ -13,10 +13,10 @@ namespace DataAccess.Repositories.AnswerRepositories
 {
     public class AnswerRepository : GenericRepository<Answer> , IAnswerRepository
     {
-        private readonly FPTHCMAdventuresDBContext _dbContext;
+        private readonly db_a9c31b_capstoneContext _dbContext;
         private readonly IMapper _mapper;
 
-        public AnswerRepository(FPTHCMAdventuresDBContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        public AnswerRepository(db_a9c31b_capstoneContext dbContext, IMapper mapper) : base(dbContext, mapper)
         {
             _dbContext = dbContext;
             _mapper = mapper;
@@ -36,49 +36,49 @@ namespace DataAccess.Repositories.AnswerRepositories
                     .Where(q => q.MajorId == majorId)
                     .ToListAsync();
 
-                var questionDtos = questions.Select(question =>
-                {
-                    var correctAnswer = _dbContext.Set<Answer>()
-                        .FirstOrDefault(a => a.Id == question.AnswerId);
+                var random = new Random();
 
-                    var incorrectAnswers = _dbContext.Set<Answer>()
-                        .Where(a => a.Id != question.AnswerId)
-                        .ToList();
-
-                    // Randomize the incorrect answers
-                    var random = new Random();
-                    var randomIncorrectAnswers = incorrectAnswers
-                        .OrderBy(a => random.Next())
-                        .Take(3)
-                        .ToList();
-
-                    var answerDtos = new List<AnswerDto>();
-                    answerDtos.Add(new AnswerDto
+                var questionDtos = questions
+                    .OrderBy(q => random.Next())
+                    .Take(5)
+                    .Select(question =>
                     {
-                        Id = correctAnswer.Id,
-                        AnswerName = correctAnswer.AnswerName,
-                        IsRight = true
-                    });
-                    answerDtos.AddRange(randomIncorrectAnswers.Select(a => new AnswerDto
-                    {
-                        Id = a.Id,
-                        AnswerName = a.AnswerName,
-                    }));
+                        var answers = _dbContext.Set<Answer>()
+                            .Where(a => a.QuestionId == question.Id)
+                            .ToList();
 
-                    return new GetAnswerAndQuestionNameDto
-                    {
-                        QuestionName = question.Name,
-                        answerDtos = answerDtos
-                    };
-                }).ToList();
+                        var randomizedAnswers = answers
+                            .OrderBy(a => random.Next())
+                            .ToList();
+
+                        var correctAnswer = randomizedAnswers.FirstOrDefault(a => a.IsRight);
+                        var correctAnswerIndex = randomizedAnswers.IndexOf(correctAnswer);
+
+                        var answerDtos = randomizedAnswers.Select(a => new GetAnswerListDto
+                        {
+                            Id = a.Id,
+                            AnswerName = a.AnswerName,
+                            IsRight = a.IsRight
+                        }).ToList();
+
+                        if (answerDtos.Count < 2)
+                        {
+                            return null; // Không đủ số lượng câu trả lời, không hiển thị câu hỏi
+                        }
+
+                        return new GetAnswerAndQuestionNameDto
+                        {
+                            QuestionName = question.Name,
+                            AnswerDtos = answerDtos,
+                            CorrectAnswerIndex = correctAnswerIndex
+                        };
+                    })
+                    .Where(q => q != null) // Lọc bỏ những câu hỏi không có đủ câu trả lời
+                    .ToList();
 
                 return questionDtos;
             }
         }
-
-       
-
-       
 
     }
 }

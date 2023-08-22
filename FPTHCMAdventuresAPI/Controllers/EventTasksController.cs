@@ -10,11 +10,17 @@ using Service.Services.EventTaskService;
 using System.Threading.Tasks;
 using System;
 using DataAccess.Dtos.EventTaskDto;
+using Microsoft.AspNetCore.Authorization;
+using DataAccess.Dtos.TaskDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class EventTasksController : ControllerBase
     {
         private readonly IEventTaskService _eventTaskService;
@@ -29,7 +35,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpGet(Name = "GetEventTaskList")]
 
-        public async Task<ActionResult<ServiceResponse<GetEventTaskDto>>> GetEventTaskList()
+        public async Task<ActionResult<ServiceResponse<EventTaskDto>>> GetEventTaskList()
         {
             try
             {
@@ -56,11 +62,19 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPost("eventtask", Name = "CreateNewEventTask")]
 
-        public async Task<ActionResult<ServiceResponse<EventDto>>> CreateNewEvent(CreateEventTaskDto eventTaskDto)
+        public async Task<ActionResult<ServiceResponse<GetEventTaskDto>>> CreateNewEventTask( CreateEventTaskDto createEventTaskDto)
         {
             try
             {
-                var res = await _eventTaskService.CreateNewEventTask(eventTaskDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _eventTaskService.CreateNewEventTask(createEventTaskDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -71,11 +85,36 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<EventDto>>> UpdateEvent(Guid id, [FromBody] UpdateEventTaskDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetEventTaskDto>>> UpdateEvent(Guid id, [FromBody] UpdateEventTaskDto updateEventDto)
         {
             try
             {
-                var res = await _eventTaskService.UpdateTaskEvent(id, eventDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _eventTaskService.UpdateTaskEvent(id, updateEventDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+      
+
+        [HttpGet("GetTaskByEventTaskWithEventId/{eventId}")]
+
+        public async Task<ActionResult<ServiceResponse<GetTaskByEventIdDto>>> GetTaskByEventTaskWithEventId(Guid eventId)
+        {
+            try
+            {
+                var res = await _eventTaskService.GetTaskByEventTaskWithEventId(eventId);
                 return Ok(res);
             }
             catch (Exception ex)

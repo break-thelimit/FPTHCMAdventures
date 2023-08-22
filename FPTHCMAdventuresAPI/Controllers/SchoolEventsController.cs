@@ -1,18 +1,22 @@
 ﻿using AutoMapper;
-using DataAccess.Dtos.RoleDto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Service.Services.RoleService;
 using Service;
 using System.Threading.Tasks;
 using System;
 using Service.Services.SchoolEventService;
 using DataAccess.Dtos.SchoolEventDto;
+using Microsoft.AspNetCore.Authorization;
+using DataAccess.Dtos.SchoolDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class SchoolEventsController : ControllerBase
     {
         private readonly ISchoolEventService _schoolEventService;
@@ -27,7 +31,7 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpGet(Name = "GetSchoolEvent")]
 
-        public async Task<ActionResult<ServiceResponse<GetSchoolEventDto>>> GetSchoolEventList()
+        public async Task<ActionResult<ServiceResponse<SchoolEventDto>>> GetSchoolEventList()
         {
             try
             {
@@ -48,11 +52,19 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpPost("schoolevent", Name = "CreateNewSchoolEvent")]
 
-        public async Task<ActionResult<ServiceResponse<SchoolEventDto>>> CreateNewSchoolEvent(CreateSchoolEventDto answerDto)
+        public async Task<ActionResult<ServiceResponse<GetSchoolEventDto>>> CreateNewSchoolEvent( CreateSchoolEventDto createSchoolEventDto)
         {
             try
             {
-                var res = await _schoolEventService.CreateNewSchoolEvent(answerDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _schoolEventService.CreateNewSchoolEvent(createSchoolEventDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -63,16 +75,38 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<SchoolEventDto>>> UpdateSchoolEvent(Guid id, [FromBody] UpdateSchoolEventDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetSchoolEventDto>>> UpdateSchoolEvent(Guid id, [FromBody] UpdateSchoolEventDto updateSchoolEventDto)
         {
             try
             {
-                var res = await _schoolEventService.UpdateSchoolEvent(id, eventDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _schoolEventService.UpdateSchoolEvent(id, updateSchoolEventDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
             {
 
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        [HttpGet("GetSchoolByEventId/{id}")]
+
+        public async Task<ActionResult<ServiceResponse<GetSchoolDto>>> GetSchoolByEventId(Guid id)
+        {
+            try
+            {
+                var res = await _schoolEventService.GetSchoolByEventId(id);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }

@@ -7,21 +7,20 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.Users
 {
-    public class UserWithToken : User
+    public class UserWithToken : Student
     {
         
         public string AccessToken { get; set; }
         public string RefreshToken { get; set; }
         public string ValidateCode { get;set; }
 
-    public UserWithToken(User user)
+    public UserWithToken(Student user)
     {
         this.Id = user.Id;
         this.Email = user.Email;
-        this.PhoneNumber = user.PhoneNumber;
+        this.Phonenumber = user.Phonenumber;
         this.Fullname = user.Fullname;
-        this.Gender = user.Gender;
-        this.Username = user.Username;
+        this.GraduateYear = user.GraduateYear;
     }
 }
 }

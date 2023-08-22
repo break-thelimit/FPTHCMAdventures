@@ -11,11 +11,13 @@ namespace Service.Services.TaskService
     public interface ITaskService
     {
         Task<ServiceResponse<IEnumerable<TaskDto>>> GetTask();
-        Task<ServiceResponse<TaskDto>> GetTaskById(Guid eventId);
+        Task<ServiceResponse<GetTaskDto>> GetTaskById(Guid eventId);
 
         Task<ServiceResponse<Guid>> CreateNewTask(CreateTaskDto createEventDto);
-        Task<ServiceResponse<string>> UpdateTask(Guid id, UpdateTaskDto updateTaskDto);
-        Task<ServiceResponse<IEnumerable<BusinessObjects.Model.Task>>> GetTaskDoneByMajor(Guid majorId);
+        Task<ServiceResponse<bool>> UpdateTask(Guid id, UpdateTaskDto updateTaskDto);
+/*        Task<ServiceResponse<IEnumerable<BusinessObjects.Model.Task>>> GetTaskDoneByMajor(Guid majorId);
+*/
+        Task<ServiceResponse<bool>> DisableTask(Guid id);
 
     }
 }

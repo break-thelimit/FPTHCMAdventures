@@ -1,5 +1,4 @@
-﻿using DataAccess.Dtos.GiftDto;
-using DataAccess.Dtos.InventoryDto;
+﻿using DataAccess.Dtos.InventoryDto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +12,6 @@ namespace Service.Services.InventoryService
         Task<ServiceResponse<IEnumerable<GetInventoryDto>>> GetInventory();
         Task<ServiceResponse<InventoryDto>> GetInventoryById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewInventory(CreateInventoryDto createGiftDto);
-        Task<ServiceResponse<string>> UpdateInventory(Guid id, UpdateInventoryDto giftDto);
+        Task<ServiceResponse<bool>> UpdateInventory(Guid id, UpdateInventoryDto giftDto);
     }
 }

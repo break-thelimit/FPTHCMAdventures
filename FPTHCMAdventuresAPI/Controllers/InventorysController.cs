@@ -1,20 +1,24 @@
 ﻿using AutoMapper;
 using DataAccess.Dtos.AnswerDto;
 using DataAccess.Dtos.ExchangeHistoryDto;
-using DataAccess.Dtos.GiftDto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Service.Services.GiftService;
 using Service;
 using System.Threading.Tasks;
 using System;
 using Service.Services.InventoryService;
 using DataAccess.Dtos.InventoryDto;
+using Microsoft.AspNetCore.Authorization;
+using DataAccess.Dtos.EventDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class InventorysController : ControllerBase
     {
         private readonly IInventoryService _inventoryService;
@@ -50,11 +54,20 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpPost("inventory", Name = "CreateNewInventory")]
 
-        public async Task<ActionResult<ServiceResponse<InventoryDto>>> CreateNewInventory(CreateInventoryDto answerDto)
+        public async Task<ActionResult<ServiceResponse<GetInventoryDto>>> CreateNewInventory(CreateInventoryDto createInventoryDto)
         {
             try
             {
-                var res = await _inventoryService.CreateNewInventory(answerDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _inventoryService.CreateNewInventory(createInventoryDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
+
                 return Ok(res);
             }
             catch (Exception ex)
@@ -65,11 +78,19 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<InventoryDto>>> UpdateInventory(Guid id, [FromBody] UpdateInventoryDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetInventoryDto>>> UpdateInventory(Guid id, [FromBody] UpdateInventoryDto updateInventoryDto)
         {
             try
             {
-                var res = await _inventoryService.UpdateInventory(id, eventDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _inventoryService.UpdateInventory(id, updateInventoryDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -78,5 +99,7 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+
+       
     }
 }

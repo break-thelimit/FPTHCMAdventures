@@ -13,7 +13,7 @@ namespace Service.Services.ItemInventoryService
         Task<ServiceResponse<IEnumerable<GetItemInventoryDto>>> GetItemInventory();
         Task<ServiceResponse<ItemInventoryDto>> GetItemInventoryById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewItemInventory(CreateItemInventoryDto createItemInventoryDto);
-        Task<ServiceResponse<string>> UpdateItemInventory(Guid id, UpdateItemInventoryDto ItemInventoryDto);
+        Task<ServiceResponse<bool>> UpdateItemInventory(Guid id, UpdateItemInventoryDto ItemInventoryDto);
         Task<ServiceResponse<ItemInventoryDto>> GetItemByItemName(string itemName);
 
         Task<ServiceResponse<GetListItemInventoryByPlayer>> getListItemInventoryByPlayer(string PlayerNickName);

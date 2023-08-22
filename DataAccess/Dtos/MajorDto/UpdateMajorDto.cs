@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.MajorDto
 {
-    public class UpdateMajorDto : BaseMajorDto, IBaseDto
+    public class UpdateMajorDto : BaseMajorDto
     {
-        public Guid Id { get; set; }
     }
 }

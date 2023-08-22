@@ -16,11 +16,15 @@ using DataAccess.Dtos.EventDto;
 using DataAccess.Exceptions;
 using DataAccess;
 using DataAccess.Dtos.TaskDto;
+using Microsoft.AspNetCore.Authorization;
+using DataAccess.Dtos.AnswerDto;
 
 namespace XavalorAdventuresAPI.Controllers
-{
+{   
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class EventsController : ControllerBase
     {
         private readonly IEventService _eventService;
@@ -78,11 +82,20 @@ namespace XavalorAdventuresAPI.Controllers
 
         [HttpPost("event", Name = "CreateNewEvent")]
 
-        public async Task<ActionResult<ServiceResponse<EventDto>>> CreateNewEvent(CreateEventDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetEventDto>>> CreateNewEvent( CreateEventDto eventDto)
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
                 var res = await _eventService.CreateNewEvent(eventDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -93,11 +106,19 @@ namespace XavalorAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<EventDto>>> CreateNewEvent(Guid id, [FromBody] UpdateEventDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetEventDto>>> UpdateNewEvent(Guid id, [FromBody] UpdateEventDto eventDto)
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
                 var res = await _eventService.UpdateEvent(id, eventDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -151,7 +172,20 @@ namespace XavalorAdventuresAPI.Controllers
                 return BadRequest(serviceResponse.Message);
             }
         }
+        [HttpDelete("disableevent")]
+        public async Task<ActionResult<ServiceResponse<GetTaskAndEventDto>>> DisableStatusEvent(Guid id)
+        {
+            try
+            {
+                var disableEvent = await _eventService.DisableEvent(id);
+                return Ok(disableEvent);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
 
+        }
         [HttpGet("excel-template-event")]
         public async Task<IActionResult> DownloadExcelTemplate()
         {

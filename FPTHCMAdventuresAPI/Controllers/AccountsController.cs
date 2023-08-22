@@ -1,5 +1,5 @@
-﻿using DataAccess.Dtos.UserDto;
-using DataAccess.Dtos.Users;
+﻿using DataAccess.Dtos.Users;
+using DataAccess.Dtos.Users.Admin;
 using DataAccess.GoogleAuthSetting;
 using DataAccess.Repositories.UserRepositories;
 using Microsoft.AspNetCore.Authentication;
@@ -74,14 +74,14 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
             // Kiểm tra xem phoneClaim có tồn tại không (tùy thuộc vào cấu hình của bạn)
             var nameClaim = result.Principal.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name);
-            if(nameClaim == null)
+            if (nameClaim == null)
             {
                 apiUserDto.Fullname = nameClaim.Value;
 
             }
             apiUserDto.Email = emailClaim.Value;
             apiUserDto.Fullname = nameClaim.Value;
-            
+
             var errors = await _authManager.RegisterUser(apiUserDto);
 
 
@@ -91,21 +91,6 @@ namespace FPTHCMAdventuresAPI.Controllers
 
             return Ok(errors);
         }
-
-
-        // POST: api/Account/register
-        [HttpPost]
-        [Route("register")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<BaseResponse<AuthResponseDto>>> Register([FromBody] ApiUserDto apiUserDto)
-        {
-            var errors = await _authManager.RegisterUser(apiUserDto);
-
-            return Ok(errors);
-        }
-
         // POST: api/Account/login
         [HttpPost]
         [Route("login")]
@@ -115,6 +100,41 @@ namespace FPTHCMAdventuresAPI.Controllers
         public async Task<ActionResult<BaseResponse<AuthResponseDto>>> Login([FromBody] LoginDto loginDto)
         {
             var authResponse = await _authManager.Login(loginDto);
+
+            if (authResponse == null)
+            {
+                return Unauthorized();
+            }
+
+            return Ok(authResponse);
+
+        }   
+        [HttpPost]
+        [Route("loginadmin")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<BaseResponse<AuthResponseDto>>> LoginAdmin([FromBody] LoginAdminDto loginDto)
+        {
+            var authResponse = await _authManager.LoginAdmin(loginDto);
+
+            if (authResponse == null)
+            {
+                return Unauthorized();
+            }
+
+            return Ok(authResponse);
+
+        }   
+        
+        [HttpPost]
+        [Route("loginunity")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<BaseResponse<LoginResponseDto>>> LoginUnity([FromBody] LoginUnityDto loginDto)
+        {
+            var authResponse = await _authManager.LoginUnity(loginDto);
 
             if (authResponse == null)
             {
@@ -141,6 +161,24 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
 
             return Ok(authResponse);
+        }
+
+        [Authorize]
+        [HttpDelete]
+        [Route("logout")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> LogOut()
+        {
+            string rawuserId = HttpContext.User.FindFirstValue(ClaimTypes.Name);
+            if (!Guid.TryParse(rawuserId, out var userId))
+            {
+                return Unauthorized();
+            }
+            await _authManager.DeleteTokenUser(userId);
+
+            return NoContent();
         }
     }
 }

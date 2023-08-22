@@ -12,11 +12,17 @@ using DataAccess.Dtos.LocationDto;
 using DataAccess.Dtos.EventDto;
 using DataAccess.Dtos.AnswerDto;
 using DataAccess;
+using Microsoft.AspNetCore.Authorization;
+using DataAccess.Dtos.ItemDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class LocationsController : ControllerBase
     {
         private readonly ILocationService _locationService;
@@ -66,11 +72,19 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpPost("location", Name = "Createlocation")]
 
-        public async Task<ActionResult<ServiceResponse<LocationDto>>> CreateLocation(CreateLocationDto eventTaskDto)
+        public async Task<ActionResult<ServiceResponse<GetLocationDto>>> CreateLocation(CreateLocationDto createLocationDto)
         {
             try
             {
-                var res = await _locationService.CreateNewLocation(eventTaskDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _locationService.CreateNewLocation(createLocationDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -81,11 +95,19 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<LocationDto>>> CreateNewEvent(Guid id, [FromBody] UpdateLocationDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetLocationDto>>> UpdateLocation(Guid id, [FromBody] UpdateLocationDto updateLocationDto)
         {
             try
             {
-                var res = await _locationService.UpdateLocation(id, eventDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _locationService.UpdateLocation(id, updateLocationDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -130,6 +152,20 @@ namespace FPTHCMAdventuresAPI.Controllers
                 // Xử lý lỗi nếu có
                 return BadRequest(serviceResponse.Message);
             }
+        }
+        [HttpDelete("disablelocation")]
+        public async Task<ActionResult<ServiceResponse<LocationDto>>> DisableStatusLocation(Guid id)
+        {
+            try
+            {
+                var disableEvent = await _locationService.DisableLocation(id);
+                return Ok(disableEvent);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+
         }
     }
 }

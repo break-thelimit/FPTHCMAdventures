@@ -1,17 +1,41 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Dtos.ExchangeHistoryDto
 {
     public abstract class BaseExchangeHistoryDto
     {
-        public Guid PlayerId { get; set; }
-        public Guid ItemId { get; set; }
-        public DateTime ExchangeDate { get; set; }
-        public int Quantity { get; set; }
+        private Guid playerId;
+        private Guid itemId;
+        private DateTime exchangeDate;
+        private int quantity;
 
+        [Required]
+        public Guid PlayerId
+        {
+            get { return playerId; }
+            set { playerId = value; }
+        }
+
+        [Required]
+        public Guid ItemId
+        {
+            get { return itemId; }
+            set { itemId = value; }
+        }
+
+        [Required]
+        public DateTime ExchangeDate
+        {
+            get { return exchangeDate; }
+            set { exchangeDate = value; }
+        }
+
+        [Required]
+        public int Quantity
+        {
+            get { return quantity; }
+            set { quantity = value; }
+        }
     }
 }

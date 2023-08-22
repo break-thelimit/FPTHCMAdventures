@@ -1,17 +1,50 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Dtos.PlayerHistoryDto
 {
     public abstract class BasePlayerHistoryDto
     {
-        public Guid TaskId { get; set; }
-        public Guid PlayerId { get; set; }
-        public int CompletedTime { get; set; }
-        public int TaskPoint { get; set; }
-        public string Status { get; set; }
+        private Guid eventtaskId;
+        private Guid playerId;
+        private double completedTime;
+        private double taskPoint;
+        private string status;
+
+        [Required]
+        public Guid EventtaskId
+        {
+            get { return eventtaskId; }
+            set { eventtaskId = value; }
+        }
+
+        [Required]
+        public Guid PlayerId
+        {
+            get { return playerId; }
+            set { playerId = value; }
+        }
+
+        [Required]
+        public double CompletedTime
+        {
+            get { return completedTime; }
+            set { completedTime = value; }
+        }
+
+        [Required]
+        public double TaskPoint
+        {
+            get { return taskPoint; }
+            set { taskPoint = value; }
+        }
+
+        [Required]
+        [RegularExpression("^(SUCCESS|FAILED)$", ErrorMessage = "Status must be 'SUCCESS' or 'FAILED'.")]
+        public string Status
+        {
+            get { return status; }
+            set { status = value; }
+        }
     }
 }

@@ -11,6 +11,6 @@ namespace DataAccess.Repositories.ExchangeHistoryRepositories
 {
     public interface IExchangeHistoryRepository : IGenericRepository<ExchangeHistory>
     {
-        Task<List<GetExchangeHistoryDto>> GetAllExchangeHistoryRepository();
+        Task<ExchangeHistoryDto> getExchangeByItemName(string itemName);
     }
 }

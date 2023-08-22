@@ -14,9 +14,11 @@ namespace Service.Services.QuestionService
         Task<ServiceResponse<IEnumerable<QuestionDto>>> GetQuestion();
         Task<ServiceResponse<QuestionDto>> GetQuestionById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewQuestion(CreateQuestionDto createQuestionDto);
-        Task<ServiceResponse<string>> UpdateQuestion(Guid id, UpdateQuestionDto questionDto);
+        Task<ServiceResponse<bool>> UpdateQuestion(Guid id, UpdateQuestionDto questionDto);
 
         Task<ServiceResponse<byte[]>> DownloadExcelTemplate();
         Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file);
+        Task<ServiceResponse<Guid>> CreateNewQuestionAndAnswer(QuestionAndAnswerDto createQuestionDto);
+        Task<ServiceResponse<bool>> DisableQuestion(Guid id);
     }
 }

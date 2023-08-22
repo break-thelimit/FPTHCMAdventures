@@ -35,14 +35,26 @@ namespace Service.Services.MajorService
         }
         public async Task<ServiceResponse<Guid>> CreateNewMajor(CreateMajorDto createMajorDto)
         {
+            if (await _majorRepository.ExistsAsync(s => s.Name == createMajorDto.Name ))
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "Duplicated data: Major with the same name already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
             var mapper = config.CreateMapper();
-            var eventTaskcreate = mapper.Map<Major>(createMajorDto);
-            eventTaskcreate.Id = Guid.NewGuid();
-            await _majorRepository.AddAsync(eventTaskcreate);
+            var createMajor = mapper.Map<Major>(createMajorDto);
+            createMajor.Id = Guid.NewGuid();
+            createMajor.Status = createMajorDto.Status.Trim();
+            createMajor.Description = createMajorDto.Description.Trim();
+            createMajor.Name = createMajorDto.Name.Trim();
+            await _majorRepository.AddAsync(createMajor);
 
             return new ServiceResponse<Guid>
             {
-                Data = eventTaskcreate.Id,
+                Data = createMajor.Id,
                 Message = "Successfully",
                 Success = true,
                 StatusCode = 201
@@ -108,14 +120,26 @@ namespace Service.Services.MajorService
                 };
             }
         }
-        public async Task<ServiceResponse<string>> UpdateMajor(Guid id, UpdateMajorDto majorDto)
+        public async Task<ServiceResponse<bool>> UpdateMajor(Guid id, UpdateMajorDto updateMajorDto)
         {
-            try
-            {   
-                majorDto.Id = id;
-                await _majorRepository.UpdateAsync(id, majorDto);
-                return new ServiceResponse<string>
+            if (await _majorRepository.ExistsAsync(s => s.Name == updateMajorDto.Name && s.Id != id))
+            {
+                return new ServiceResponse<bool>
                 {
+                    Message = "Duplicated data: Major with the same name already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            try
+            {
+                updateMajorDto.Status = updateMajorDto.Status.Trim();
+                updateMajorDto.Description = updateMajorDto.Description.Trim();
+                updateMajorDto.Name = updateMajorDto.Name.Trim();
+                await _majorRepository.UpdateAsync(id, updateMajorDto);
+                return new ServiceResponse<bool>
+                {
+                    Data = true,
                     Message = "Success edit",
                     Success = true,
                     StatusCode = 202
@@ -125,8 +149,9 @@ namespace Service.Services.MajorService
             {
                 if (!await EventTaskExists(id))
                 {
-                    return new ServiceResponse<string>
+                    return new ServiceResponse<bool>
                     {
+                        Data = false,
                         Message = "Invalid Record Id",
                         Success = false,
                         StatusCode = 500
@@ -278,6 +303,35 @@ namespace Service.Services.MajorService
 
             }
 
+        }
+
+        public async Task<ServiceResponse<bool>> DisableMajor(Guid id)
+        {
+            var checkEvent = await _majorRepository.GetAsync<MajorDto>(id);
+
+            if (checkEvent == null)
+            {
+                return new ServiceResponse<bool>
+                {
+                    Data = false,
+                    Message = "Failed",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            else
+            {
+                checkEvent.Status = "INACTIVE";
+
+                await _majorRepository.UpdateAsync(id, checkEvent);
+                return new ServiceResponse<bool>
+                {
+                    Data = true,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
         }
     }
 }

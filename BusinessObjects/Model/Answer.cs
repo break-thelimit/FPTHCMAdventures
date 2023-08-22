@@ -7,15 +7,12 @@ namespace BusinessObjects.Model
 {
     public partial class Answer
     {
-        public Answer()
-        {
-            Questions = new HashSet<Question>();
-        }
-
         public Guid Id { get; set; }
         public string AnswerName { get; set; }
         public bool IsRight { get; set; }
+        public Guid? QuestionId { get; set; }
+        public DateTime CreatedAt { get; set; }
 
-        public virtual ICollection<Question> Questions { get; set; }
+        public virtual Question Question { get; set; }
     }
 }

@@ -6,14 +6,12 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.PlayerHistoryDto
 {
-    public class PlayerHistoryDto : IBaseDto
+    public class PlayerHistoryDto 
     {
-        public Guid Id { get; set; }
-
-        public string TaskName { get; set; }
-        public string PlayerName { get; set; }
-        public int CompletedTime { get; set; }
-        public int TaskPoint { get; set; }
+        public Guid EventtaskId { get; set; }
+        public string PlayerNickName { get; set; }
+        public double CompletedTime { get; set; }
+        public double TaskPoint { get; set; }
         public string Status { get; set; }
     }
 }

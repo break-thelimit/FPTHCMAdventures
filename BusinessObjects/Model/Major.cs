@@ -17,6 +17,7 @@ namespace BusinessObjects.Model
         public string Name { get; set; }
         public string Description { get; set; }
         public string Status { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         public virtual ICollection<Question> Questions { get; set; }
         public virtual ICollection<Task> Tasks { get; set; }

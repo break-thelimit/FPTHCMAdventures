@@ -1,13 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Dtos.InventoryDto
 {
     public abstract class BaseInventoryDto
     {
-        public Guid PlayerId { get; set; }
+        private Guid playerId;
+
+        [Required]
+        public Guid PlayerId
+        {
+            get { return playerId; }
+            set { playerId = value; }
+        }
     }
 }

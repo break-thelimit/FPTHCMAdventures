@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
 using DataAccess.Configuration;
+using DataAccess.Dtos.AnswerDto;
 using DataAccess.Dtos.MajorDto;
+using DataAccess.Dtos.PlayerHistoryDto;
 using DataAccess.Dtos.QuestionDto;
+using DataAccess.Repositories.AnswerRepositories;
 using DataAccess.Repositories.MajorRepositories;
 using DataAccess.Repositories.QuestionRepositories;
 using Microsoft.AspNetCore.Http;
@@ -20,20 +23,33 @@ namespace Service.Services.QuestionService
     public class QuestionService : IQuestionService
     {
         private readonly IQuestionRepository _questionRepository;
+        private readonly IAnswerRepository _answerRepository;
         private readonly IMajorRepository _majorRepository;
         private readonly IMapper _mapper;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MapperConfig());
         });
-        public QuestionService(IQuestionRepository questionRepository, IMapper mapper, IMajorRepository majorRepository)
+        public QuestionService(IQuestionRepository questionRepository, IMapper mapper, IMajorRepository majorRepository, IAnswerRepository answerRepository)
         {
             _questionRepository = questionRepository;
             _mapper = mapper;
+            _answerRepository = answerRepository;
             _majorRepository = majorRepository;
         }
         public async Task<ServiceResponse<Guid>> CreateNewQuestion(CreateQuestionDto createQuestionDto)
         {
+            if (await _questionRepository.ExistsAsync(s => s.Name == createQuestionDto.Name))
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "Duplicated data: Question with the same name already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            createQuestionDto.Name = createQuestionDto.Name.Trim();
+            createQuestionDto.Status = createQuestionDto.Status.Trim();
             var mapper = config.CreateMapper();
             var eventTaskcreate = mapper.Map<Question>(createQuestionDto);
             eventTaskcreate.Id = Guid.NewGuid();
@@ -48,12 +64,98 @@ namespace Service.Services.QuestionService
             };
         }
 
-       
+        public async Task<ServiceResponse<Guid>> CreateNewQuestionAndAnswer(QuestionAndAnswerDto createQuestionDto)
+        {
+            var isFirstAnswer = true;
+
+            if (await _questionRepository.ExistsAsync(q => q.Name == createQuestionDto.Name))
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "Duplicated data: Question with the same name already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+
+            createQuestionDto.Name = createQuestionDto.Name.Trim();
+            createQuestionDto.Status = createQuestionDto.Status.Trim();
+
+            if (createQuestionDto.Answers == null || createQuestionDto.Answers.Count < 2 && createQuestionDto.Answers.Count > 5)
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "You must provide at least 2 answers for each question.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+
+            // Check for duplicate answer names
+            var distinctAnswerNames = createQuestionDto.Answers.Select(a => a.AnswerName).Distinct();
+            if (distinctAnswerNames.Count() < createQuestionDto.Answers.Count)
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "Duplicate answer names are not allowed.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+
+            var correctAnswerCount = createQuestionDto.Answers.Count(a => a.IsRight);
+
+            if (correctAnswerCount != 1)
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "There must be exactly one correct answer.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+
+            var newQuestion = new CreateQuestionDto
+            {
+                MajorId = createQuestionDto.MajorId,
+                Name = createQuestionDto.Name.Trim(),
+                Status = createQuestionDto.Status.Trim(),
+            };
+            var question = _mapper.Map<Question>(newQuestion);
+
+            question.Id = Guid.NewGuid();
+            await _questionRepository.AddAsync(question);
+
+            foreach (var answerText in createQuestionDto.Answers)
+            {
+                var answer = _mapper.Map<Answer>(answerText);
+                answer.Id = Guid.NewGuid();
+                answer.QuestionId = question.Id;
+                answer.AnswerName = answerText.AnswerName;
+                answer.IsRight = isFirstAnswer && answerText.IsRight; 
+            
+                await _answerRepository.AddAsync(answer);
+                
+                isFirstAnswer = false; 
+
+            }
+
+            return new ServiceResponse<Guid>
+            {
+                Data = question.Id,
+                Message = "Successfully created question with user-provided answer options.",
+                Success = true,
+                StatusCode = 201
+            };
+        }
+    
+
+
         public async Task<ServiceResponse<IEnumerable<QuestionDto>>> GetQuestion()
         {
             var majorList = await _questionRepository.GetAllAsync<QuestionDto>();
 
-
+            
             if (majorList != null)
             {
                 return new ServiceResponse<IEnumerable<QuestionDto>>
@@ -82,7 +184,7 @@ namespace Service.Services.QuestionService
             {
 
                 var eventDetail = await _questionRepository.GetAsync<QuestionDto>(eventId);
-
+               
                 if (eventDetail == null)
                 {
 
@@ -109,14 +211,25 @@ namespace Service.Services.QuestionService
         }
        
 
-        public async Task<ServiceResponse<string>> UpdateQuestion(Guid id, UpdateQuestionDto questionDto)
+        public async Task<ServiceResponse<bool>> UpdateQuestion(Guid id, UpdateQuestionDto updateQuestionDto)
         {
+            if (await _questionRepository.ExistsAsync(s => s.Name == updateQuestionDto.Name && s.Id != id))
+            {
+                return new ServiceResponse<bool>
+                {
+                    Message = "Duplicated data: Question with the same name already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
             try
             {
-                questionDto.Id = id;
-                await _questionRepository.UpdateAsync(id, questionDto);
-                return new ServiceResponse<string>
+                updateQuestionDto.Name = updateQuestionDto.Name.Trim();
+                updateQuestionDto.Status = updateQuestionDto.Status.Trim();
+                await _questionRepository.UpdateAsync(id, updateQuestionDto);
+                return new ServiceResponse<bool>
                 {
+                    Data = true,
                     Message = "Success edit",
                     Success = true,
                     StatusCode = 202
@@ -126,8 +239,9 @@ namespace Service.Services.QuestionService
             {
                 if (!await EventTaskExists(id))
                 {
-                    return new ServiceResponse<string>
+                    return new ServiceResponse<bool>
                     {
+                        Data = false,
                         Message = "Invalid Record Id",
                         Success = false,
                         StatusCode = 500
@@ -301,6 +415,36 @@ namespace Service.Services.QuestionService
                 StatusCode = 200
             };
         }
+        public async Task<ServiceResponse<bool>> DisableQuestion(Guid id)
+        {
+            var checkEvent = await _questionRepository.GetAsync<QuestionDto>(id);
+
+            if (checkEvent == null)
+            {
+                return new ServiceResponse<bool>
+                {
+                    Data = false,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            else
+            {
+                checkEvent.Status = "INACTIVE";
+                var question = _mapper.Map<Question>(checkEvent);
+
+                await _questionRepository.UpdateAsync(id, question);
+                return new ServiceResponse<bool>
+                {
+                    Data = true,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+        }
+
 
     }
 }

@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Dtos.ExchangeHistoryDto
 {
-    public class UpdateExchangeHistoryDto : BaseExchangeHistoryDto, IBaseDto
+    public class UpdateExchangeHistoryDto : BaseExchangeHistoryDto
     {
-        public Guid Id { get; set; }
     }
 }

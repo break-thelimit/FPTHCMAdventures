@@ -1,20 +1,68 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
+using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Dtos.ItemDto
 {
     public abstract class BaseItemDto
     {
-        public string Name { get; set; }
-        public double Price { get; set; }
-        public string Description { get; set; }
-        public string Type { get; set; }
-        public bool? LimitExchange { get; set; }
-        public string Status { get; set; }
-        public int Quantity { get; set; }
-        public string ImageUrl { get; set; }
+        private string name;
+        private double price;
+        private string description;
+        private string type;
+        private bool? limitExchange;
+        private string status;
+        public string imageUrl;
+        public IFormFile Image { get; set; } 
+
+        [Required]
+        public string Name
+        {
+            get { return name; }
+            set { name = value; }
+        }
+
+        [Required]
+        [Range(1, 1000000000, ErrorMessage = "The Price field must be between 0 and 1 billion.")]
+        public double Price
+        {
+            get { return price; }
+            set { price = value; }
+        }
+
+        [Required]
+        public string Description
+        {
+            get { return description; }
+            set { description = value; }
+        }
+
+        [Required]
+        public string Type
+        {
+            get { return type; }
+            set { type = value; }
+        }
+
+        public bool? LimitExchange
+        {
+            get { return limitExchange; }
+            set { limitExchange = value; }
+        }
+
+        [Required]
+        [RegularExpression("^(INACTIVE|ACTIVE)$", ErrorMessage = "Status must be 'INACTIVE' or 'ACTIVE'.")]
+        public string Status
+        {
+            get { return status; }
+            set { status = value; }
+        }
+
+        
+        public string ImageUrl
+        {
+            get { return imageUrl; }
+            set { imageUrl = value; }
+        }
     }
 }

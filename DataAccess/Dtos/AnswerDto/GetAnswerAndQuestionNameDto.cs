@@ -11,7 +11,7 @@ namespace DataAccess.Dtos.AnswerDto
 
         public string QuestionName { get; set; }
 
-        public List<AnswerDto> answerDtos { get; set; }
+        public List<GetAnswerListDto> AnswerDtos { get; set; }
         public int CorrectAnswerIndex { get; set; }
     }
 }

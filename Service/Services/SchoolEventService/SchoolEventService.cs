@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
 using BusinessObjects.Model;
 using DataAccess.Configuration;
-using DataAccess.Dtos.RoleDto;
+using DataAccess.Dtos.SchoolDto;
 using DataAccess.Dtos.SchoolEventDto;
-using DataAccess.Repositories.RoleRepositories;
 using DataAccess.Repositories.SchoolEventRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -29,9 +28,20 @@ namespace Service.Services.SchoolEventService
         }
         public async Task<ServiceResponse<Guid>> CreateNewSchoolEvent(CreateSchoolEventDto createSchoolEventDto)
         {
+            if (await _schoolEventRepository.ExistsAsync(se => se.EventId == createSchoolEventDto.EventId && se.SchoolId == createSchoolEventDto.SchoolId))
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "Duplicated data: School Event with the same EventId and SchoolId already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            createSchoolEventDto.InvitationLetter = createSchoolEventDto.InvitationLetter.Trim();
             var mapper = config.CreateMapper();
             var eventTaskcreate = mapper.Map<SchoolEvent>(createSchoolEventDto);
             eventTaskcreate.Id = Guid.NewGuid();
+
             await _schoolEventRepository.AddAsync(eventTaskcreate);
 
             return new ServiceResponse<Guid>
@@ -43,13 +53,13 @@ namespace Service.Services.SchoolEventService
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<GetSchoolEventDto>>> GetSchoolEvent()
+        public async Task<ServiceResponse<IEnumerable<SchoolEventDto>>> GetSchoolEvent()
         {
-            var majorList = await _schoolEventRepository.GetAllAsync<GetSchoolEventDto>();
+            var majorList = await _schoolEventRepository.GetAllAsync<SchoolEventDto>();
 
             if (majorList != null)
             {
-                return new ServiceResponse<IEnumerable<GetSchoolEventDto>>
+                return new ServiceResponse<IEnumerable<SchoolEventDto>>
                 {
                     Data = majorList,
                     Success = true,
@@ -59,7 +69,7 @@ namespace Service.Services.SchoolEventService
             }
             else
             {
-                return new ServiceResponse<IEnumerable<GetSchoolEventDto>>
+                return new ServiceResponse<IEnumerable<SchoolEventDto>>
                 {
                     Data = majorList,
                     Success = false,
@@ -101,14 +111,26 @@ namespace Service.Services.SchoolEventService
             }
         }
 
-        public async Task<ServiceResponse<string>> UpdateSchoolEvent(Guid id, UpdateSchoolEventDto schoolEventDto)
+        public async Task<ServiceResponse<bool>> UpdateSchoolEvent(Guid id, UpdateSchoolEventDto schoolEventDto)
         {
-            try
-            {   
-                schoolEventDto.Id = id;
-                await _schoolEventRepository.UpdateAsync(id, schoolEventDto);
-                return new ServiceResponse<string>
+            if (await _schoolEventRepository.ExistsAsync(se => se.EventId == schoolEventDto.EventId && se.SchoolId == schoolEventDto.SchoolId && se.Id != id))
+            {
+                return new ServiceResponse<bool>
                 {
+                    Message = "Duplicated data: School Event with the same EventId and SchoolId already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+
+            try
+            {
+                schoolEventDto.InvitationLetter = schoolEventDto.InvitationLetter.Trim();
+
+                await _schoolEventRepository.UpdateAsync(id, schoolEventDto);
+                return new ServiceResponse<bool>
+                {
+                    Data = true,
                     Message = "Success edit",
                     Success = true,
                     StatusCode = 202
@@ -118,8 +140,9 @@ namespace Service.Services.SchoolEventService
             {
                 if (!await EventTaskExists(id))
                 {
-                    return new ServiceResponse<string>
+                    return new ServiceResponse<bool>
                     {
+                        Data = false,
                         Message = "Invalid Record Id",
                         Success = false,
                         StatusCode = 500
@@ -135,6 +158,30 @@ namespace Service.Services.SchoolEventService
         {
             return await _schoolEventRepository.Exists(id);
         }
-        
+        public async Task<ServiceResponse<List<GetSchoolDto>>> GetSchoolByEventId(Guid eventid)
+        {
+            var schoolList = await _schoolEventRepository.GetSchoolByEventId(eventid);
+
+            if (schoolList != null)
+            {
+                return new ServiceResponse<List<GetSchoolDto>>
+                {
+                    Data = schoolList,
+                    Success = true,
+                    Message = "Successfully",
+                    StatusCode = 200
+                };
+            }
+            else
+            {
+                return new ServiceResponse<List<GetSchoolDto>>
+                {
+                    Data = schoolList,
+                    Success = false,
+                    Message = "Faile because List event null",
+                    StatusCode = 200
+                };
+            }
+        }
     }
 }

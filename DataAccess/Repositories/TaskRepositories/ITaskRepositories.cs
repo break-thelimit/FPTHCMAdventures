@@ -11,7 +11,6 @@ namespace DataAccess.Repositories.TaskRepositories
 {
     public interface ITaskRepositories : IGenericRepository<Task>
     {
-        Task<IEnumerable<TaskDto>> GetTaskByEventTaskWithEventId(Guid eventId);
 
     }
 }

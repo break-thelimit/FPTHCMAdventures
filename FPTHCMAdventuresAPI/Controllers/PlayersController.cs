@@ -1,19 +1,19 @@
 ﻿using AutoMapper;
-using DataAccess.Dtos.PlayerHistoryDto;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Service.Services.PlayerHistoryService;
 using Service;
 using System.Threading.Tasks;
 using System;
 using Service.Services.PlayerService;
 using DataAccess.Dtos.PlayerDto;
-
+using Microsoft.AspNetCore.Authorization;
+using System.Collections.Generic;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
+
     public class PlayersController : ControllerBase
     {
         private readonly IPlayerService _playerService;
@@ -41,27 +41,27 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
         }
 
-        [HttpGet("players/getTotalPlayerToday")]
-        public async Task<ActionResult<ServiceResponse<string>>> GetTotalPlayerToday()
+        /*   [HttpGet("players/listPlayer-username", Name = "GetPlayerWithUserNames")]
+
+           public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> GetPlayerListWithUserName()
+           {
+               try
+               {
+                   var res = await _playerService.GetPlayerWithUserName();
+                   return Ok(res);
+               }
+               catch (Exception ex)
+               {
+                   return StatusCode(500, "Internal server error: " + ex.Message);
+               }
+           }*/
+        [HttpGet("GetRankedPlayer/{eventId}/{schoolId}")]
+
+        public async Task<ActionResult<ServiceResponse<PlayerDto>>> GetRankedPlayer(Guid eventId, Guid schoolId)
         {
             try
             {
-                var res = await _playerService.GetTotalPlayerToday();
-                return Ok(res);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Internal server error: " + ex.Message);
-            }
-        }
-
-        [HttpGet("players/listPlayer-username", Name = "GetPlayerWithUserNames")]
-
-        public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> GetPlayerListWithUserName()
-        {
-            try
-            {
-                var res = await _playerService.GetPlayerWithUserName();
+                var res = await _playerService.GetRankedPlayer(eventId, schoolId);
                 return Ok(res);
             }
             catch (Exception ex)
@@ -70,38 +70,63 @@ namespace FPTHCMAdventuresAPI.Controllers
             }
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<PlayerDto>> GetPlayerById(Guid id)
+        public async Task<ActionResult<GetPlayerDto>> GetPlayerById(Guid id)
         {
             var eventDetail = await _playerService.GetPlayerById(id);
             return Ok(eventDetail);
-        }
-
-        [HttpGet("user/{id}")]
-        public async Task<ActionResult<PlayerDto>> GetPlayerByUserId(Guid id)
+        } 
+        [HttpGet("playerschool/{playerId}")]
+        public async Task<ActionResult<GetPlayerDto>> GetSchoolByPlayerId(Guid playerId)
         {
-            var eventDetail = await _playerService.GetPlayerByUserId(id);
+            var eventDetail = await _playerService.GetSchoolByPlayerId(playerId);
             return Ok(eventDetail);
         }
-        [HttpGet("player/player-{nickname}")]
+
+        [HttpGet("user/{studentId}")]
+        public async Task<ActionResult<GetPlayerDto>> GetPlayerByStudentId(Guid studentId)
+        {
+            var eventDetail = await _playerService.GetPlayerByStudentId(studentId);
+            return Ok(eventDetail);
+        }
+        [HttpGet("player/{nickname}")]
         public async Task<ActionResult<GetPlayerDto>> GetPlayerByNickName(string nickname)
         {
             var eventDetail = await _playerService.CheckPlayerByNickName(nickname);
             return Ok(eventDetail);
         }
-        [HttpGet("player/{username}")]
-        public async Task<ActionResult<PlayerDto>> GetPlayerByUserName(string username)
+        /*  [HttpGet("player/{username}")]
+          public async Task<ActionResult<PlayerDto>> GetPlayerByUserName(string username)
+          {
+              var eventDetail = await _playerService.CheckPlayerByUserName(username);
+              return Ok(eventDetail);
+          }*/
+        [HttpPost("createlistplayer")]
+        public async Task<IActionResult> CreatePlayers([FromBody] List<CreatePlayerDto> players)
         {
-            var eventDetail = await _playerService.CheckPlayerByUserName(username);
-            return Ok(eventDetail);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var response = await _playerService.CreateNewPlayers(players);
+            return Ok(response);
         }
+        [Authorize]
 
         [HttpPost("player", Name = "CreateNewPlayer")]
 
-        public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> CreateNewPlayer(CreatePlayerDto answerDto)
+        public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> CreateNewPlayer( CreatePlayerDto createPlayerDto)
         {
             try
             {
-                var res = await _playerService.CreateNewPlayer(answerDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _playerService.CreateNewPlayer(createPlayerDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -110,13 +135,24 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+
+        [Authorize]
+
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> UpdatePlayer(Guid id, [FromBody] UpdatePlayerDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetPlayerDto>>> UpdatePlayer(Guid id, [FromBody] UpdatePlayerDto updatePlayerDto)
         {
             try
             {
-                var res = await _playerService.UpdatePlayer(id, eventDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _playerService.UpdatePlayer(id, updatePlayerDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)

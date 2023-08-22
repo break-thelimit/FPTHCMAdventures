@@ -16,11 +16,13 @@ namespace Service.Services.LocationServoce
         Task<ServiceResponse<IEnumerable<GetLocationDto>>> GetLocation();
         Task<ServiceResponse<LocationDto>> GetLocationById(Guid eventId);
         Task<ServiceResponse<Guid>> CreateNewLocation(CreateLocationDto createEventTaskDto);
-        Task<ServiceResponse<string>> UpdateLocation(Guid id, UpdateLocationDto eventTaskDto);
+        Task<ServiceResponse<bool>> UpdateLocation(Guid id, UpdateLocationDto eventTaskDto);
         Task<ServiceResponse<byte[]>> DownloadExcelTemplate();
         Task<ServiceResponse<string>> ImportDataFromExcel(IFormFile file);
 
         Task<ServiceResponse<PagedResult<LocationDto>>> GetLocationWithPage(QueryParameters queryParameters);
+
+        Task<ServiceResponse<bool>> DisableLocation(Guid id);
 
     }
 }

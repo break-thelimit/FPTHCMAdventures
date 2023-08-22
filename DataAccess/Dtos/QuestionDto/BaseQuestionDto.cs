@@ -1,16 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Dtos.QuestionDto
 {
     public abstract class BaseQuestionDto
     {
-        public Guid AnswerId { get; set; }
-        public Guid MajorId { get; set; }
-        public string Name { get; set; }
-        public string Status { get; set; }
+        private Guid majorId;
+        private string name;
+        private string status;
+
+        [Required]
+        public Guid MajorId
+        {
+            get { return majorId; }
+            set { majorId = value; }
+        }
+
+        [Required]
+        public string Name
+        {
+            get { return name; }
+            set { name = value; }
+        }
+
+        [RegularExpression("^(ACTIVE|INACTIVE)$", ErrorMessage = "Status must be 'ACTIVE' or 'INACTIVE'.")]
+        public string Status
+        {
+            get { return status; }
+            set { status = value; }
+        }
     }
 }

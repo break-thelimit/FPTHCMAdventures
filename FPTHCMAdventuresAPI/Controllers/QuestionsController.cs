@@ -9,11 +9,17 @@ using System.Threading.Tasks;
 using System;
 using Service.Services.QuestionService;
 using DataAccess.Dtos.QuestionDto;
+using Microsoft.AspNetCore.Authorization;
+using DataAccess.Dtos.ItemDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
+
     public class QuestionsController : ControllerBase
     {
         private readonly IQuestionService _questionService;
@@ -49,11 +55,19 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpPost("question", Name = "CreateQuestion")]
 
-        public async Task<ActionResult<ServiceResponse<MajorDto>>> CreateNewQuestion(CreateQuestionDto eventTaskDto)
+        public async Task<ActionResult<ServiceResponse<GetQuestionDto>>> CreateNewQuestion(CreateQuestionDto createQuestionDto)
         {
             try
             {
-                var res = await _questionService.CreateNewQuestion(eventTaskDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _questionService.CreateNewQuestion(createQuestionDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -62,13 +76,46 @@ namespace FPTHCMAdventuresAPI.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-        [HttpPut("{id}")]
+        [HttpPost("question/answer", Name = "CreateQuestionAnswer")]
 
-        public async Task<ActionResult<ServiceResponse<MajorDto>>> CreateNewEvent(Guid id, [FromBody] UpdateQuestionDto eventDto)
+        public async Task<ActionResult<ServiceResponse<QuestionAndAnswerDto>>> CreateNewQuestionAndAnswer(QuestionAndAnswerDto createQuestionDto)
         {
             try
             {
-                var res = await _questionService.UpdateQuestion(id, eventDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _questionService.CreateNewQuestionAndAnswer(createQuestionDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+
+        [HttpPut("{id}")]
+
+        public async Task<ActionResult<ServiceResponse<GetQuestionDto>>> UpdateQuestion(Guid id, [FromBody] UpdateQuestionDto updateQuestionDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _questionService.UpdateQuestion(id, updateQuestionDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -113,6 +160,21 @@ namespace FPTHCMAdventuresAPI.Controllers
                 // Xử lý lỗi nếu có
                 return BadRequest(serviceResponse.Message);
             }
+        }
+
+        [HttpDelete("disablequestion")]
+        public async Task<ActionResult<ServiceResponse<QuestionDto>>> DisableStatusQuestion(Guid id)
+        {
+            try
+            {
+                var disableEvent = await _questionService.DisableQuestion(id);
+                return Ok(disableEvent);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+
         }
     }
 }

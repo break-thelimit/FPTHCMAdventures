@@ -2,12 +2,13 @@
 using BusinessObjects.Model;
 using DataAccess;
 using DataAccess.Configuration;
+using DataAccess.Dtos.AnswerDto;
 using DataAccess.Dtos.EventDto;
 using DataAccess.Dtos.LocationDto;
+using DataAccess.Dtos.StudentDto;
 using DataAccess.Dtos.TaskDto;
 using DataAccess.Exceptions;
 using DataAccess.Repositories.EventRepositories;
-using DataAccess.Repositories.RankRepositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -25,7 +26,6 @@ namespace Service.Services.EventService
     public class EventService : IEventService
     {
         private readonly IEventRepositories _eventRepository;
-        private readonly IRankRepository _rankRepository;
         private readonly IMapper _mapper;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
@@ -39,6 +39,28 @@ namespace Service.Services.EventService
 
         public async Task<ServiceResponse<Guid>> CreateNewEvent(CreateEventDto createEventDto)
         {
+            if (await _eventRepository.ExistsAsync(e =>
+            (createEventDto.StartTime >= e.StartTime && createEventDto.StartTime <= e.EndTime) ||
+            (createEventDto.EndTime >= e.StartTime && createEventDto.EndTime <= e.EndTime)))
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "Duplicated data: An event already exists within the specified time range.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            if (await _eventRepository.ExistsAsync(e => e.Name == createEventDto.Name))
+            {
+                return new ServiceResponse<Guid>
+                {
+                    Message = "Duplicated data: An event with the same name already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            createEventDto.Name = createEventDto.Name.Trim();
+            createEventDto.Status = createEventDto.Status.Trim();
             var mapper = config.CreateMapper();
             var eventcreate = mapper.Map<Event>(createEventDto);
             eventcreate.Id = Guid.NewGuid();
@@ -119,19 +141,51 @@ namespace Service.Services.EventService
         }
 
        
-        public async Task<ServiceResponse<string>> UpdateEvent(Guid id, UpdateEventDto eventDto)
+        public async Task<ServiceResponse<bool>> UpdateEvent(Guid id, UpdateEventDto eventDto)
         {
+            if (await _eventRepository.ExistsAsync(e => e.Name == eventDto.Name && e.Id != id))
+            {
+                return new ServiceResponse<bool>
+                {
+                    Message = "Duplicated data: An event with the same name already exists.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+
+            // Kiểm tra xem có sự kiện nào trùng khung giờ đã tồn tại hay không
+            if (await _eventRepository.ExistsAsync(e =>
+                    e.Id != id && (
+                    (eventDto.StartTime >= e.StartTime && eventDto.StartTime <= e.EndTime) ||
+                    (eventDto.EndTime >= e.StartTime && eventDto.EndTime <= e.EndTime))))
+            {
+                return new ServiceResponse<bool>
+                {
+                    Message = "Duplicated data: An event already exists within the specified time range.",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
             try
             {
-                eventDto.Id = id;
+                eventDto.Name = eventDto.Name.Trim();
+                eventDto.Status = eventDto.Status.Trim();
                 await _eventRepository.UpdateAsync(id, eventDto);
+                return new ServiceResponse<bool>
+                {
+                    Data = true,
+                    Message = "Update Success",
+                    Success = true,
+                    StatusCode = 200
+                };
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!await CountryExists(id))
                 {
-                    return new ServiceResponse<string>
+                    return new ServiceResponse<bool>
                     {
+                        Data = false,
                         Message = "No rows",
                         Success = false,
                         StatusCode = 500
@@ -142,12 +196,7 @@ namespace Service.Services.EventService
                     throw;
                 }
             }
-            return new ServiceResponse<string>
-            {
-                Message = "Update Success",
-                Success = true,
-                StatusCode = 200
-            };
+            
         }
 
         private async Task<bool> CountryExists(Guid id)
@@ -418,16 +467,33 @@ namespace Service.Services.EventService
             }
         }
 
-        public async Task<ServiceResponse<string>> GetTotalEventToday()
+        public async Task<ServiceResponse<bool>> DisableEvent(Guid id)
         {
-            var total = await _eventRepository.GetTotalEventsToday();
-            return new ServiceResponse<string>
+            var checkEvent = await _eventRepository.GetAsync<EventDto>(id);
+
+            if (checkEvent == null)
             {
-                Data = total,
-                Message = "Successfully",
-                StatusCode = 200,
-                Success = true
-            };
+                return new ServiceResponse<bool>
+                {
+                    Data = true,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            else
+            {
+                checkEvent.Status = "INACTIVE";
+
+                await _eventRepository.UpdateAsync(id, checkEvent);
+                return new ServiceResponse<bool>
+                {
+                    Data = false,
+                    Message = "Success",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
         }
     }
 }

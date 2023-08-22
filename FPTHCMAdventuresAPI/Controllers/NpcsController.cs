@@ -8,11 +8,16 @@ using System.Threading.Tasks;
 using System;
 using Service.Services.NpcService;
 using DataAccess.Dtos.NPCDto;
+using Microsoft.AspNetCore.Authorization;
+using DataAccess.Dtos.ItemDto;
 
 namespace FPTHCMAdventuresAPI.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
 
     public class NpcsController : ControllerBase
     {
@@ -49,11 +54,19 @@ namespace FPTHCMAdventuresAPI.Controllers
 
         [HttpPost("npc", Name = "CreateNpc")]
 
-        public async Task<ActionResult<ServiceResponse<NpcDto>>> CreateNpc(CreateNpcDto eventTaskDto)
+        public async Task<ActionResult<ServiceResponse<GetNpcDto>>> CreateNpc( CreateNpcDto createNpcDto)
         {
             try
             {
-                var res = await _npcService.CreateNewNpc(eventTaskDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _npcService.CreateNewNpc(createNpcDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -64,11 +77,19 @@ namespace FPTHCMAdventuresAPI.Controllers
         }
         [HttpPut("{id}")]
 
-        public async Task<ActionResult<ServiceResponse<NpcDto>>> UpdateNpc(Guid id, [FromBody] UpdateNpcDto eventDto)
+        public async Task<ActionResult<ServiceResponse<GetNpcDto>>> UpdateNpc(Guid id, [FromForm] UpdateNpcDto updateNpcDto)
         {
             try
             {
-                var res = await _npcService.UpdateNpc(id, eventDto);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var res = await _npcService.UpdateNpc(id, updateNpcDto);
+                if (!res.Success)
+                {
+                    return BadRequest(res);
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -76,6 +97,21 @@ namespace FPTHCMAdventuresAPI.Controllers
 
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
+        }
+
+        [HttpDelete("disablenpc")]
+        public async Task<ActionResult<ServiceResponse<NpcDto>>> DisableStatusMajor(Guid id)
+        {
+            try
+            {
+                var disableEvent = await _npcService.DisableNpc(id);
+                return Ok(disableEvent);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+
         }
     }
 }
