@@ -13,7 +13,6 @@ namespace BusinessObjects.Model
             Inventories = new HashSet<Inventory>();
             PlayerHistories = new HashSet<PlayerHistory>();
             PlayerPrizes = new HashSet<PlayerPrize>();
-            Students = new HashSet<Student>();
         }
 
         public Guid Id { get; set; }
@@ -21,10 +20,10 @@ namespace BusinessObjects.Model
         public Guid EventId { get; set; }
         public string Nickname { get; set; }
         public string Passcode { get; set; }
-        public DateTime? CreatedAt { get; set; }
         public double TotalPoint { get; set; }
         public double TotalTime { get; set; }
         public bool Isplayer { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         public virtual Event Event { get; set; }
         public virtual Student Student { get; set; }
@@ -32,6 +31,5 @@ namespace BusinessObjects.Model
         public virtual ICollection<Inventory> Inventories { get; set; }
         public virtual ICollection<PlayerHistory> PlayerHistories { get; set; }
         public virtual ICollection<PlayerPrize> PlayerPrizes { get; set; }
-        public virtual ICollection<Student> Students { get; set; }
     }
 }

@@ -77,6 +77,7 @@ namespace BusinessObjects.Model
                 entity.HasOne(d => d.Question)
                     .WithMany(p => p.Answers)
                     .HasForeignKey(d => d.QuestionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Answer_question_id");
             });
 
@@ -101,6 +102,7 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.Status)
                     .IsRequired()
                     .HasMaxLength(100)
+                    .IsUnicode(false)
                     .HasColumnName("status");
             });
 
@@ -117,9 +119,7 @@ namespace BusinessObjects.Model
                     .HasColumnName("created_at")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.EndTime)
-                    .HasColumnType("datetime")
-                    .HasColumnName("end_time");
+                entity.Property(e => e.EndTime).HasColumnName("end_time");
 
                 entity.Property(e => e.EventId).HasColumnName("event_id");
 
@@ -127,9 +127,13 @@ namespace BusinessObjects.Model
 
                 entity.Property(e => e.Priority).HasColumnName("priority");
 
-                entity.Property(e => e.StartTime)
-                    .HasColumnType("datetime")
-                    .HasColumnName("start_time");
+                entity.Property(e => e.StartTime).HasColumnName("start_time");
+
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("status");
 
                 entity.Property(e => e.TaskId).HasColumnName("task_id");
 
@@ -166,6 +170,14 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.ItemId).HasColumnName("item_id");
 
                 entity.Property(e => e.PlayerId).HasColumnName("player_id");
+
+                entity.Property(e => e.Quantity).HasColumnName("quantity");
+
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("status");
 
                 entity.HasOne(d => d.Item)
                     .WithMany(p => p.ExchangeHistories)
@@ -236,6 +248,7 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.Status)
                     .IsRequired()
                     .HasMaxLength(100)
+                    .IsUnicode(false)
                     .HasColumnName("status");
 
                 entity.Property(e => e.Type)
@@ -297,6 +310,7 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.Status)
                     .IsRequired()
                     .HasMaxLength(100)
+                    .IsUnicode(false)
                     .HasColumnName("status");
 
                 entity.Property(e => e.X).HasColumnName("x");
@@ -332,6 +346,7 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.Status)
                     .IsRequired()
                     .HasMaxLength(100)
+                    .IsUnicode(false)
                     .HasColumnName("status");
             });
 
@@ -361,6 +376,7 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.Status)
                     .IsRequired()
                     .HasMaxLength(100)
+                    .IsUnicode(false)
                     .HasColumnName("status");
             });
 
@@ -368,13 +384,17 @@ namespace BusinessObjects.Model
             {
                 entity.ToTable("Player");
 
+                entity.HasIndex(e => e.StudentId, "UQ_StudentId")
+                    .IsUnique();
+
                 entity.Property(e => e.Id)
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
                 entity.Property(e => e.CreatedAt)
                     .HasColumnType("datetime")
-                    .HasColumnName("created_at");
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("('1970-01-01 00:00:00')");
 
                 entity.Property(e => e.EventId).HasColumnName("event_id");
 
@@ -402,8 +422,8 @@ namespace BusinessObjects.Model
                     .HasConstraintName("FK_Player.event_id");
 
                 entity.HasOne(d => d.Student)
-                    .WithMany(p => p.Players)
-                    .HasForeignKey(d => d.StudentId)
+                    .WithOne(p => p.Player)
+                    .HasForeignKey<Player>(d => d.StudentId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Player.student_id");
             });
@@ -430,6 +450,7 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.Status)
                     .IsRequired()
                     .HasMaxLength(100)
+                    .IsUnicode(false)
                     .HasColumnName("status");
 
                 entity.Property(e => e.TaskPoint).HasColumnName("task_point");
@@ -464,6 +485,12 @@ namespace BusinessObjects.Model
 
                 entity.Property(e => e.PrizeId).HasColumnName("prize_id");
 
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("status");
+
                 entity.HasOne(d => d.Player)
                     .WithMany(p => p.PlayerPrizes)
                     .HasForeignKey(d => d.PlayerId)
@@ -490,10 +517,10 @@ namespace BusinessObjects.Model
                     .HasColumnName("created_at")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Decription)
+                entity.Property(e => e.Description)
                     .IsRequired()
                     .HasMaxLength(1000)
-                    .HasColumnName("decription");
+                    .HasColumnName("description");
 
                 entity.Property(e => e.EventId).HasColumnName("event_id");
 
@@ -507,6 +534,7 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.Status)
                     .IsRequired()
                     .HasMaxLength(100)
+                    .IsUnicode(false)
                     .HasColumnName("status");
 
                 entity.HasOne(d => d.Event)
@@ -532,13 +560,13 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.MajorId).HasColumnName("major_id");
 
                 entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasMaxLength(1000)
+                    .HasMaxLength(200)
                     .HasColumnName("name");
 
                 entity.Property(e => e.Status)
                     .IsRequired()
                     .HasMaxLength(100)
+                    .IsUnicode(false)
                     .HasColumnName("status");
 
                 entity.HasOne(d => d.Major)
@@ -609,6 +637,7 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.Status)
                     .IsRequired()
                     .HasMaxLength(100)
+                    .IsUnicode(false)
                     .HasColumnName("status");
             });
 
@@ -620,6 +649,12 @@ namespace BusinessObjects.Model
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
+                entity.Property(e => e.Approvalstatus)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("approvalstatus");
+
                 entity.Property(e => e.CreatedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("created_at")
@@ -627,21 +662,20 @@ namespace BusinessObjects.Model
 
                 entity.Property(e => e.EndTime)
                     .HasColumnType("datetime")
-                    .HasColumnName("end_time");
+                    .HasColumnName("end_time")
+                    .HasDefaultValueSql("('1970-01-01 00:00:00')");
 
                 entity.Property(e => e.EventId).HasColumnName("event_id");
-
-                entity.Property(e => e.InvitationLetter)
-                    .HasMaxLength(255)
-                    .HasColumnName("invitation_letter");
 
                 entity.Property(e => e.SchoolId).HasColumnName("school_id");
 
                 entity.Property(e => e.StartTime)
                     .HasColumnType("datetime")
-                    .HasColumnName("start_time");
+                    .HasColumnName("start_time")
+                    .HasDefaultValueSql("('1970-01-01 00:00:00')");
 
                 entity.Property(e => e.Status)
+                    .IsRequired()
                     .HasMaxLength(100)
                     .IsUnicode(false)
                     .HasColumnName("status");
@@ -688,26 +722,17 @@ namespace BusinessObjects.Model
                     .HasMaxLength(100)
                     .HasColumnName("fullname");
 
-                entity.Property(e => e.GraduateYear)
-                    .IsRequired()
-                    .HasMaxLength(100)
-                    .HasColumnName("graduate_year");
+                entity.Property(e => e.GraduateYear).HasColumnName("graduate_year");
 
                 entity.Property(e => e.Phonenumber).HasColumnName("phonenumber");
-
-                entity.Property(e => e.PlayerId).HasColumnName("player_id");
 
                 entity.Property(e => e.SchoolId).HasColumnName("school_id");
 
                 entity.Property(e => e.Status)
                     .IsRequired()
                     .HasMaxLength(100)
+                    .IsUnicode(false)
                     .HasColumnName("status");
-
-                entity.HasOne(d => d.Player)
-                    .WithMany(p => p.Students)
-                    .HasForeignKey(d => d.PlayerId)
-                    .HasConstraintName("FK__Student__player___3A4CA8FD");
 
                 entity.HasOne(d => d.School)
                     .WithMany(p => p.Students)
@@ -745,6 +770,7 @@ namespace BusinessObjects.Model
                 entity.Property(e => e.Status)
                     .IsRequired()
                     .HasMaxLength(100)
+                    .IsUnicode(false)
                     .HasColumnName("status");
 
                 entity.Property(e => e.Type)

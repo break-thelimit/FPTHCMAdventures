@@ -9,7 +9,6 @@ namespace BusinessObjects.Model
     {
         public Student()
         {
-            Players = new HashSet<Player>();
             RefreshTokens = new HashSet<RefreshToken>();
         }
 
@@ -18,15 +17,13 @@ namespace BusinessObjects.Model
         public string Fullname { get; set; }
         public string Email { get; set; }
         public long Phonenumber { get; set; }
-        public string GraduateYear { get; set; }
         public string Classname { get; set; }
         public string Status { get; set; }
-        public Guid? PlayerId { get; set; }
         public DateTime CreatedAt { get; set; }
+        public int GraduateYear { get; set; }
 
-        public virtual Player Player { get; set; }
         public virtual School School { get; set; }
-        public virtual ICollection<Player> Players { get; set; }
+        public virtual Player Player { get; set; }
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; }
     }
 }

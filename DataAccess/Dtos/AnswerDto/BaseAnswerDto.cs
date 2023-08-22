@@ -7,7 +7,7 @@ namespace DataAccess.Dtos.AnswerDto
     {
         private string answerName;
         private bool isRight;
-        private Guid? questionId;
+        private Guid questionId;
 
         [Required]
         public string AnswerName
@@ -24,7 +24,7 @@ namespace DataAccess.Dtos.AnswerDto
         }
 
         [Required]
-        public Guid? QuestionId
+        public Guid QuestionId
         {
             get { return questionId; }
             set { questionId = value; }

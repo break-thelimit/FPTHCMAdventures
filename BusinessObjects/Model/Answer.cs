@@ -10,7 +10,7 @@ namespace BusinessObjects.Model
         public Guid Id { get; set; }
         public string AnswerName { get; set; }
         public bool IsRight { get; set; }
-        public Guid? QuestionId { get; set; }
+        public Guid QuestionId { get; set; }
         public DateTime CreatedAt { get; set; }
 
         public virtual Question Question { get; set; }

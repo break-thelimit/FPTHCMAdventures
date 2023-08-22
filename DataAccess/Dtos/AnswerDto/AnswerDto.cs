@@ -13,7 +13,7 @@ namespace DataAccess.Dtos.AnswerDto
         public string AnswerName { get; set; }
         public bool IsRight { get; set; }
         public string QuestionName { get; set; }
-        public Guid? QuestionId { get; set; }
+        public Guid QuestionId { get; set; }
 
     }
 }

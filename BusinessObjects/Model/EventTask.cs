@@ -15,11 +15,12 @@ namespace BusinessObjects.Model
         public Guid Id { get; set; }
         public Guid TaskId { get; set; }
         public Guid EventId { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
         public double Point { get; set; }
-        public int? Priority { get; set; }
+        public int Priority { get; set; }
         public DateTime CreatedAt { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+        public string Status { get; set; }
 
         public virtual Event Event { get; set; }
         public virtual Task Task { get; set; }
